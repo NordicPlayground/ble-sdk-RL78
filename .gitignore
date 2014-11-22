@@ -1,0 +1,8 @@
+
+*.eww
+libraries/Examples/settings/
+*.dep
+*.ewd
+*.ewp
+libraries/Examples/ble_aci_transport_layer_verification/Debug/
+libraries/Examples/ble_aci_transport_layer_verification/settings/
