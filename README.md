@@ -38,17 +38,17 @@ Quick start guide
 
 1. Connect the nRF8001/nRF24L01+ shield adapter to YRPBRL78G13
 
-| YRPBRL78G13 <br> (J2 and J1 headers)  | nRF24L01+  <br> (P10 and P11 headers) |
-|:-------------------------|:----------------------|
-|**J1 pin1**   GND         |**P11 pin2**  GND      |
-|**J1 pin2**   VDD         |**P11 pin4**  5V       |
-|**EXTERNAL**  3.3V        |**P11 pin5**  3.3V     |
-|**J1 pin3**   p10/SCK00   |**P10 pin8**  ACI_SCLK |
-|**J1 pin4**   p11/SI00    |**P10 pin7**  ACI_MISO |
-|**J1 pin5**   p12/SO00    |**P10 pin6**  ACI_MOSI |
-|**J2 pin3**   p141        |**P10 pin5**  ACI_REQN |
-|**J2 pin4**   p140        |**P10 pin3**  ACI_RESET|
-|**J2 pin26**  p147        |**P10 pin2**  ACI_RDYN |
+  | YRPBRL78G13 <br> (J2 and J1 headers)  | nRF24L01+  <br> (P10 and P11 headers) |
+  |:-------------------------|:----------------------|
+  |**J1 pin1**   GND         |**P11 pin2**  GND      |
+  |**J1 pin2**   VDD         |**P11 pin4**  5V       |
+  |**EXTERNAL**  3.3V        |**P11 pin5**  3.3V     |
+  |**J1 pin3**   p10/SCK00   |**P10 pin8**  ACI_SCLK |
+  |**J1 pin4**   p11/SI00    |**P10 pin7**  ACI_MISO |
+  |**J1 pin5**   p12/SO00    |**P10 pin6**  ACI_MOSI |
+  |**J2 pin3**   p141        |**P10 pin5**  ACI_REQN |
+  |**J2 pin4**   p140        |**P10 pin3**  ACI_RESET|
+  |**J2 pin26**  p147        |**P10 pin2**  ACI_RDYN |
 
   There should be connected an external 3.3V source to the nRF24L01+ as unfortunately the YRPBRL78G13 does not provide any 3.3V output. 
   The 3.3V voltage is needed so the shield can convert the 5V logic from the YRPBRL78G13 to the needed 3.3V logic of the nRF2740 and vice versa.
@@ -69,22 +69,22 @@ Quick start guide
 
   The pins that have to be connected are the next
 
-| YRPBRL78G13 <br> (J1 header) |
-|:-----------------------:|
-|**J1 pin7**  P02/TxD1    |
-|**J1 pin8**  P02/RxD1    |
+  | YRPBRL78G13 <br> (J1 header) |
+  |:-----------------------:|
+  |**J1 pin7**  P02/TxD1    |
+  |**J1 pin8**  P02/RxD1    |
 
 3. Jumper configuration on YRPBRL78G13.
 
   The demo board YRPBRL78G13 has several jumpers that have to be set on specific positions so the BLE examples work properly. For further details about the jumpers functions please refer to the [RL78/G13 Stick (YRPBRL78G13)](http://am.renesas.com/products/tools/introductory_evaluation_tools/renesas_promo_board/yrpbrl78g13/Documentation.jsp) document.
 
-| Jumpers | Configuration |
-|:-------:|:-------------:|
-|   J3    |  put a jumper |
-|   J6    |      1-2      |
-|   J7    |      1-2      |
-|   J8    |      1-2      |
-|   J9    |      1-2      |
+  | Jumpers | Configuration |
+  |:-------:|:-------------:|
+  |   J3    |  put a jumper |
+  |   J6    |      1-2      |
+  |   J7    |      1-2      |
+  |   J8    |      1-2      |
+  |   J9    |      1-2      |
 
 4. IAR workspace creation for all examples.
 
