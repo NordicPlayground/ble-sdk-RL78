@@ -20,19 +20,23 @@
  */
 
 /**
- * echo project to verify the SPI/ACI connectivity
+ * My project template
  */
 
 /** @defgroup my_project my_project
 @{
 @ingroup projects
-@brief Echo project to loop data from the mcu to the nRF800 and back
+@brief Empty project that can be used as a template for new projects.
 
 @details
-This project is a test project to verify the SPI/ACI.
-The data in the ACI echo command send and the data
-received in the ACI echo event should be the same.
+This project is a firmware template for new projects.
+The project will run correctly in its current state, but does nothing.
+With this project you have a starting point for adding your own application functionality.
 
+The following instructions describe the steps to be made on the Windows PC:
+
+ -# Install the Master Control Panel on your computer. Connect the Master Emulator
+    (nRF2739) and make sure the hardware drivers are installed.
 
  */
 
@@ -41,8 +45,17 @@ received in the ACI echo event should be the same.
 **  HEADERS
 *******************************************************************************
 */
-#define DEBUG_ENABLE CODED_TRACES
 #include <lib_aci.h>
+#include <aci_setup.h>
+/**
+Put the nRF8001 setup in the RAM of the nRF8001.
+*/
+#include "ble_my_project_template_inc\services.h"
+/**
+Include the services_lock.h to put the setup in the OTP memory of the nRF8001.
+This would mean that the setup cannot be changed once put in.
+However this removes the need to do the setup of the nRF8001 on every reset.
+*/
 
 /*
 *******************************************************************************
@@ -64,7 +77,18 @@ __root const UCHAR opbyte3 = 0x85U;
 __root const UCHAR secuid[10] = 
   {0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU};
 
-// aci_struct that will contain
+  
+  
+#ifdef SERVICES_PIPE_TYPE_MAPPING_CONTENT
+    static services_pipe_type_mapping_t
+        services_pipe_type_mapping[NUMBER_OF_PIPES] = SERVICES_PIPE_TYPE_MAPPING_CONTENT;
+#else
+    #define NUMBER_OF_PIPES 0
+    static services_pipe_type_mapping_t * services_pipe_type_mapping = NULL;
+#endif
+static hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] PROGMEM = SETUP_MESSAGES_CONTENT;
+
+//@todo have an aci_struct that will contain
 // total initial credits
 // current credit
 // current state of the aci (setup/standby/active/sleep)
@@ -76,13 +100,8 @@ __root const UCHAR secuid[10] =
 // Current State of the the GATT client (Service Discovery)
 // Status of the bond (R) Peer address
 static struct aci_state_t aci_state;
-
 static hal_aci_evt_t aci_data;
-
-static uint8_t echo_data[] = { 0x00, 0xaa, 0x55, 0xff, 0x77, 0x55, 0x33, 0x22, 0x11, 0x44, 0x66, 0x88, 0x99, 0xbb, 0xdd, 0xcc, 0x00, 0xaa, 0x55, 0xff };
-static uint8_t aci_echo_cmd = 0;
-
-#define NUM_ECHO_CMDS    3
+//static hal_aci_data_t aci_cmd;
 
 /* Define how assert should function in the BLE library */
 void __ble_assert(const char *file, uint16_t line)
@@ -118,6 +137,21 @@ void setup(void)
   
   Serial.println(F("Arduino setup"));
 
+  /**
+  Point ACI data structures to the the setup data that the nRFgo studio generated for the nRF8001
+  */
+  if (NULL != services_pipe_type_mapping)
+  {
+    aci_state.aci_setup_info.services_pipe_type_mapping = &services_pipe_type_mapping[0];
+  }
+  else
+  {
+    aci_state.aci_setup_info.services_pipe_type_mapping = NULL;
+  }
+  aci_state.aci_setup_info.number_of_pipes    = NUMBER_OF_PIPES;
+  aci_state.aci_setup_info.setup_msgs         = setup_msgs;
+  aci_state.aci_setup_info.num_setup_msgs     = NB_SETUP_MESSAGES;
+  
   /*
   Tell the ACI library, the MCU to nRF8001 pin connections.
   The Active pin is optional and can be marked UNUSED
@@ -140,16 +174,18 @@ void setup(void)
   aci_state.aci_pins.interrupt_number       = 1;
 
   //The second parameter is for turning debug printing on for the ACI Commands and Events so they be printed on the Serial
-  hal_aci_tl_init(&(aci_state.aci_pins),true);
-  Serial.println(F("nRF8001 Reset done"));
+  hal_aci_tl_init(&(aci_state.aci_pins),false);
 }
 
 void loop()
 {
+  static bool setup_required = false;
+
   // We enter the if statement only when there is a ACI event available to be processed
   if (lib_aci_event_get(&aci_state, &aci_data))
   {
     aci_evt_t * aci_evt;
+
     aci_evt = &aci_data.evt;
     switch(aci_evt->evt_opcode)
     {
@@ -162,30 +198,29 @@ void loop()
         switch(aci_evt->params.device_started.device_mode)
         {
           case ACI_DEVICE_SETUP:
+            /**
+            When the device is in the setup mode
+            */
             Serial.println(F("Evt Device Started: Setup"));
-            lib_aci_test(ACI_TEST_MODE_DTM_UART);
+            setup_required = true;
             break;
+
           case ACI_DEVICE_STANDBY:
             Serial.println(F("Evt Device Started: Standby"));
-            break;
-          case ACI_DEVICE_TEST:
-          {
-            uint8_t i = 0;
-            Serial.println(F("Evt Device Started: Test"));
-            Serial.println(F("Started infinite Echo test"));
-            Serial.println(F("Repeat the test with all bytes in echo_data inverted."));
-            Serial.println(F("Waiting 4 seconds before the test starts...."));
-            delay(4000);
-            for(i=0; i<NUM_ECHO_CMDS; i++)
+            if (aci_evt->params.device_started.hw_error)
             {
-              lib_aci_echo_msg(sizeof(echo_data), &echo_data[0]);
-              aci_echo_cmd++;
+              delay(20); //Magic number used to make sure the HW error event is handled correctly.
             }
-          }
+            else
+            {
+            lib_aci_connect(180/* in seconds */, 0x0100 /* advertising interval 100ms*/);
+            Serial.println(F("Advertising started"));
+            }
             break;
         }
       }
         break; //ACI Device Started Event
+
       case ACI_EVT_CMD_RSP:
         //If an ACI command response event comes with an error -> stop
         if (ACI_STATUS_SUCCESS != aci_evt->params.cmd_rsp.cmd_status)
@@ -193,41 +228,94 @@ void loop()
           //ACI ReadDynamicData and ACI WriteDynamicData will have status codes of
           //TRANSACTION_CONTINUE and TRANSACTION_COMPLETE
           //all other ACI commands will have status code of ACI_STATUS_SCUCCESS for a successful command
-          Serial.print(F("ACI Command 0x"));
+          Serial.print(F("ACI Command "));
           Serial.println(aci_evt->params.cmd_rsp.cmd_opcode, HEX);
           Serial.println(F("Evt Cmd respone: Error. Arduino is in an while(1); loop"));
           while (1);
         }
         break;
-      case ACI_EVT_ECHO:
-        if (0 != memcmp(&echo_data[0], &(aci_evt->params.echo.echo_data[0]), sizeof(echo_data)))
+
+      case ACI_EVT_CONNECTED:
+        Serial.println(F("Evt Connected"));
+        break;
+
+      case ACI_EVT_PIPE_STATUS:
+        Serial.println(F("Evt Pipe Status"));
+        break;
+
+      case ACI_EVT_DISCONNECTED:
+        Serial.println(F("Evt Disconnected/Advertising timed out"));
+        lib_aci_connect(180/* in seconds */, 0x0100 /* advertising interval 100ms*/);
+        Serial.println(F("Advertising started"));
+        break;
+
+      case ACI_EVT_PIPE_ERROR:
+        //See the appendix in the nRF8001 Product Specication for details on the error codes
+        Serial.print(F("ACI Evt Pipe Error: Pipe #:"));
+        Serial.print(aci_evt->params.pipe_error.pipe_number, DEC);
+        Serial.print(F("  Pipe Error Code: 0x"));
+        Serial.println(aci_evt->params.pipe_error.error_code, HEX);
+
+        //Increment the credit available as the data packet was not sent.
+        //The pipe error also represents the Attribute protocol Error Response sent from the peer and that should not be counted
+        //for the credit.
+        if (ACI_STATUS_ERROR_PEER_ATT_ERROR != aci_evt->params.pipe_error.error_code)
         {
-          Serial.println(F("Error: Echo loop test failed. Verify the SPI connectivity on the PCB."));
+          aci_state.data_credit_available++;
         }
-        else
+        break;
+
+      case ACI_EVT_DATA_RECEIVED:
+        Serial.print(F("Pipe #: 0x"));
+        Serial.print(aci_evt->params.data_received.rx_data.pipe_number, HEX);
         {
-          Serial.println(F("Echo OK"));
-        }
-        if (NUM_ECHO_CMDS == aci_echo_cmd)
-        {
-          uint8_t i = 0;
-          aci_echo_cmd = 0;
-          for(i=0; i<NUM_ECHO_CMDS; i++)
+          int i=0;
+          Serial.print(F(" Data(Hex) : "));
+          for(i=0; i<aci_evt->len - 2; i++)
           {
-            lib_aci_echo_msg(sizeof(echo_data), &echo_data[0]);
-            aci_echo_cmd++;
+            Serial.print(aci_evt->params.data_received.rx_data.aci_data[i], HEX);
+            Serial.print(F(" "));
           }
         }
+        Serial.println(F(""));
+        break;
+
+      case ACI_EVT_HW_ERROR:
+        Serial.print(F("HW error: "));
+        Serial.println(aci_evt->params.hw_error.line_num, DEC);
+
+        for(uint8_t counter = 0; counter <= (aci_evt->len - 3); counter++)
+        {
+        Serial.write(aci_evt->params.hw_error.file_name[counter]); //uint8_t file_name[20];
+        }
+        Serial.println("");
+        lib_aci_connect(180/* in seconds */, 0x0050 /* advertising interval 50ms*/);
+        Serial.println(F("Advertising started"));
         break;
     }
   }
   else
   {
+    //Serial.println(F("No ACI Events available"));
     // No event in the ACI Event queue
     // Arduino can go to sleep now
     // Wakeup from sleep from the RDYN line
   }
+
+  /* setup_required is set to true when the device starts up and enters setup mode.
+   * It indicates that do_aci_setup() should be called. The flag should be cleared if
+   * do_aci_setup() returns ACI_STATUS_TRANSACTION_COMPLETE.
+   */
+  if(setup_required)
+  {
+    if (SETUP_SUCCESS == do_aci_setup(&aci_state))
+    {
+      setup_required = false;
+    }
+  }
 }
+
+
 
 
 

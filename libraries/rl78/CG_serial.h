@@ -383,6 +383,7 @@
 typedef struct SerialAdapter_t{  
   bool (*print) (uint8_t * string, uint8_t typeString);
   bool (*println) (uint8_t * string, uint8_t typeString);
+  bool (*write) (uint8_t value);
 }SerialAdapter;
 
 extern SerialAdapter Serial;
@@ -398,6 +399,7 @@ bool printHex(uint8_t hexNumber, uint8_t lineOption);
 bool printDec(uint8_t decNumber, uint8_t lineOption);
 bool selectPrintln(uint8_t * string, uint8_t typeString);
 bool selectPrintln(uint8_t * string, uint8_t typeString);
+bool writeByte(uint8_t value);
 void initializeSerialMonitor(SerialAdapter * initSerial);
 bool getUART(uint8_t * uartBuffer, uint8_t * uartLenght);
 uint8_t CSI00_SendReceiveData(UCHAR txByte);

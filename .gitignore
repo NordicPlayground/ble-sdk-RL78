@@ -6,3 +6,7 @@ libraries/Examples/settings/
 *.ewp
 libraries/Examples/ble_aci_transport_layer_verification/Debug/
 libraries/Examples/ble_aci_transport_layer_verification/settings/
+libraries/Examples/ble_my_project_template/Debug/
+libraries/Examples/ble_my_project_template/settings/
+libraries/Examples/ble_A_Hello_World_Program/Debug/
+libraries/Examples/ble_A_Hello_World_Program/settings/

@@ -92,6 +92,13 @@
   //For deleting the flash characteristic on the Serial.Print and make it
   //compatible
   #define F(X) (X)
+
+  //For ChipKit neither PROGMEM or PSTR are needed for PIC32
+  #define PROGMEM
+  #define PSTR(s) (s)  
+
+  //Just to have a value as the RL78 hardware is already configured.
+  #define SPI_CLOCK_DIV8   0   
   
   #define HIGH 1
   #define LOW  0

@@ -38,12 +38,11 @@
 **  Global define
 *******************************************************************************
 */
-volatile UCHAR  *gpUart1TxAddress;  /* uart1 transmit buffer address */
-volatile USHORT gUart1TxCnt;        /* uart1 transmit data number */
+volatile uint8_t * addByte;    //Address of the next byte to be transmitted
+volatile uint8_t TXcnt;       //Number of pending bytes to be transmitted
+volatile uint8_t RXcnt;       //Number of received bytes
 
-volatile USHORT gUart1RxCnt;        /* uart1 receive data number */
-
-uint8_t bufferUARTtx[BUFFER_SIZE+1];   //Can transmit up to 128 bytes. It needs the '\0' string delimitator at the end
+uint8_t bufferUARTtx[BUFFER_SIZE];     //Can transmit up to 128 bytes.
 uint8_t bufferUARTrx[BUFFER_SIZE];     //Can receive up to 128 bytes.
 
 SerialAdapter Serial;          //Structure used to convert the Arduino Serial commands into plain C
@@ -59,9 +58,8 @@ volatile uint8_t RxSPIByte;
 void UART1_Init(void);
 void UART1_Start(void);
 void UART1_Stop(void);
-bool UART1_SendData(UCHAR *txbuf, USHORT txnum);
-__interrupt void MD_INTST1(void);
-__interrupt void MD_INTSR1(void);
+__interrupt void UARTtxInterrupt(void);
+__interrupt void UARTrxInterrupt(void);
 void CSI00_Init(void);
 void CSI00_Start(void);
 void CSI00_Stop(void);
@@ -173,7 +171,7 @@ void UART1_Start(void)
   SS0 |= _0008_SAU_CH3_START_TRG_ON | _0004_SAU_CH2_START_TRG_ON; /* enable UART1 receive and transmit */
   
   //Reset counters for UART reception
-  gUart1RxCnt = 0;
+  RXcnt = 0;
 }
 
 /*
@@ -204,43 +202,6 @@ void UART1_Stop(void)
 **-----------------------------------------------------------------------------
 **
 **  Abstract:
-**  This function sends UART1 data.
-**
-**  Parameters:
-**  txbuf: transfer buffer pointer
-**  txnum: buffer size
-**
-**  Returns:
-**  True:  Succesful UART transmission
-**  False: Unsuccesful UART transmission
-**
-**-----------------------------------------------------------------------------
-*/
-bool UART1_SendData(UCHAR* txbuf, USHORT txnum)
-{
-  bool status = true;
-
-  if (txnum < 1U)
-  {
-    status = false;
-  }
-  else
-  {
-    gpUart1TxAddress = txbuf;
-    gUart1TxCnt = txnum;
-    STMK1 = 1U; /* disable INTST1 interrupt */
-    TXD1 = *gpUart1TxAddress;
-    gpUart1TxAddress++;
-    gUart1TxCnt--;
-    STMK1 = 0U; /* enable INTST1 interrupt */
-  }
-
-  return (status);
-}
-/*
-**-----------------------------------------------------------------------------
-**
-**  Abstract:
 **  This function sends through UART a string.
 **
 **  Parameters:
@@ -255,84 +216,102 @@ bool UART1_SendData(UCHAR* txbuf, USHORT txnum)
 */
 bool printString(uint8_t * string, uint8_t lineOption)
 {
-  uint8_t newLine[] = {'\n'};
   uint8_t maxSize = 0;
-  uint8_t index = 0;
   uint8_t sizeString = 0;
   
-  if(bufferUARTtx[0] == '\0')   //The buffer is empty and ready to recieve more data to send
+  if(TXcnt == 0)   //There are no more characters to send. The buffer is empty and ready to receive more data.
   {
+    sizeString = strlen(string);
     if(lineOption == NO_LINE){
-      if (strlen(string) > BUFFER_SIZE)
+      if (sizeString > BUFFER_SIZE)
       {
-        strncpy(bufferUARTtx,string,BUFFER_SIZE);
+        memcpy(bufferUARTtx, string, BUFFER_SIZE);
+        TXcnt = BUFFER_SIZE;
       }
       else
       {
-        strcpy(bufferUARTtx, string);
+        memcpy(bufferUARTtx, string, sizeString);
+        TXcnt = sizeString;
       }
       
     }else if(lineOption == WITH_LINE){
-      if (strlen(string) > BUFFER_SIZE - 1)    //Smaller that the 128 bytes as we need to include the '\n' character
+      if (sizeString > (BUFFER_SIZE - 1))    //127 bytes as still needs to include the '\n' character
       {
-        strncpy(bufferUARTtx,string,BUFFER_SIZE -1);
-        strcat(bufferUARTtx, newLine);
+        memcpy(bufferUARTtx, string, (BUFFER_SIZE - 1));
+        //Copy the '\n' character to the 128 location. 129 location for '\0'
+        bufferUARTtx[BUFFER_SIZE - 1] = '\n';
+        TXcnt = BUFFER_SIZE;
       }
       else
       {
-        strcpy(bufferUARTtx, string);
-        strcat(bufferUARTtx, newLine);
+        memcpy(bufferUARTtx , string, sizeString);
+        //Counter is the pending chars on buffer and the new string
+        TXcnt = sizeString;
+        //Add the '\n' char
+        bufferUARTtx[TXcnt++] = '\n';
       }
     }
     
-    bufferUARTtx[BUFFER_SIZE] = '\0';
-    return (UART1_SendData(bufferUARTtx, strlen(bufferUARTtx)));
+    //Write to the UART register
+    STMK1 = 1U; //Disable UART Tx Interrupt
+    addByte = bufferUARTtx;
+    TXD1 = *addByte;
+    addByte++;
+    TXcnt--;
+    STMK1 = 0U; //Enable UART Tx Interrupt
+    
+    return true;
   }
   else
   {
-    STMK1 = 1U; /* disable INTST1 interrupt */
+    STMK1 = 1U; //Disable UART Tx Interrupt
+    
     //First move the pending characters to the first position of the UARTbuffer
-    index = (uint8_t) (gpUart1TxAddress - bufferUARTtx);
-    //One extra character is added due to the '\0' character at the end of the string
-    memmove(bufferUARTtx, (void *)gpUart1TxAddress, strlen(bufferUARTtx) - index + 1);
+    memmove(bufferUARTtx, (void *)addByte, TXcnt);
     //Obtain the maximum free spaces still in the buffer.
-    //One less because the buffer is one character bigger due to the '\0' character
-    maxSize = BUFFER_SIZE - strlen(bufferUARTtx) - 1;
+    maxSize = BUFFER_SIZE - TXcnt;
     sizeString = strlen(string);
     
     if(lineOption == NO_LINE){
       if (sizeString > maxSize)
       {
-        strncat(bufferUARTtx,string,maxSize);
+        memcpy((bufferUARTtx + TXcnt), string, maxSize);
+        TXcnt = BUFFER_SIZE;
       }
       else
       {
-        strcat(bufferUARTtx, string);
+        memcpy((bufferUARTtx + TXcnt), string, sizeString);
+        TXcnt = TXcnt + sizeString;
       }
       
     }else if(lineOption == WITH_LINE){
       //The string is bigger than the available space
       //maxSize - 1 because we still need to add the '\n' character
-      if (sizeString > (maxSize - 1))    
+      if (sizeString > (maxSize - 1))
       {
-        strncat(bufferUARTtx,string,maxSize - 1);
-        strcat(bufferUARTtx, newLine);
+        //Copy the string
+        memcpy((bufferUARTtx + TXcnt), string, (maxSize - 1));
+        //Copy the '\n' character to the 128 location. 129 location for '\0'
+        bufferUARTtx[BUFFER_SIZE - 1] = '\n';
+        TXcnt = BUFFER_SIZE;
       }
       else
       {
-        strcat(bufferUARTtx, string);
-        strcat(bufferUARTtx, newLine);
+        memcpy((bufferUARTtx + TXcnt), string, sizeString);
+        //Counter is the pending chars on buffer and the new string
+        TXcnt = TXcnt + sizeString;
+        //Add the '\n' char
+        bufferUARTtx[TXcnt++] = '\n';
       }
     }
     
-    bufferUARTtx[BUFFER_SIZE] = '\0';
-    //Set the character pointer and counter to the new values for continuing UART transmission
-    gpUart1TxAddress = bufferUARTtx;
-    gUart1TxCnt = strlen(bufferUARTtx);
-    STMK1 = 0U; /* enable INTST1 interrupt */
+    //Set the character pointer to location 0 of buffer
+    addByte = bufferUARTtx;
+    
+    STMK1 = 0U; //Enable UART Tx Interrupt
     
     //If the buffer is almost full, wait until it gets emptied a little
-    if(gUart1TxCnt > 64){
+    if(TXcnt > 64){
       delay(5);
     }
 
@@ -358,68 +337,67 @@ bool printString(uint8_t * string, uint8_t lineOption)
 bool printHex(uint8_t hexNumber, uint8_t lineOption)
 {
   uint8_t residueNumber = 0;
-  uint8_t charCounter = 0;
-  
-  uint8_t index = 0;
-  if(bufferUARTtx[0] == '\0')   //The buffer is empty and ready to recieve more data to send
+
+  if(TXcnt == 0)   //There are no more characters to send. The buffer is empty and ready to receive more data.
   {
-    bufferUARTtx[charCounter++] = '0';
-    bufferUARTtx[charCounter++] = 'x';
+    bufferUARTtx[TXcnt++] = '0';
+    bufferUARTtx[TXcnt++] = 'x';
     
     if(hexNumber > 0x0F)
     {
       residueNumber = hexNumber % 16;
       hexNumber = hexNumber / 16;
-      bufferUARTtx[charCounter++] = tableAscii[hexNumber];
+      bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
       hexNumber = residueNumber;
     }
     
-    bufferUARTtx[charCounter++] = tableAscii[hexNumber];
+    bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
     
     if(lineOption == WITH_LINE){
-      bufferUARTtx[charCounter++] = '\n';
+      bufferUARTtx[TXcnt++] = '\n';
     }
+
+    //Write to the UART register
+    STMK1 = 1U; //Disable UART Tx Interrupt
+    addByte = bufferUARTtx;
+    TXD1 = *addByte;
+    addByte++;
+    TXcnt--;
+    STMK1 = 0U; //Enable UART Tx Interrupt
     
-    bufferUARTtx[charCounter] = '\0';
-    return (UART1_SendData(bufferUARTtx, strlen(bufferUARTtx)));
+    return true;
     
   }
   else
   {
-    STMK1 = 1U; /* disable INTST1 interrupt */
+    STMK1 = 1U; //Disable INTST1 interrupt
     //First move the pending characters to the first position of the UARTbuffer
-    index = (uint8_t) (gpUart1TxAddress - bufferUARTtx);
-    //One extra character is added due to the '\0' character at the end of the string
-    memmove(bufferUARTtx, (void *)gpUart1TxAddress, strlen(bufferUARTtx) - index + 1);
-    charCounter = strlen(bufferUARTtx);    
+    memmove(bufferUARTtx, (void *)addByte, TXcnt);   
     
-    bufferUARTtx[charCounter++] = '0';
-    bufferUARTtx[charCounter++] = 'x';
+    bufferUARTtx[TXcnt++] = '0';
+    bufferUARTtx[TXcnt++] = 'x';
     
     if(hexNumber > 0x0F)
     {
       residueNumber = hexNumber % 16;
       hexNumber = hexNumber / 16;
-      bufferUARTtx[charCounter++] = tableAscii[hexNumber];
+      bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
       hexNumber = residueNumber;
     }
     
-    bufferUARTtx[charCounter++] = tableAscii[hexNumber];
+    bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
     
      if(lineOption == WITH_LINE){
-      bufferUARTtx[charCounter++] = '\n';
+      bufferUARTtx[TXcnt++] = '\n';
     }
     
-    bufferUARTtx[charCounter] = '\0';
-    
-    bufferUARTtx[BUFFER_SIZE] = '\0';
     //Set the character pointer and counter to the new values for continuing UART transmission
-    gpUart1TxAddress = bufferUARTtx;
-    gUart1TxCnt = strlen(bufferUARTtx);
+    addByte = bufferUARTtx;
+    
     STMK1 = 0U; /* enable INTST1 interrupt */
     
     //If the buffer is almost full, wait until it gets emptied a little
-    if(gUart1TxCnt > 100){
+    if(TXcnt > 100){
       delay(5);
     }
 
@@ -445,16 +423,14 @@ bool printHex(uint8_t hexNumber, uint8_t lineOption)
 bool printDec(uint8_t decNumber, uint8_t lineOption)
 {
   uint8_t residueNumber = 0;
-  uint8_t charCounter = 0;
   
-  uint8_t index = 0;
-  if(bufferUARTtx[0] == '\0')   //The buffer is empty and ready to recieve more data to send
+  if(TXcnt == 0)
   {
     if(decNumber > 99)
     {
       residueNumber = decNumber % 100;
       decNumber = decNumber / 100;
-      bufferUARTtx[charCounter++] = tableAscii[decNumber];
+      bufferUARTtx[TXcnt++] = tableAscii[decNumber];
       decNumber = residueNumber;
     }
     
@@ -462,35 +438,38 @@ bool printDec(uint8_t decNumber, uint8_t lineOption)
     {
       residueNumber = decNumber % 10;
       decNumber = decNumber / 10;
-      bufferUARTtx[charCounter++] = tableAscii[decNumber];
+      bufferUARTtx[TXcnt++] = tableAscii[decNumber];
       decNumber = residueNumber;
     }
     
-    bufferUARTtx[charCounter++] = tableAscii[decNumber];
+    bufferUARTtx[TXcnt++] = tableAscii[decNumber];
     
     if(lineOption == WITH_LINE){
-      bufferUARTtx[charCounter++] = '\n';
+      bufferUARTtx[TXcnt++] = '\n';
     }
     
-    bufferUARTtx[charCounter] = '\0';
-    return (UART1_SendData(bufferUARTtx, strlen(bufferUARTtx)));
+    //Write to the UART register
+    STMK1 = 1U; //Disable UART Tx Interrupt
+    addByte = bufferUARTtx;
+    TXD1 = *addByte;
+    addByte++;
+    TXcnt--;
+    STMK1 = 0U; //Enable UART Tx Interrupt
+    
+    return true;
     
   }
   else
   {
-    STMK1 = 1U; /* disable INTST1 interrupt */
+    STMK1 = 1U; //Disable INTST1 interrupt
     //First move the pending characters to the first position of the UARTbuffer
-    index = (uint8_t) (gpUart1TxAddress - bufferUARTtx);
-    //One extra character is added due to the '\0' character at the end of the string
-    memmove(bufferUARTtx, (void *)gpUart1TxAddress, strlen(bufferUARTtx) - index + 1);
-    
-    charCounter = strlen(bufferUARTtx);    
+    memmove(bufferUARTtx, (void *)addByte, TXcnt);
     
     if(decNumber > 99)
     {
       residueNumber = decNumber % 100;
       decNumber = decNumber / 100;
-      bufferUARTtx[charCounter++] = tableAscii[decNumber];
+      bufferUARTtx[TXcnt++] = tableAscii[decNumber];
       decNumber = residueNumber;
     }
     
@@ -498,26 +477,22 @@ bool printDec(uint8_t decNumber, uint8_t lineOption)
     {
       residueNumber = decNumber % 10;
       decNumber = decNumber / 10;
-      bufferUARTtx[charCounter++] = tableAscii[decNumber];
+      bufferUARTtx[TXcnt++] = tableAscii[decNumber];
       decNumber = residueNumber;
     }
     
-    bufferUARTtx[charCounter++] = tableAscii[decNumber];
+    bufferUARTtx[TXcnt++] = tableAscii[decNumber];
     
     if(lineOption == WITH_LINE){
-      bufferUARTtx[charCounter++] = '\n';
+      bufferUARTtx[TXcnt++] = '\n';
     }
     
-    bufferUARTtx[charCounter] = '\0';
-    
-    bufferUARTtx[BUFFER_SIZE] = '\0';
     //Set the character pointer and counter to the new values for continuing UART transmission
-    gpUart1TxAddress = bufferUARTtx;
-    gUart1TxCnt = strlen(bufferUARTtx);
+    addByte = bufferUARTtx;
     STMK1 = 0U; /* enable INTST1 interrupt */
 
     //If the buffer is almost full, wait until it gets emptied a little
-    if(gUart1TxCnt > 100){
+    if(TXcnt > 100){
       delay(5);
     }
 
@@ -537,8 +512,8 @@ bool printDec(uint8_t decNumber, uint8_t lineOption)
 **  typeString: selects wheter it is string, decimal or hex
 **
 **  Returns:
-**  True:  Succesful UART transmission
-**  False: Unsuccesful UART transmission
+**  True:  Successful UART transmission
+**  False: Unsuccessful UART transmission
 **
 **-----------------------------------------------------------------------------
 */
@@ -600,6 +575,30 @@ bool selectPrintln(uint8_t * string, uint8_t typeString)
   return result;
 }
 
+bool writeByte(uint8_t value){
+  bool status = false;
+
+  if(TXcnt == 0){
+    bufferUARTtx[TXcnt++] = value;
+    status =  true;
+    
+    //Write to the UART register
+    STMK1 = 1U; //Disable UART Tx Interrupt
+    addByte = bufferUARTtx;
+    TXD1 = *addByte;
+    addByte++;
+    TXcnt--;
+    STMK1 = 0U; //Enable UART Tx Interrupt     
+    
+  }else{
+    STMK1 = 1U; //Disable UART Tx Interrupt
+    bufferUARTtx[TXcnt++] = value;
+    STMK1 = 0U; //Enable UART Tx Interrupt       
+  }
+  
+  return status; 
+}
+
 /*
 **-----------------------------------------------------------------------------
 **
@@ -620,6 +619,7 @@ void initializeSerialMonitor(SerialAdapter * initSerial)
 {
     initSerial->print = selectPrint;
     initSerial->println = selectPrintln;
+    initSerial->write = writeByte;
 }
 
 /*
@@ -637,17 +637,17 @@ void initializeSerialMonitor(SerialAdapter * initSerial)
 **-----------------------------------------------------------------------------
 */
 #pragma vector = INTST1_vect
-__interrupt void MD_INTST1(void)
+__interrupt void UARTtxInterrupt(void)
 {
-  if (gUart1TxCnt > 0U)
+  if (TXcnt > 0U)
   {
-    TXD1 = *gpUart1TxAddress;
-    gpUart1TxAddress++;
-    gUart1TxCnt--;
+    TXD1 = *addByte;
+    addByte++;
+    TXcnt--;
   }
   else
   {
-    bufferUARTtx[0]='\0';    //Transmition finished. Clear the first bit of the Buffer so more data can be sent
+    TXcnt = 0;         //Be sure to set the counter to 0
   }
 }
 
@@ -673,7 +673,7 @@ bool existsNewLine(uint8_t * targetChar)
   
   for(index = 0; index < 20; index++)
   {
-    if(bufferUARTrx[index] == '\n'){
+    if(bufferUARTrx[index] == '\n'){      
       *targetChar = index;
       status = true;
       break;
@@ -701,45 +701,54 @@ bool existsNewLine(uint8_t * targetChar)
 */
 bool getUART(uint8_t * uartBuffer, uint8_t * uartLenght)
 {
-  uint8_t i = 0;
   uint8_t newLinePosition = 0;
+  uint8_t i = 0;
   bool status = true;
   
   SRMK1 = 1U; /* disable INTSR1 interrupt */
   
-  if(existsNewLine(&newLinePosition))        //Copy data if there is a '\n' character between the first 20 characters
-  {
-    strncpy(uartBuffer,bufferUARTrx,newLinePosition);
-    *uartLenght = newLinePosition;
-    
-    if(gUart1RxCnt == (newLinePosition + 1))   //Check if the '\n' was the last character
+  if(RXcnt > 0){
+    if(existsNewLine(&newLinePosition))        //Copy data if there is a '\n' character between the first 20 characters
     {
-      gUart1RxCnt = 0;
-    }
-    else                                       //Otherwise move forward the values of the Rx UART buffer, except the '\n'
-    {
-      newLinePosition++;
-      for (i = 0; i < (BUFFER_SIZE - newLinePosition); i++)
+      memcpy(uartBuffer, bufferUARTrx, newLinePosition);
+      *uartLenght = newLinePosition;
+      
+      if(RXcnt == (newLinePosition + 1))   //Check if the '\n' was the last character
       {
-        bufferUARTrx[i] = bufferUARTrx[i + newLinePosition]; 
+        RXcnt = 0;
+        //Clean the buffer
+        for(i = 0; i < BUFFER_SIZE; i++){
+          bufferUARTrx[i] = '\0';
+        }
       }
-      gUart1RxCnt = gUart1RxCnt - newLinePosition;
+      else                  //Otherwise move forward the values of the Rx UART buffer, except the '\n'
+      {
+        newLinePosition++;
+        memmove(bufferUARTrx, (bufferUARTrx + newLinePosition), RXcnt - newLinePosition);
+        RXcnt = RXcnt - newLinePosition;
+        //Clear the rest of the buffer
+        for(i = RXcnt; i < BUFFER_SIZE; i++){
+          bufferUARTrx[i] = '\0';
+        }
+      }
+      
     }
-    
-  }
-  else if(gUart1RxCnt > 19)                 //Copy data if there are more than 20 characters
-  {
-    strncpy(uartBuffer,bufferUARTrx,20);
-    *uartLenght = 20;
-    for (i = 0; i < (BUFFER_SIZE - 20); i++)
+    else if(RXcnt > 20)                 //Copy data if there are more than 20 characters
     {
-      bufferUARTrx[i] = bufferUARTrx[i + 20]; //Move forward the values of the Rx UART buffer
+      memcpy(uartBuffer, bufferUARTrx, 20);
+      *uartLenght = 20;
+      memmove(bufferUARTrx, (bufferUARTrx + 20), RXcnt - 20);
+      RXcnt = RXcnt - 20;
+      Serial.println("Serial input truncated");
     }
-    gUart1RxCnt = gUart1RxCnt - 19;
+    else
+    {
+      status = false;
+    }
   }
   else
   {
-    status = false;
+      status = false;
   }
   
   SRMK1 = 0U; /* enable INTSR1 interrupt */
@@ -762,16 +771,16 @@ bool getUART(uint8_t * uartBuffer, uint8_t * uartLenght)
 **-----------------------------------------------------------------------------
 */
 #pragma vector = INTSR1_vect
-__interrupt void MD_INTSR1(void)
+__interrupt void UARTrxInterrupt(void)
 {
-  UCHAR rx_data;
+  uint8_t rx_data;
 
   rx_data = RXD1;
   
   //While you have space in the buffer just copy the data received via UART
-  if (gUart1RxCnt < BUFFER_SIZE)
+  if (RXcnt < BUFFER_SIZE)
   {
-    bufferUARTrx[gUart1RxCnt++] = rx_data;
+    bufferUARTrx[RXcnt++] = rx_data;
   }
 }
 
