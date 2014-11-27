@@ -51,6 +51,7 @@ bool aci_queue_dequeue(aci_queue_t *aci_q, hal_aci_data_t *p_data)
   {
     return false;
   }
+
   memcpy((uint8_t *)p_data, (uint8_t *)&(aci_q->aci_data[aci_q->head % ACI_QUEUE_SIZE]), sizeof(hal_aci_data_t));
   ++aci_q->head;
 
