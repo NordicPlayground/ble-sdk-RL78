@@ -1,0 +1,3072 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:42
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\BLE\lib_aci.cpp
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\lib_aci.cpp" --core rl78_1
+#        --code_model near --data_model near --near_const_location rom0 -o
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\lib_aci.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\lib_aci.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\BLE\lib_aci.cpp
+      1          /* Copyright (c) 2014, Nordic Semiconductor ASA
+      2           *
+      3           * Permission is hereby granted, free of charge, to any person obtaining a copy
+      4           * of this software and associated documentation files (the "Software"), to deal
+      5           * in the Software without restriction, including without limitation the rights
+      6           * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      7           * copies of the Software, and to permit persons to whom the Software is
+      8           * furnished to do so, subject to the following conditions:
+      9           *
+     10           * The above copyright notice and this permission notice shall be included in all
+     11           * copies or substantial portions of the Software.
+     12           *
+     13           * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     14           * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     15           * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     16           * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     17           * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     18           * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+     19           * SOFTWARE.
+     20           */
+     21          
+     22          /** @file
+     23            @brief Implementation of the ACI library.
+     24           */
+     25          
+     26          #include "hal_platform.h"
+     27          #include "aci.h"
+     28          #include "aci_cmds.h"
+     29          #include "aci_evts.h"
+     30          #include "aci_protocol_defines.h"
+     31          #include "acilib_defs.h"
+     32          #include "acilib_if.h"
+     33          #include "hal_aci_tl.h"
+     34          #include "aci_queue.h"
+     35          #include "lib_aci.h"
+     36          
+     37          
+     38          #define LIB_ACI_DEFAULT_CREDIT_NUMBER   1
+     39          
+     40          /*
+     41          Global additionally used used in aci_setup 
+     42          */
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     43          hal_aci_data_t  msg_to_send;
+   \                     msg_to_send:
+   \   000000                       DS 33
+   \   000021                       REQUIRE __INIT_NEAR_Z
+     44          
+     45          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     46          static services_pipe_type_mapping_t * p_services_pipe_type_map;
+   \                     p_services_pipe_type_map:
+   \   000000                       DS 2
+   \   000002                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     47          static hal_aci_data_t *               p_setup_msgs;
+   \                     p_setup_msgs:
+   \   000000                       DS 2
+   \   000002                       REQUIRE __INIT_NEAR_Z
+     48          
+     49          
+     50          
+     51          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     52          static bool is_request_operation_pending;
+   \                     is_request_operation_pending:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     53          static bool is_indicate_operation_pending;
+   \                     is_indicate_operation_pending:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     54          static bool is_open_remote_pipe_pending;
+   \                     is_open_remote_pipe_pending:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     55          static bool is_close_remote_pipe_pending;
+   \                     is_close_remote_pipe_pending:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+     56          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     57          static uint8_t request_operation_pipe = 0;
+   \                     request_operation_pipe:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     58          static uint8_t indicate_operation_pipe = 0;
+   \                     indicate_operation_pipe:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+     59          
+     60          
+     61          // The following structure (aci_cmd_params_open_adv_pipe) will be used to store the complete command 
+     62          // including the pipes to be opened. 
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     63          static aci_cmd_params_open_adv_pipe_t aci_cmd_params_open_adv_pipe; 
+   \                     aci_cmd_params_open_adv_pipe:
+   \   000000                       DS 8
+   \   000008                       REQUIRE __INIT_NEAR_Z
+     64          
+     65          
+     66          
+     67          extern aci_queue_t    aci_rx_q;
+     68          extern aci_queue_t    aci_tx_q;
+     69          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     70          bool lib_aci_is_pipe_available(aci_state_t *aci_stat, uint8_t pipe)
+   \                     lib_aci_is_pipe_available:
+     71          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 16                    MOVW      HL, AX             ;; 1 cycle
+     72            uint8_t byte_idx;
+     73          
+     74            byte_idx = pipe / 8;
+   \   000003 5008                  MOV       X, #0x8            ;; 1 cycle
+   \   000005 63                    MOV       A, B               ;; 1 cycle
+   \   000006 FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   000009 74                    MOV       E, A               ;; 1 cycle
+     75            if (aci_stat->pipes_open_bitmap[byte_idx] & (0x01 << (pipe % 8)))
+   \   00000A 5008                  MOV       X, #0x8            ;; 1 cycle
+   \   00000C 63                    MOV       A, B               ;; 1 cycle
+   \   00000D FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000010 72                    MOV       C, A               ;; 1 cycle
+   \   000011 E6                    ONEW      AX                 ;; 1 cycle
+   \   000012 FD....                CALL      N:?I_LSH_L02       ;; 3 cycles
+   \   000015 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   000017 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000018 05                    ADDW      AX, DE             ;; 1 cycle
+   \   000019 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001A 8C1C                  MOV       A, [HL+0x1C]       ;; 1 cycle
+   \   00001C 6158                  AND       A, X               ;; 1 cycle
+   \   00001E D1                    CMP0      A                  ;; 1 cycle
+   \   00001F DD03                  BZ        ??lib_aci_command_queue_full_0  ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 30 cycles
+     76            {
+     77              return(true);
+   \   000021 E1                    ONEB      A                  ;; 1 cycle
+   \   000022 EF01                  BR        S:??lib_aci_command_queue_full_1  ;; 3 cycles
+   \   000024                       ; ------------------------------------- Block: 4 cycles
+     78            }
+     79            return(false);
+   \                     ??lib_aci_command_queue_full_0:
+   \   000024 F1                    CLRB      A                  ;; 1 cycle
+   \   000025                       ; ------------------------------------- Block: 1 cycles
+   \                     ??lib_aci_command_queue_full_1:
+   \   000025 C4                    POP       DE                 ;; 1 cycle
+   \   000026 C2                    POP       BC                 ;; 1 cycle
+   \   000027 D7                    RET                          ;; 6 cycles
+   \   000028                       ; ------------------------------------- Block: 8 cycles
+   \   000028                       ; ------------------------------------- Total: 43 cycles
+   \   000028                       REQUIRE ?CLRL78_V1_0_L00
+     80          }
+     81          
+     82          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     83          bool lib_aci_is_pipe_closed(aci_state_t *aci_stat, uint8_t pipe)
+   \                     lib_aci_is_pipe_closed:
+     84          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 16                    MOVW      HL, AX             ;; 1 cycle
+     85            uint8_t byte_idx;
+     86          
+     87            byte_idx = pipe / 8;
+   \   000003 5008                  MOV       X, #0x8            ;; 1 cycle
+   \   000005 63                    MOV       A, B               ;; 1 cycle
+   \   000006 FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   000009 74                    MOV       E, A               ;; 1 cycle
+     88            if (aci_stat->pipes_closed_bitmap[byte_idx] & (0x01 << (pipe % 8)))
+   \   00000A 5008                  MOV       X, #0x8            ;; 1 cycle
+   \   00000C 63                    MOV       A, B               ;; 1 cycle
+   \   00000D FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000010 72                    MOV       C, A               ;; 1 cycle
+   \   000011 E6                    ONEW      AX                 ;; 1 cycle
+   \   000012 FD....                CALL      N:?I_LSH_L02       ;; 3 cycles
+   \   000015 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   000017 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000018 05                    ADDW      AX, DE             ;; 1 cycle
+   \   000019 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001A 8C24                  MOV       A, [HL+0x24]       ;; 1 cycle
+   \   00001C 6158                  AND       A, X               ;; 1 cycle
+   \   00001E D1                    CMP0      A                  ;; 1 cycle
+   \   00001F DD03                  BZ        ??lib_aci_command_queue_full_2  ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 30 cycles
+     89            {
+     90              return(true);
+   \   000021 E1                    ONEB      A                  ;; 1 cycle
+   \   000022 EF01                  BR        S:??lib_aci_command_queue_full_3  ;; 3 cycles
+   \   000024                       ; ------------------------------------- Block: 4 cycles
+     91            }
+     92            return(false);
+   \                     ??lib_aci_command_queue_full_2:
+   \   000024 F1                    CLRB      A                  ;; 1 cycle
+   \   000025                       ; ------------------------------------- Block: 1 cycles
+   \                     ??lib_aci_command_queue_full_3:
+   \   000025 C4                    POP       DE                 ;; 1 cycle
+   \   000026 C2                    POP       BC                 ;; 1 cycle
+   \   000027 D7                    RET                          ;; 6 cycles
+   \   000028                       ; ------------------------------------- Block: 8 cycles
+   \   000028                       ; ------------------------------------- Total: 43 cycles
+   \   000028                       REQUIRE ?CLRL78_V1_0_L00
+     93          }
+     94          
+     95          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     96          bool lib_aci_is_discovery_finished(aci_state_t *aci_stat)
+   \                     lib_aci_is_discovery_finished:
+     97          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+   \   000000 16                    MOVW      HL, AX             ;; 1 cycle
+     98            return(aci_stat->pipes_open_bitmap[0]&0x01);
+   \   000001 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000002 041C00                ADDW      AX, #0x1C          ;; 1 cycle
+   \   000005 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000006 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000007 5C01                  AND       A, #0x1            ;; 1 cycle
+   \   000009 D7                    RET                          ;; 6 cycles
+   \   00000A                       ; ------------------------------------- Block: 12 cycles
+   \   00000A                       ; ------------------------------------- Total: 12 cycles
+   \   00000A                       REQUIRE ?CLRL78_V1_0_L00
+     99          }
+    100          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    101          void lib_aci_board_init(aci_state_t *aci_stat)
+   \                     lib_aci_board_init:
+    102          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 2
+    103            hal_aci_evt_t *aci_data = NULL;
+   \   000003 F6                    CLRW      AX                 ;; 1 cycle
+   \   000004 14                    MOVW      DE, AX             ;; 1 cycle
+    104            aci_data = (hal_aci_evt_t *)&msg_to_send;
+   \   000005 36....                MOVW      HL, #msg_to_send   ;; 1 cycle
+   \   000008 C7                    PUSH      HL                 ;; 1 cycle
+   \   000009 C4                    POP       DE                 ;; 1 cycle
+    105                    
+    106            if (REDBEARLAB_SHIELD_V1_1 == aci_stat->aci_pins.board_name)
+   \   00000A A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00000C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00000D 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00000E 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000010 61E8                  SKZ                          ;; 4 cycles
+   \   000012 ED....                BR        N:??lib_aci_command_queue_full_4  ;; 4 cycles
+   \   000015                       ; ------------------------------------- Block: 16 cycles
+    107            {
+    108              /*
+    109              The Bluetooth low energy Arduino shield v1.1 requires about 100ms to reset.
+    110              This is not required for the nRF2740, nRF2741 modules
+    111              */
+    112              delay(100);
+   \   000015 306400                MOVW      AX, #0x64          ;; 1 cycle
+   \   000018 FD....                CALL      delay              ;; 3 cycles
+    113            
+    114              /*
+    115              Send the soft reset command to the nRF8001 to get the nRF8001 to a known state.
+    116              */
+    117              lib_aci_radio_reset();
+   \   00001B FD....                CALL      lib_aci_radio_reset  ;; 3 cycles
+   \   00001E                       ; ------------------------------------- Block: 7 cycles
+    118            
+    119              while (1)
+    120              {
+    121              /*Wait for the command response of the radio reset command.
+    122              as the nRF8001 will be in either SETUP or STANDBY after the ACI Reset Radio is processed
+    123              */
+    124          
+    125                
+    126              if (true == lib_aci_event_get(aci_stat, aci_data))
+   \                     ??lib_aci_board_init_0:
+   \   00001E C5                    PUSH      DE                 ;; 1 cycle
+   \   00001F C2                    POP       BC                 ;; 1 cycle
+   \   000020 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000022 FD....                CALL      lib_aci_event_get  ;; 3 cycles
+   \   000025 D1                    CMP0      A                  ;; 1 cycle
+   \   000026 DDF6                  BZ        ??lib_aci_board_init_0  ;; 4 cycles
+   \   000028                       ; ------------------------------------- Block: 11 cycles
+    127              {
+    128                aci_evt_t * aci_evt;      
+    129                aci_evt = &(aci_data->evt);
+   \   000028 C5                    PUSH      DE                 ;; 1 cycle
+   \   000029 C6                    POP       HL                 ;; 1 cycle
+   \   00002A A7                    INCW      HL                 ;; 1 cycle
+    130              
+    131                if (ACI_EVT_CMD_RSP == aci_evt->evt_opcode)
+   \   00002B 8C01                  MOV       A, [HL+0x01]       ;; 1 cycle
+   \   00002D 4C84                  CMP       A, #0x84           ;; 1 cycle
+   \   00002F DFED                  BNZ       ??lib_aci_board_init_0  ;; 4 cycles
+   \   000031                       ; ------------------------------------- Block: 9 cycles
+    132                {
+    133                  if (ACI_STATUS_ERROR_DEVICE_STATE_INVALID == aci_evt->params.cmd_rsp.cmd_status) //in SETUP
+   \   000031 8C03                  MOV       A, [HL+0x03]       ;; 1 cycle
+   \   000033 4C83                  CMP       A, #0x83           ;; 1 cycle
+   \   000035 DF1E                  BNZ       ??lib_aci_command_queue_full_5  ;; 4 cycles
+   \   000037                       ; ------------------------------------- Block: 6 cycles
+    134                  {
+    135                    //Inject a Device Started Event Setup to the ACI Event Queue
+    136                    msg_to_send.buffer[0] = 4;    //Length
+   \   000037 CF......              MOV       N:msg_to_send+1, #0x4  ;; 1 cycle
+    137                    msg_to_send.buffer[1] = 0x81; //Device Started Event
+   \   00003B CF......              MOV       N:msg_to_send+2, #0x81  ;; 1 cycle
+    138                    msg_to_send.buffer[2] = 0x02; //Setup
+   \   00003F CF......              MOV       N:msg_to_send+3, #0x2  ;; 1 cycle
+    139                    msg_to_send.buffer[3] = 0;    //Hardware Error -> None
+   \   000043 F5....                CLRB      N:msg_to_send+4    ;; 1 cycle
+    140                    msg_to_send.buffer[4] = 2;    //Data Credit Available
+   \   000046 CF......              MOV       N:msg_to_send+5, #0x2  ;; 1 cycle
+    141                    aci_queue_enqueue(&aci_rx_q, &msg_to_send);
+   \   00004A 32....                MOVW      BC, #msg_to_send   ;; 1 cycle
+   \   00004D 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000050 FD....                CALL      aci_queue_enqueue  ;; 3 cycles
+   \   000053 EF43                  BR        S:??lib_aci_command_queue_full_4  ;; 3 cycles
+   \   000055                       ; ------------------------------------- Block: 13 cycles
+    142                  }
+    143                  else if (ACI_STATUS_SUCCESS == aci_evt->params.cmd_rsp.cmd_status) //We are now in STANDBY
+   \                     ??lib_aci_command_queue_full_5:
+   \   000055 8C03                  MOV       A, [HL+0x03]       ;; 1 cycle
+   \   000057 D1                    CMP0      A                  ;; 1 cycle
+   \   000058 DF1E                  BNZ       ??lib_aci_command_queue_full_6  ;; 4 cycles
+   \   00005A                       ; ------------------------------------- Block: 6 cycles
+    144                  {
+    145                    //Inject a Device Started Event Standby to the ACI Event Queue
+    146                    msg_to_send.buffer[0] = 4;    //Length
+   \   00005A CF......              MOV       N:msg_to_send+1, #0x4  ;; 1 cycle
+    147                    msg_to_send.buffer[1] = 0x81; //Device Started Event
+   \   00005E CF......              MOV       N:msg_to_send+2, #0x81  ;; 1 cycle
+    148                    msg_to_send.buffer[2] = 0x03; //Standby
+   \   000062 CF......              MOV       N:msg_to_send+3, #0x3  ;; 1 cycle
+    149                    msg_to_send.buffer[3] = 0;    //Hardware Error -> None
+   \   000066 F5....                CLRB      N:msg_to_send+4    ;; 1 cycle
+    150                    msg_to_send.buffer[4] = 2;    //Data Credit Available
+   \   000069 CF......              MOV       N:msg_to_send+5, #0x2  ;; 1 cycle
+    151                    aci_queue_enqueue(&aci_rx_q, &msg_to_send);
+   \   00006D 32....                MOVW      BC, #msg_to_send   ;; 1 cycle
+   \   000070 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000073 FD....                CALL      aci_queue_enqueue  ;; 3 cycles
+   \   000076 EF20                  BR        S:??lib_aci_command_queue_full_4  ;; 3 cycles
+   \   000078                       ; ------------------------------------- Block: 13 cycles
+    152                  }
+    153                  else if (ACI_STATUS_ERROR_CMD_UNKNOWN == aci_evt->params.cmd_rsp.cmd_status) //We are now in TEST
+   \                     ??lib_aci_command_queue_full_6:
+   \   000078 8C03                  MOV       A, [HL+0x03]       ;; 1 cycle
+   \   00007A 4C82                  CMP       A, #0x82           ;; 1 cycle
+   \   00007C DF1A                  BNZ       ??lib_aci_command_queue_full_4  ;; 4 cycles
+   \   00007E                       ; ------------------------------------- Block: 6 cycles
+    154                  {
+    155                    //Inject a Device Started Event Test to the ACI Event Queue
+    156                    msg_to_send.buffer[0] = 4;    //Length
+   \   00007E CF......              MOV       N:msg_to_send+1, #0x4  ;; 1 cycle
+    157                    msg_to_send.buffer[1] = 0x81; //Device Started Event
+   \   000082 CF......              MOV       N:msg_to_send+2, #0x81  ;; 1 cycle
+    158                    msg_to_send.buffer[2] = 0x01; //Test
+   \   000086 E5....                ONEB      N:msg_to_send+3    ;; 1 cycle
+    159                    msg_to_send.buffer[3] = 0;    //Hardware Error -> None
+   \   000089 F5....                CLRB      N:msg_to_send+4    ;; 1 cycle
+    160                    msg_to_send.buffer[4] = 0;    //Data Credit Available
+   \   00008C F5....                CLRB      N:msg_to_send+5    ;; 1 cycle
+    161                    aci_queue_enqueue(&aci_rx_q, &msg_to_send);
+   \   00008F 32....                MOVW      BC, #msg_to_send   ;; 1 cycle
+   \   000092 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000095 FD....                CALL      aci_queue_enqueue  ;; 3 cycles
+   \   000098                       ; ------------------------------------- Block: 10 cycles
+    162                  }
+    163                  
+    164                  //Break out of the while loop
+    165                  break;
+    166                }
+    167                else
+    168                {     
+    169                //Serial.println(F("Discard any other ACI Events"));
+    170                }
+    171              
+    172              }
+    173              }   
+    174            }
+    175          }
+   \                     ??lib_aci_command_queue_full_4:
+   \   000098 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   00009A C4                    POP       DE                 ;; 1 cycle
+   \   00009B C2                    POP       BC                 ;; 1 cycle
+   \   00009C D7                    RET                          ;; 6 cycles
+   \   00009D                       ; ------------------------------------- Block: 9 cycles
+   \   00009D                       ; ------------------------------------- Total: 106 cycles
+   \   00009D                       REQUIRE ?CLRL78_V1_0_L00
+    176          
+    177          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    178          void lib_aci_init(aci_state_t *aci_stat, bool debug)
+   \                     lib_aci_init:
+    179          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 6
+   \   000003 2004                  SUBW      SP, #0x4           ;; 1 cycle
+    180            uint8_t i;
+    181          
+    182            for (i = 0; i < PIPES_ARRAY_SIZE; i++)
+   \   000005 F2                    CLRB      C                  ;; 1 cycle
+   \   000006 EF1B                  BR        S:??lib_aci_command_queue_full_7  ;; 3 cycles
+   \   000008                       ; ------------------------------------- Block: 8 cycles
+    183            {
+    184              aci_stat->pipes_open_bitmap[i]          = 0;
+   \                     ??lib_aci_init_0:
+   \   000008 C3                    PUSH      BC                 ;; 1 cycle
+   \   000009 C6                    POP       HL                 ;; 1 cycle
+   \   00000A 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   00000C A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00000E 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00000F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000010 F1                    CLRB      A                  ;; 1 cycle
+   \   000011 9C1C                  MOV       [HL+0x1C], A       ;; 1 cycle
+    185              aci_stat->pipes_closed_bitmap[i]        = 0;
+   \   000013 C3                    PUSH      BC                 ;; 1 cycle
+   \   000014 C6                    POP       HL                 ;; 1 cycle
+   \   000015 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000017 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000019 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00001A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001B F1                    CLRB      A                  ;; 1 cycle
+   \   00001C 9C24                  MOV       [HL+0x24], A       ;; 1 cycle
+    186              aci_cmd_params_open_adv_pipe.pipes[i]   = 0;
+   \   00001E F1                    CLRB      A                  ;; 1 cycle
+   \   00001F 28....                MOV       (aci_cmd_params_open_adv_pipe & 0xFFFF)[C], A  ;; 1 cycle
+    187            }
+   \   000022 82                    INC       C                  ;; 1 cycle
+   \   000023                       ; ------------------------------------- Block: 19 cycles
+   \                     ??lib_aci_command_queue_full_7:
+   \   000023 62                    MOV       A, C               ;; 1 cycle
+   \   000024 4C08                  CMP       A, #0x8            ;; 1 cycle
+   \   000026 DCE0                  BC        ??lib_aci_init_0   ;; 4 cycles
+   \   000028                       ; ------------------------------------- Block: 6 cycles
+    188            
+    189          
+    190          
+    191          
+    192            is_request_operation_pending     = false;
+   \   000028 F5....                CLRB      N:is_request_operation_pending  ;; 1 cycle
+    193            is_indicate_operation_pending    = false; 
+   \   00002B F5....                CLRB      N:is_indicate_operation_pending  ;; 1 cycle
+    194            is_open_remote_pipe_pending      = false;
+   \   00002E F5....                CLRB      N:is_open_remote_pipe_pending  ;; 1 cycle
+    195            is_close_remote_pipe_pending     = false;
+   \   000031 F5....                CLRB      N:is_close_remote_pipe_pending  ;; 1 cycle
+    196          
+    197          
+    198          
+    199            
+    200            
+    201            request_operation_pipe           = 0;
+   \   000034 F5....                CLRB      N:request_operation_pipe  ;; 1 cycle
+    202            indicate_operation_pipe          = 0;
+   \   000037 F5....                CLRB      N:indicate_operation_pipe  ;; 1 cycle
+    203            
+    204            
+    205            
+    206            p_services_pipe_type_map = aci_stat->aci_setup_info.services_pipe_type_mapping;
+   \   00003A F6                    CLRW      AX                 ;; 1 cycle
+   \   00003B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003C                       ; ------------------------------------- Block: 8 cycles
+   \                     ??lib_aci_init_1:
+   \   00003C A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00003E 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00003F 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000040 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000041 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000042 8A0C                  MOV       A, [DE+0x0C]       ;; 1 cycle
+   \   000044 72                    MOV       C, A               ;; 1 cycle
+   \   000045 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000047 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   00004A 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00004B 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00004C 62                    MOV       A, C               ;; 1 cycle
+   \   00004D 99                    MOV       [DE], A            ;; 1 cycle
+   \   00004E A7                    INCW      HL                 ;; 1 cycle
+   \   00004F 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000050 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000053 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000054 DCE6                  BC        ??lib_aci_init_1   ;; 4 cycles
+   \   000056                       ; ------------------------------------- Block: 21 cycles
+   \   000056 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000058 BF....                MOVW      N:p_services_pipe_type_map, AX  ;; 1 cycle
+    207            
+    208            p_setup_msgs             = aci_stat->aci_setup_info.setup_msgs;
+   \   00005B F6                    CLRW      AX                 ;; 1 cycle
+   \   00005C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00005D                       ; ------------------------------------- Block: 4 cycles
+   \                     ??lib_aci_init_2:
+   \   00005D A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00005F 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000060 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000061 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000062 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000063 8A0F                  MOV       A, [DE+0x0F]       ;; 1 cycle
+   \   000065 72                    MOV       C, A               ;; 1 cycle
+   \   000066 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000068 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   00006B 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00006C 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00006D 62                    MOV       A, C               ;; 1 cycle
+   \   00006E 99                    MOV       [DE], A            ;; 1 cycle
+   \   00006F A7                    INCW      HL                 ;; 1 cycle
+   \   000070 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000071 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000074 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000075 DCE6                  BC        ??lib_aci_init_2   ;; 4 cycles
+   \   000077                       ; ------------------------------------- Block: 21 cycles
+   \   000077 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000079 BF....                MOVW      N:p_setup_msgs, AX  ;; 1 cycle
+    209            
+    210            
+    211            hal_aci_tl_init(&aci_stat->aci_pins, debug);
+   \   00007C A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00007E FD....                CALL      hal_aci_tl_init    ;; 3 cycles
+    212            
+    213            lib_aci_board_init(aci_stat);
+   \   000081 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000083 FD....                CALL      lib_aci_board_init  ;; 3 cycles
+    214          }
+   \   000086 1006                  ADDW      SP, #0x6           ;; 1 cycle
+   \   000088 C4                    POP       DE                 ;; 1 cycle
+   \   000089 C2                    POP       BC                 ;; 1 cycle
+   \   00008A D7                    RET                          ;; 6 cycles
+   \   00008B                       ; ------------------------------------- Block: 19 cycles
+   \   00008B                       ; ------------------------------------- Total: 106 cycles
+   \   00008B                       REQUIRE ?CLRL78_V1_0_L00
+    215          
+    216          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    217          uint8_t lib_aci_get_nb_available_credits(aci_state_t *aci_stat)
+   \                     lib_aci_get_nb_available_credits:
+    218          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+   \   000000 16                    MOVW      HL, AX             ;; 1 cycle
+    219            return aci_stat->data_credit_available;
+   \   000001 8C15                  MOV       A, [HL+0x15]       ;; 1 cycle
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 8 cycles
+   \   000004                       ; ------------------------------------- Total: 8 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    220          }
+    221          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    222          uint16_t lib_aci_get_cx_interval_ms(aci_state_t *aci_stat)
+   \                     lib_aci_get_cx_interval_ms:
+    223          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    224            uint32_t cx_rf_interval_ms_32bits;
+    225            uint16_t cx_rf_interval_ms;
+    226            
+    227            cx_rf_interval_ms_32bits  = aci_stat->connection_interval;
+   \   000003 8A16                  MOV       A, [DE+0x16]       ;; 1 cycle
+   \   000005 76                    MOV       L, A               ;; 1 cycle
+   \   000006 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000008 8A17                  MOV       A, [DE+0x17]       ;; 1 cycle
+   \   00000A 70                    MOV       X, A               ;; 1 cycle
+   \   00000B 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   00000D 616F                  OR        A, H               ;; 1 cycle
+   \   00000F 08                    XCH       A, X               ;; 1 cycle
+   \   000010 616E                  OR        A, L               ;; 1 cycle
+   \   000012 08                    XCH       A, X               ;; 1 cycle
+   \   000013 F7                    CLRW      BC                 ;; 1 cycle
+    228            cx_rf_interval_ms_32bits *= 125;                      // the connection interval is given in multiples of 0.125 milliseconds
+   \   000014 360000                MOVW      HL, #0x0           ;; 1 cycle
+   \   000017 C7                    PUSH      HL                 ;; 1 cycle
+   \   000018 367D00                MOVW      HL, #0x7D          ;; 1 cycle
+   \   00001B C7                    PUSH      HL                 ;; 1 cycle
+   \   00001C FD....                CALL      N:?L_MUL_L03       ;; 3 cycles
+    229            cx_rf_interval_ms         = cx_rf_interval_ms_32bits / 100;
+   \   00001F 360000                MOVW      HL, #0x0           ;; 1 cycle
+   \   000022 C7                    PUSH      HL                 ;; 1 cycle
+   \   000023 366400                MOVW      HL, #0x64          ;; 1 cycle
+   \   000026 C7                    PUSH      HL                 ;; 1 cycle
+   \   000027 FD....                CALL      N:?UL_DIV_L03      ;; 3 cycles
+    230            
+    231            return cx_rf_interval_ms;
+   \   00002A C4                    POP       DE                 ;; 1 cycle
+   \   00002B C2                    POP       BC                 ;; 1 cycle
+   \   00002C D7                    RET                          ;; 6 cycles
+   \   00002D                       ; ------------------------------------- Block: 36 cycles
+   \   00002D                       ; ------------------------------------- Total: 36 cycles
+   \   00002D                       REQUIRE ?CLRL78_V1_0_L00
+    232          }
+    233          
+    234          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    235          uint16_t lib_aci_get_cx_interval(aci_state_t *aci_stat)
+   \                     lib_aci_get_cx_interval:
+    236          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+   \   000001 14                    MOVW      DE, AX             ;; 1 cycle
+    237            return aci_stat->connection_interval;
+   \   000002 8A16                  MOV       A, [DE+0x16]       ;; 1 cycle
+   \   000004 76                    MOV       L, A               ;; 1 cycle
+   \   000005 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000007 8A17                  MOV       A, [DE+0x17]       ;; 1 cycle
+   \   000009 70                    MOV       X, A               ;; 1 cycle
+   \   00000A 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   00000C 616F                  OR        A, H               ;; 1 cycle
+   \   00000E 08                    XCH       A, X               ;; 1 cycle
+   \   00000F 616E                  OR        A, L               ;; 1 cycle
+   \   000011 08                    XCH       A, X               ;; 1 cycle
+   \   000012 C4                    POP       DE                 ;; 1 cycle
+   \   000013 D7                    RET                          ;; 6 cycles
+   \   000014                       ; ------------------------------------- Block: 19 cycles
+   \   000014                       ; ------------------------------------- Total: 19 cycles
+   \   000014                       REQUIRE ?CLRL78_V1_0_L00
+    238          }
+    239          
+    240          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    241          uint16_t lib_aci_get_slave_latency(aci_state_t *aci_stat)
+   \                     lib_aci_get_slave_latency:
+    242          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+   \   000001 14                    MOVW      DE, AX             ;; 1 cycle
+    243            return aci_stat->slave_latency;
+   \   000002 8A18                  MOV       A, [DE+0x18]       ;; 1 cycle
+   \   000004 76                    MOV       L, A               ;; 1 cycle
+   \   000005 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000007 8A19                  MOV       A, [DE+0x19]       ;; 1 cycle
+   \   000009 70                    MOV       X, A               ;; 1 cycle
+   \   00000A 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   00000C 616F                  OR        A, H               ;; 1 cycle
+   \   00000E 08                    XCH       A, X               ;; 1 cycle
+   \   00000F 616E                  OR        A, L               ;; 1 cycle
+   \   000011 08                    XCH       A, X               ;; 1 cycle
+   \   000012 C4                    POP       DE                 ;; 1 cycle
+   \   000013 D7                    RET                          ;; 6 cycles
+   \   000014                       ; ------------------------------------- Block: 19 cycles
+   \   000014                       ; ------------------------------------- Total: 19 cycles
+   \   000014                       REQUIRE ?CLRL78_V1_0_L00
+    244          }
+    245          
+    246          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    247          bool lib_aci_set_app_latency(uint16_t latency, aci_app_latency_mode_t latency_mode)
+   \                     lib_aci_set_app_latency:
+    248          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 4
+   \   000001 2004                  SUBW      SP, #0x4           ;; 1 cycle
+    249            aci_cmd_params_set_app_latency_t aci_set_app_latency;
+    250            
+    251            aci_set_app_latency.mode    = latency_mode;
+   \   000003 618B                  XCH       A, B               ;; 1 cycle
+   \   000005 9800                  MOV       [SP], A            ;; 1 cycle
+   \   000007 63                    MOV       A, B               ;; 1 cycle
+    252            aci_set_app_latency.latency = latency;  
+   \   000008 08                    XCH       A, X               ;; 1 cycle
+   \   000009 73                    MOV       B, A               ;; 1 cycle
+   \   00000A 60                    MOV       A, X               ;; 1 cycle
+   \   00000B 618B                  XCH       A, B               ;; 1 cycle
+   \   00000D 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   00000F 63                    MOV       A, B               ;; 1 cycle
+   \   000010 F0                    CLRB      X                  ;; 1 cycle
+   \   000011 70                    MOV       X, A               ;; 1 cycle
+   \   000012 60                    MOV       A, X               ;; 1 cycle
+   \   000013 9802                  MOV       [SP+0x02], A       ;; 1 cycle
+    253            acil_encode_cmd_set_app_latency(&(msg_to_send.buffer[0]), &aci_set_app_latency);
+   \   000015 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000017 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000018 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00001B FD....                CALL      acil_encode_cmd_set_app_latency  ;; 3 cycles
+    254            
+    255            return hal_aci_tl_send(&msg_to_send);
+   \   00001E 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000021 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000024 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000026 C2                    POP       BC                 ;; 1 cycle
+   \   000027 D7                    RET                          ;; 6 cycles
+   \   000028                       ; ------------------------------------- Block: 33 cycles
+   \   000028                       ; ------------------------------------- Total: 33 cycles
+   \   000028                       REQUIRE ?CLRL78_V1_0_L00
+    256          }
+    257          
+    258          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    259          bool lib_aci_test(aci_test_mode_change_t enter_exit_test_mode)
+   \                     lib_aci_test:
+    260          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 2
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+    261            aci_cmd_params_test_t aci_cmd_params_test;
+    262            aci_cmd_params_test.test_mode_change = enter_exit_test_mode;
+   \   000002 9800                  MOV       [SP], A            ;; 1 cycle
+    263            acil_encode_cmd_set_test_mode(&(msg_to_send.buffer[0]), &aci_cmd_params_test);
+   \   000004 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000006 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000007 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00000A FD....                CALL      acil_encode_cmd_set_test_mode  ;; 3 cycles
+    264            return hal_aci_tl_send(&msg_to_send);
+   \   00000D 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000010 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000013 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   000015 C2                    POP       BC                 ;; 1 cycle
+   \   000016 D7                    RET                          ;; 6 cycles
+   \   000017                       ; ------------------------------------- Block: 21 cycles
+   \   000017                       ; ------------------------------------- Total: 21 cycles
+   \   000017                       REQUIRE ?CLRL78_V1_0_L00
+    265          }
+    266          
+    267          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    268          bool lib_aci_sleep()
+   \                     lib_aci_sleep:
+    269          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    270            acil_encode_cmd_sleep(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_sleep  ;; 3 cycles
+    271            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    272          }
+    273          
+    274          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    275          bool lib_aci_radio_reset()
+   \                     lib_aci_radio_reset:
+    276          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    277            acil_encode_baseband_reset(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_baseband_reset  ;; 3 cycles
+    278            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    279          }
+    280          
+    281          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    282          bool lib_aci_direct_connect()
+   \                     lib_aci_direct_connect:
+    283          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    284            acil_encode_direct_connect(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_direct_connect  ;; 3 cycles
+    285            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    286          }
+    287          
+    288          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    289          bool lib_aci_device_version()
+   \                     lib_aci_device_version:
+    290          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    291            acil_encode_cmd_get_device_version(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_get_device_version  ;; 3 cycles
+    292            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    293          }
+    294          
+    295          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    296          bool lib_aci_set_local_data(aci_state_t *aci_stat, uint8_t pipe, uint8_t *p_value, uint8_t size)
+   \                     lib_aci_set_local_data:
+    297          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C3                    PUSH      BC                 ;; 1 cycle
+   \   000002                       ; Auto size: 26
+   \   000002 2016                  SUBW      SP, #0x16          ;; 1 cycle
+   \   000004 63                    MOV       A, B               ;; 1 cycle
+   \   000005 74                    MOV       E, A               ;; 1 cycle
+   \   000006 73                    MOV       B, A               ;; 1 cycle
+    298            aci_cmd_params_set_local_data_t aci_cmd_params_set_local_data;
+    299            
+    300            if ((p_services_pipe_type_map[pipe-1].location != ACI_STORE_LOCAL)
+    301                ||
+    302                (size > ACI_PIPE_TX_DATA_MAX_LEN))
+   \   000007 64                    MOV       A, E               ;; 1 cycle
+   \   000008 70                    MOV       X, A               ;; 1 cycle
+   \   000009 F1                    CLRB      A                  ;; 1 cycle
+   \   00000A 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00000D FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000010 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000013 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000014 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000015 04FDFF                ADDW      AX, #0xFFFD        ;; 1 cycle
+   \   000018 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000019 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001A 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   00001C DF06                  BNZ       ??lib_aci_command_queue_full_8  ;; 4 cycles
+   \   00001E                       ; ------------------------------------- Block: 24 cycles
+   \   00001E 8816                  MOV       A, [SP+0x16]       ;; 1 cycle
+   \   000020 4C15                  CMP       A, #0x15           ;; 1 cycle
+   \   000022 DC03                  BC        ??lib_aci_command_queue_full_9  ;; 4 cycles
+   \   000024                       ; ------------------------------------- Block: 6 cycles
+    303            {
+    304              return false;
+   \                     ??lib_aci_command_queue_full_8:
+   \   000024 F1                    CLRB      A                  ;; 1 cycle
+   \   000025 EF26                  BR        S:??lib_aci_command_queue_full_10  ;; 3 cycles
+   \   000027                       ; ------------------------------------- Block: 4 cycles
+    305            }
+    306          
+    307            aci_cmd_params_set_local_data.tx_data.pipe_number = pipe;
+   \                     ??lib_aci_command_queue_full_9:
+   \   000027 64                    MOV       A, E               ;; 1 cycle
+   \   000028 9800                  MOV       [SP], A            ;; 1 cycle
+   \   00002A 74                    MOV       E, A               ;; 1 cycle
+    308            memcpy(&(aci_cmd_params_set_local_data.tx_data.aci_data[0]), p_value, size);
+   \   00002B 8816                  MOV       A, [SP+0x16]       ;; 1 cycle
+   \   00002D 72                    MOV       C, A               ;; 1 cycle
+   \   00002E F3                    CLRB      B                  ;; 1 cycle
+   \   00002F A818                  MOVW      AX, [SP+0x18]      ;; 1 cycle
+   \   000031 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000032 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000033 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000035 A1                    INCW      AX                 ;; 1 cycle
+   \   000036 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000037 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000038 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    309            acil_encode_cmd_set_local_data(&(msg_to_send.buffer[0]), &aci_cmd_params_set_local_data, size);
+   \   00003B 8816                  MOV       A, [SP+0x16]       ;; 1 cycle
+   \   00003D 75                    MOV       D, A               ;; 1 cycle
+   \   00003E AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000040 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000041 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000044 FD....                CALL      acil_encode_cmd_set_local_data  ;; 3 cycles
+    310            return hal_aci_tl_send(&msg_to_send);
+   \   000047 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00004A FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00004D                       ; ------------------------------------- Block: 28 cycles
+   \                     ??lib_aci_command_queue_full_10:
+   \   00004D 101A                  ADDW      SP, #0x1A          ;; 1 cycle
+   \   00004F D7                    RET                          ;; 6 cycles
+   \   000050                       ; ------------------------------------- Block: 7 cycles
+   \   000050                       ; ------------------------------------- Total: 69 cycles
+   \   000050                       REQUIRE ?CLRL78_V1_0_L00
+    311          }
+    312          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    313          bool lib_aci_connect(uint16_t run_timeout, uint16_t adv_interval)
+   \                     lib_aci_connect:
+    314          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 4
+   \   000001 2004                  SUBW      SP, #0x4           ;; 1 cycle
+    315            aci_cmd_params_connect_t aci_cmd_params_connect;
+    316            aci_cmd_params_connect.timeout      = run_timeout;
+   \   000003 08                    XCH       A, X               ;; 1 cycle
+   \   000004 75                    MOV       D, A               ;; 1 cycle
+   \   000005 60                    MOV       A, X               ;; 1 cycle
+   \   000006 618D                  XCH       A, D               ;; 1 cycle
+   \   000008 9800                  MOV       [SP], A            ;; 1 cycle
+   \   00000A 65                    MOV       A, D               ;; 1 cycle
+   \   00000B F0                    CLRB      X                  ;; 1 cycle
+   \   00000C 70                    MOV       X, A               ;; 1 cycle
+   \   00000D 60                    MOV       A, X               ;; 1 cycle
+   \   00000E 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+    317            aci_cmd_params_connect.adv_interval = adv_interval;
+   \   000010 62                    MOV       A, C               ;; 1 cycle
+   \   000011 9802                  MOV       [SP+0x02], A       ;; 1 cycle
+   \   000013 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000014 F0                    CLRB      X                  ;; 1 cycle
+   \   000015 70                    MOV       X, A               ;; 1 cycle
+   \   000016 60                    MOV       A, X               ;; 1 cycle
+   \   000017 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+    318            acil_encode_cmd_connect(&(msg_to_send.buffer[0]), &aci_cmd_params_connect);
+   \   000019 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00001B 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00001C 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00001F FD....                CALL      acil_encode_cmd_connect  ;; 3 cycles
+    319            return hal_aci_tl_send(&msg_to_send);
+   \   000022 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000025 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000028 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00002A C4                    POP       DE                 ;; 1 cycle
+   \   00002B D7                    RET                          ;; 6 cycles
+   \   00002C                       ; ------------------------------------- Block: 37 cycles
+   \   00002C                       ; ------------------------------------- Total: 37 cycles
+   \   00002C                       REQUIRE ?CLRL78_V1_0_L00
+    320          }
+    321          
+    322          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    323          bool lib_aci_disconnect(aci_state_t *aci_stat, aci_disconnect_reason_t reason)
+   \                     lib_aci_disconnect:
+    324          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+   \   000003 C1                    PUSH      AX                 ;; 1 cycle
+    325            bool ret_val;
+    326            uint8_t i;
+    327            aci_cmd_params_disconnect_t aci_cmd_params_disconnect;
+    328            aci_cmd_params_disconnect.reason = reason;
+   \   000004 63                    MOV       A, B               ;; 1 cycle
+   \   000005 9800                  MOV       [SP], A            ;; 1 cycle
+   \   000007 73                    MOV       B, A               ;; 1 cycle
+    329            acil_encode_cmd_disconnect(&(msg_to_send.buffer[0]), &aci_cmd_params_disconnect);
+   \   000008 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00000A 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00000B 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00000E FD....                CALL      acil_encode_cmd_disconnect  ;; 3 cycles
+    330            ret_val = hal_aci_tl_send(&msg_to_send);
+   \   000011 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000014 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000017 73                    MOV       B, A               ;; 1 cycle
+    331            // If we have actually sent the disconnect
+    332            if (ret_val)
+   \   000018 D3                    CMP0      B                  ;; 1 cycle
+   \   000019 DD23                  BZ        ??lib_aci_command_queue_full_11  ;; 4 cycles
+   \   00001B                       ; ------------------------------------- Block: 23 cycles
+    333            {
+    334              // Update pipes immediately so that while the disconnect is happening,
+    335              // the application can't attempt sending another message
+    336              // If the application sends another message before we updated this
+    337              //    a ACI Pipe Error Event will be received from nRF8001
+    338              for (i=0; i < PIPES_ARRAY_SIZE; i++)
+   \   00001B F0                    CLRB      X                  ;; 1 cycle
+   \   00001C EF1B                  BR        S:??lib_aci_command_queue_full_12  ;; 3 cycles
+   \   00001E                       ; ------------------------------------- Block: 4 cycles
+    339              {
+    340                aci_stat->pipes_open_bitmap[i] = 0;
+   \                     ??lib_aci_disconnect_0:
+   \   00001E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001F 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000021 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000022 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000024 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000025 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000026 C5                    PUSH      DE                 ;; 1 cycle
+   \   000027 C6                    POP       HL                 ;; 1 cycle
+   \   000028 F1                    CLRB      A                  ;; 1 cycle
+   \   000029 9C1C                  MOV       [HL+0x1C], A       ;; 1 cycle
+    341                aci_stat->pipes_closed_bitmap[i] = 0;
+   \   00002B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00002C 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   00002E 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00002F A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000031 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000032 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000033 C5                    PUSH      DE                 ;; 1 cycle
+   \   000034 C6                    POP       HL                 ;; 1 cycle
+   \   000035 F1                    CLRB      A                  ;; 1 cycle
+   \   000036 9C24                  MOV       [HL+0x24], A       ;; 1 cycle
+    342              }
+   \   000038 80                    INC       X                  ;; 1 cycle
+   \   000039                       ; ------------------------------------- Block: 21 cycles
+   \                     ??lib_aci_command_queue_full_12:
+   \   000039 60                    MOV       A, X               ;; 1 cycle
+   \   00003A 4C08                  CMP       A, #0x8            ;; 1 cycle
+   \   00003C DCE0                  BC        ??lib_aci_disconnect_0  ;; 4 cycles
+   \   00003E                       ; ------------------------------------- Block: 6 cycles
+    343            }
+    344            return ret_val;
+   \                     ??lib_aci_command_queue_full_11:
+   \   00003E 63                    MOV       A, B               ;; 1 cycle
+   \   00003F 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000041 C4                    POP       DE                 ;; 1 cycle
+   \   000042 C2                    POP       BC                 ;; 1 cycle
+   \   000043 D7                    RET                          ;; 6 cycles
+   \   000044                       ; ------------------------------------- Block: 10 cycles
+   \   000044                       ; ------------------------------------- Total: 64 cycles
+   \   000044                       REQUIRE ?CLRL78_V1_0_L00
+    345          }
+    346          
+    347          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    348          bool lib_aci_bond(uint16_t run_timeout, uint16_t adv_interval)
+   \                     lib_aci_bond:
+    349          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 4
+   \   000001 2004                  SUBW      SP, #0x4           ;; 1 cycle
+    350            aci_cmd_params_bond_t aci_cmd_params_bond;
+    351            aci_cmd_params_bond.timeout = run_timeout;
+   \   000003 08                    XCH       A, X               ;; 1 cycle
+   \   000004 75                    MOV       D, A               ;; 1 cycle
+   \   000005 60                    MOV       A, X               ;; 1 cycle
+   \   000006 618D                  XCH       A, D               ;; 1 cycle
+   \   000008 9800                  MOV       [SP], A            ;; 1 cycle
+   \   00000A 65                    MOV       A, D               ;; 1 cycle
+   \   00000B F0                    CLRB      X                  ;; 1 cycle
+   \   00000C 70                    MOV       X, A               ;; 1 cycle
+   \   00000D 60                    MOV       A, X               ;; 1 cycle
+   \   00000E 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+    352            aci_cmd_params_bond.adv_interval = adv_interval;
+   \   000010 62                    MOV       A, C               ;; 1 cycle
+   \   000011 9802                  MOV       [SP+0x02], A       ;; 1 cycle
+   \   000013 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000014 F0                    CLRB      X                  ;; 1 cycle
+   \   000015 70                    MOV       X, A               ;; 1 cycle
+   \   000016 60                    MOV       A, X               ;; 1 cycle
+   \   000017 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+    353            acil_encode_cmd_bond(&(msg_to_send.buffer[0]), &aci_cmd_params_bond);
+   \   000019 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00001B 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00001C 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00001F FD....                CALL      acil_encode_cmd_bond  ;; 3 cycles
+    354            return hal_aci_tl_send(&msg_to_send);
+   \   000022 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000025 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000028 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00002A C4                    POP       DE                 ;; 1 cycle
+   \   00002B D7                    RET                          ;; 6 cycles
+   \   00002C                       ; ------------------------------------- Block: 37 cycles
+   \   00002C                       ; ------------------------------------- Total: 37 cycles
+   \   00002C                       REQUIRE ?CLRL78_V1_0_L00
+    355          }
+    356          
+    357          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    358          bool lib_aci_wakeup()
+   \                     lib_aci_wakeup:
+    359          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    360            acil_encode_cmd_wakeup(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_wakeup  ;; 3 cycles
+    361            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    362          }
+    363          
+    364          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    365          bool lib_aci_set_tx_power(aci_device_output_power_t tx_power)
+   \                     lib_aci_set_tx_power:
+    366          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 2
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+    367            aci_cmd_params_set_tx_power_t aci_cmd_params_set_tx_power;
+    368            aci_cmd_params_set_tx_power.device_power = tx_power;
+   \   000002 9800                  MOV       [SP], A            ;; 1 cycle
+    369            acil_encode_cmd_set_radio_tx_power(&(msg_to_send.buffer[0]), &aci_cmd_params_set_tx_power);
+   \   000004 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000006 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000007 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00000A FD....                CALL      acil_encode_cmd_set_radio_tx_power  ;; 3 cycles
+    370            return hal_aci_tl_send(&msg_to_send);
+   \   00000D 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000010 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000013 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   000015 C2                    POP       BC                 ;; 1 cycle
+   \   000016 D7                    RET                          ;; 6 cycles
+   \   000017                       ; ------------------------------------- Block: 21 cycles
+   \   000017                       ; ------------------------------------- Total: 21 cycles
+   \   000017                       REQUIRE ?CLRL78_V1_0_L00
+    371          }
+    372          
+    373          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    374          bool lib_aci_get_address()
+   \                     lib_aci_get_address:
+    375          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    376            acil_encode_cmd_get_address(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_get_address  ;; 3 cycles
+    377            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    378          }
+    379          
+    380          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    381          bool lib_aci_get_temperature()
+   \                     lib_aci_get_temperature:
+    382          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    383            acil_encode_cmd_temparature(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_temparature  ;; 3 cycles
+    384            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    385          }
+    386          
+    387          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    388          bool lib_aci_get_battery_level()
+   \                     lib_aci_get_battery_level:
+    389          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    390            acil_encode_cmd_battery_level(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_battery_level  ;; 3 cycles
+    391            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    392          }
+    393          
+    394          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    395          bool lib_aci_send_data(uint8_t pipe, uint8_t *p_value, uint8_t size)
+   \                     lib_aci_send_data:
+    396          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C3                    PUSH      BC                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 26
+   \   000003 2016                  SUBW      SP, #0x16          ;; 1 cycle
+   \   000005 74                    MOV       E, A               ;; 1 cycle
+    397            bool ret_val = false;
+   \   000006 5500                  MOV       D, #0x0            ;; 1 cycle
+    398            aci_cmd_params_send_data_t aci_cmd_params_send_data;
+    399          
+    400            
+    401            if(!((p_services_pipe_type_map[pipe-1].pipe_type == ACI_TX) ||
+    402                (p_services_pipe_type_map[pipe-1].pipe_type == ACI_TX_ACK)))
+   \   000008 64                    MOV       A, E               ;; 1 cycle
+   \   000009 70                    MOV       X, A               ;; 1 cycle
+   \   00000A F1                    CLRB      A                  ;; 1 cycle
+   \   00000B 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00000E FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000011 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000014 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000015 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000016 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   000019 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001B 70                    MOV       X, A               ;; 1 cycle
+   \   00001C F1                    CLRB      A                  ;; 1 cycle
+   \   00001D C1                    PUSH      AX                 ;; 1 cycle
+   \   00001E 64                    MOV       A, E               ;; 1 cycle
+   \   00001F 70                    MOV       X, A               ;; 1 cycle
+   \   000020 F1                    CLRB      A                  ;; 1 cycle
+   \   000021 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000024 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000027 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   00002A 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00002B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00002C B7                    DECW      HL                 ;; 1 cycle
+   \   00002D 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00002E 70                    MOV       X, A               ;; 1 cycle
+   \   00002F 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   000031 C6                    POP       HL                 ;; 1 cycle
+   \   000032 616F                  OR        A, H               ;; 1 cycle
+   \   000034 08                    XCH       A, X               ;; 1 cycle
+   \   000035 616E                  OR        A, L               ;; 1 cycle
+   \   000037 08                    XCH       A, X               ;; 1 cycle
+   \   000038 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00003B DD38                  BZ        ??lib_aci_command_queue_full_13  ;; 4 cycles
+   \   00003D                       ; ------------------------------------- Block: 46 cycles
+   \   00003D 64                    MOV       A, E               ;; 1 cycle
+   \   00003E 70                    MOV       X, A               ;; 1 cycle
+   \   00003F F1                    CLRB      A                  ;; 1 cycle
+   \   000040 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000043 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000046 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000049 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00004A 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00004B 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   00004E 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00004F 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000050 70                    MOV       X, A               ;; 1 cycle
+   \   000051 F1                    CLRB      A                  ;; 1 cycle
+   \   000052 C1                    PUSH      AX                 ;; 1 cycle
+   \   000053 64                    MOV       A, E               ;; 1 cycle
+   \   000054 70                    MOV       X, A               ;; 1 cycle
+   \   000055 F1                    CLRB      A                  ;; 1 cycle
+   \   000056 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000059 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00005C FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   00005F 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000060 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000061 B7                    DECW      HL                 ;; 1 cycle
+   \   000062 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000063 70                    MOV       X, A               ;; 1 cycle
+   \   000064 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   000066 C6                    POP       HL                 ;; 1 cycle
+   \   000067 616F                  OR        A, H               ;; 1 cycle
+   \   000069 08                    XCH       A, X               ;; 1 cycle
+   \   00006A 616E                  OR        A, L               ;; 1 cycle
+   \   00006C 08                    XCH       A, X               ;; 1 cycle
+   \   00006D 440400                CMPW      AX, #0x4           ;; 1 cycle
+   \   000070 DD03                  BZ        ??lib_aci_command_queue_full_13  ;; 4 cycles
+   \   000072                       ; ------------------------------------- Block: 40 cycles
+    403            {
+    404              return false;
+   \   000072 F1                    CLRB      A                  ;; 1 cycle
+   \   000073 EF31                  BR        S:??lib_aci_command_queue_full_14  ;; 3 cycles
+   \   000075                       ; ------------------------------------- Block: 4 cycles
+    405            }
+    406          
+    407            if (size > ACI_PIPE_TX_DATA_MAX_LEN)
+   \                     ??lib_aci_command_queue_full_13:
+   \   000075 8816                  MOV       A, [SP+0x16]       ;; 1 cycle
+   \   000077 4C15                  CMP       A, #0x15           ;; 1 cycle
+   \   000079 DC03                  BC        ??lib_aci_command_queue_full_15  ;; 4 cycles
+   \   00007B                       ; ------------------------------------- Block: 6 cycles
+    408            {
+    409              return false;
+   \   00007B F1                    CLRB      A                  ;; 1 cycle
+   \   00007C EF28                  BR        S:??lib_aci_command_queue_full_14  ;; 3 cycles
+   \   00007E                       ; ------------------------------------- Block: 4 cycles
+    410            }
+    411            {
+    412                aci_cmd_params_send_data.tx_data.pipe_number = pipe;
+   \                     ??lib_aci_command_queue_full_15:
+   \   00007E 64                    MOV       A, E               ;; 1 cycle
+   \   00007F 9800                  MOV       [SP], A            ;; 1 cycle
+   \   000081 74                    MOV       E, A               ;; 1 cycle
+    413                memcpy(&(aci_cmd_params_send_data.tx_data.aci_data[0]), p_value, size);
+   \   000082 8816                  MOV       A, [SP+0x16]       ;; 1 cycle
+   \   000084 72                    MOV       C, A               ;; 1 cycle
+   \   000085 F3                    CLRB      B                  ;; 1 cycle
+   \   000086 A818                  MOVW      AX, [SP+0x18]      ;; 1 cycle
+   \   000088 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000089 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00008A AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00008C A1                    INCW      AX                 ;; 1 cycle
+   \   00008D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00008E 13                    MOVW      AX, BC             ;; 1 cycle
+   \   00008F FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    414                acil_encode_cmd_send_data(&(msg_to_send.buffer[0]), &aci_cmd_params_send_data, size);
+   \   000092 8816                  MOV       A, [SP+0x16]       ;; 1 cycle
+   \   000094 75                    MOV       D, A               ;; 1 cycle
+   \   000095 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000097 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000098 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00009B FD....                CALL      acil_encode_cmd_send_data  ;; 3 cycles
+    415                
+    416                ret_val = hal_aci_tl_send(&msg_to_send);          
+   \   00009E 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   0000A1 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   0000A4 75                    MOV       D, A               ;; 1 cycle
+    417            }
+    418            return ret_val;
+   \   0000A5 65                    MOV       A, D               ;; 1 cycle
+   \   0000A6                       ; ------------------------------------- Block: 30 cycles
+   \                     ??lib_aci_command_queue_full_14:
+   \   0000A6 101A                  ADDW      SP, #0x1A          ;; 1 cycle
+   \   0000A8 C4                    POP       DE                 ;; 1 cycle
+   \   0000A9 D7                    RET                          ;; 6 cycles
+   \   0000AA                       ; ------------------------------------- Block: 8 cycles
+   \   0000AA                       ; ------------------------------------- Total: 138 cycles
+   \   0000AA                       REQUIRE ?CLRL78_V1_0_L00
+    419          }
+    420          
+    421          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    422          bool lib_aci_request_data(aci_state_t *aci_stat, uint8_t pipe)
+   \                     lib_aci_request_data:
+    423          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 2
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 63                    MOV       A, B               ;; 1 cycle
+   \   000004 74                    MOV       E, A               ;; 1 cycle
+   \   000005 73                    MOV       B, A               ;; 1 cycle
+    424            bool ret_val = false;
+   \   000006 5500                  MOV       D, #0x0            ;; 1 cycle
+    425            aci_cmd_params_request_data_t aci_cmd_params_request_data;
+    426          
+    427            if(!((p_services_pipe_type_map[pipe-1].location == ACI_STORE_REMOTE)&&(p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX_REQ)))
+   \   000008 64                    MOV       A, E               ;; 1 cycle
+   \   000009 70                    MOV       X, A               ;; 1 cycle
+   \   00000A F1                    CLRB      A                  ;; 1 cycle
+   \   00000B 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00000E FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000011 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000014 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000015 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000016 04FDFF                ADDW      AX, #0xFFFD        ;; 1 cycle
+   \   000019 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001B 4C02                  CMP       A, #0x2            ;; 1 cycle
+   \   00001D DF35                  BNZ       ??lib_aci_command_queue_full_16  ;; 4 cycles
+   \   00001F                       ; ------------------------------------- Block: 25 cycles
+   \   00001F 64                    MOV       A, E               ;; 1 cycle
+   \   000020 70                    MOV       X, A               ;; 1 cycle
+   \   000021 F1                    CLRB      A                  ;; 1 cycle
+   \   000022 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000025 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000028 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   00002B 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00002C 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00002D 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   000030 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000031 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000032 70                    MOV       X, A               ;; 1 cycle
+   \   000033 F1                    CLRB      A                  ;; 1 cycle
+   \   000034 C1                    PUSH      AX                 ;; 1 cycle
+   \   000035 64                    MOV       A, E               ;; 1 cycle
+   \   000036 70                    MOV       X, A               ;; 1 cycle
+   \   000037 F1                    CLRB      A                  ;; 1 cycle
+   \   000038 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00003B FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00003E FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000041 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000042 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000043 B7                    DECW      HL                 ;; 1 cycle
+   \   000044 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000045 70                    MOV       X, A               ;; 1 cycle
+   \   000046 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   000048 C6                    POP       HL                 ;; 1 cycle
+   \   000049 616F                  OR        A, H               ;; 1 cycle
+   \   00004B 08                    XCH       A, X               ;; 1 cycle
+   \   00004C 616E                  OR        A, L               ;; 1 cycle
+   \   00004E 08                    XCH       A, X               ;; 1 cycle
+   \   00004F 444000                CMPW      AX, #0x40          ;; 1 cycle
+   \   000052 DD03                  BZ        ??lib_aci_command_queue_full_17  ;; 4 cycles
+   \   000054                       ; ------------------------------------- Block: 40 cycles
+    428            {
+    429              return false;
+   \                     ??lib_aci_command_queue_full_16:
+   \   000054 F1                    CLRB      A                  ;; 1 cycle
+   \   000055 EF15                  BR        S:??lib_aci_command_queue_full_18  ;; 3 cycles
+   \   000057                       ; ------------------------------------- Block: 4 cycles
+    430            }
+    431          
+    432          
+    433            {
+    434          
+    435              {
+    436          
+    437          
+    438          
+    439                aci_cmd_params_request_data.pipe_number = pipe;
+   \                     ??lib_aci_command_queue_full_17:
+   \   000057 64                    MOV       A, E               ;; 1 cycle
+   \   000058 9800                  MOV       [SP], A            ;; 1 cycle
+   \   00005A 74                    MOV       E, A               ;; 1 cycle
+    440                acil_encode_cmd_request_data(&(msg_to_send.buffer[0]), &aci_cmd_params_request_data);
+   \   00005B AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00005D 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00005E 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000061 FD....                CALL      acil_encode_cmd_request_data  ;; 3 cycles
+    441          
+    442                ret_val = hal_aci_tl_send(&msg_to_send);
+   \   000064 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000067 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00006A 75                    MOV       D, A               ;; 1 cycle
+    443              }
+    444            }
+    445            return ret_val;
+   \   00006B 65                    MOV       A, D               ;; 1 cycle
+   \   00006C                       ; ------------------------------------- Block: 15 cycles
+   \                     ??lib_aci_command_queue_full_18:
+   \   00006C 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   00006E C4                    POP       DE                 ;; 1 cycle
+   \   00006F C2                    POP       BC                 ;; 1 cycle
+   \   000070 D7                    RET                          ;; 6 cycles
+   \   000071                       ; ------------------------------------- Block: 9 cycles
+   \   000071                       ; ------------------------------------- Total: 93 cycles
+   \   000071                       REQUIRE ?CLRL78_V1_0_L00
+    446          }
+    447          
+    448          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    449          bool lib_aci_change_timing(uint16_t minimun_cx_interval, uint16_t maximum_cx_interval, uint16_t slave_latency, uint16_t timeout)
+   \                     lib_aci_change_timing:
+    450          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 2
+   \   000000                       ; Auto size: 8
+   \   000000 2008                  SUBW      SP, #0x8           ;; 1 cycle
+    451            aci_cmd_params_change_timing_t aci_cmd_params_change_timing;
+    452            aci_cmd_params_change_timing.conn_params.min_conn_interval = minimun_cx_interval;
+   \   000002 08                    XCH       A, X               ;; 1 cycle
+   \   000003 77                    MOV       H, A               ;; 1 cycle
+   \   000004 60                    MOV       A, X               ;; 1 cycle
+   \   000005 618F                  XCH       A, H               ;; 1 cycle
+   \   000007 9800                  MOV       [SP], A            ;; 1 cycle
+   \   000009 67                    MOV       A, H               ;; 1 cycle
+   \   00000A F0                    CLRB      X                  ;; 1 cycle
+   \   00000B 70                    MOV       X, A               ;; 1 cycle
+   \   00000C 60                    MOV       A, X               ;; 1 cycle
+   \   00000D 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+    453            aci_cmd_params_change_timing.conn_params.max_conn_interval = maximum_cx_interval;
+   \   00000F 62                    MOV       A, C               ;; 1 cycle
+   \   000010 9802                  MOV       [SP+0x02], A       ;; 1 cycle
+   \   000012 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000013 F0                    CLRB      X                  ;; 1 cycle
+   \   000014 70                    MOV       X, A               ;; 1 cycle
+   \   000015 60                    MOV       A, X               ;; 1 cycle
+   \   000016 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+    454            aci_cmd_params_change_timing.conn_params.slave_latency     = slave_latency;    
+   \   000018 64                    MOV       A, E               ;; 1 cycle
+   \   000019 9804                  MOV       [SP+0x04], A       ;; 1 cycle
+   \   00001B 15                    MOVW      AX, DE             ;; 1 cycle
+   \   00001C F0                    CLRB      X                  ;; 1 cycle
+   \   00001D 70                    MOV       X, A               ;; 1 cycle
+   \   00001E 60                    MOV       A, X               ;; 1 cycle
+   \   00001F 9805                  MOV       [SP+0x05], A       ;; 1 cycle
+    455            aci_cmd_params_change_timing.conn_params.timeout_mult      = timeout;     
+   \   000021 A80C                  MOVW      AX, [SP+0x0C]      ;; 1 cycle
+   \   000023 08                    XCH       A, X               ;; 1 cycle
+   \   000024 73                    MOV       B, A               ;; 1 cycle
+   \   000025 60                    MOV       A, X               ;; 1 cycle
+   \   000026 618B                  XCH       A, B               ;; 1 cycle
+   \   000028 9806                  MOV       [SP+0x06], A       ;; 1 cycle
+   \   00002A 63                    MOV       A, B               ;; 1 cycle
+   \   00002B F0                    CLRB      X                  ;; 1 cycle
+   \   00002C 70                    MOV       X, A               ;; 1 cycle
+   \   00002D 60                    MOV       A, X               ;; 1 cycle
+   \   00002E 9807                  MOV       [SP+0x07], A       ;; 1 cycle
+    456            acil_encode_cmd_change_timing_req(&(msg_to_send.buffer[0]), &aci_cmd_params_change_timing);
+   \   000030 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000032 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000033 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000036 FD....                CALL      acil_encode_cmd_change_timing_req  ;; 3 cycles
+    457            return hal_aci_tl_send(&msg_to_send);
+   \   000039 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00003C FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00003F 1008                  ADDW      SP, #0x8           ;; 1 cycle
+   \   000041 FD....                CALL      N:?FUNC_LEAVE_L06
+   \   000044 0200                  DW        0x2                ;; 3 cycles
+   \   000046                       ; ------------------------------------- Block: 50 cycles
+   \   000046                       ; ------------------------------------- Total: 50 cycles
+   \   000046                       REQUIRE ?CLRL78_V1_0_L00
+    458          }
+    459          
+    460          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    461          bool lib_aci_change_timing_GAP_PPCP()
+   \                     lib_aci_change_timing_GAP_PPCP:
+    462          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    463            acil_encode_cmd_change_timing_req_GAP_PPCP(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_change_timing_req_GAP_PPCP  ;; 3 cycles
+    464            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    465          }
+    466          
+    467          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    468          bool lib_aci_open_remote_pipe(aci_state_t *aci_stat, uint8_t pipe)
+   \                     lib_aci_open_remote_pipe:
+    469          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 2
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 63                    MOV       A, B               ;; 1 cycle
+   \   000004 74                    MOV       E, A               ;; 1 cycle
+   \   000005 73                    MOV       B, A               ;; 1 cycle
+    470            bool ret_val = false;
+   \   000006 5500                  MOV       D, #0x0            ;; 1 cycle
+    471            aci_cmd_params_open_remote_pipe_t aci_cmd_params_open_remote_pipe;
+    472          
+    473            if(!((p_services_pipe_type_map[pipe-1].location == ACI_STORE_REMOTE)&&
+    474                          ((p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX)||
+    475                          (p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX_ACK_AUTO)||
+    476                          (p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX_ACK))))
+   \   000008 64                    MOV       A, E               ;; 1 cycle
+   \   000009 70                    MOV       X, A               ;; 1 cycle
+   \   00000A F1                    CLRB      A                  ;; 1 cycle
+   \   00000B 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00000E FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000011 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000014 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000015 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000016 04FDFF                ADDW      AX, #0xFFFD        ;; 1 cycle
+   \   000019 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001B 4C02                  CMP       A, #0x2            ;; 1 cycle
+   \   00001D 61E8                  SKZ                          ;; 4 cycles
+   \   00001F ED....                BR        N:??lib_aci_command_queue_full_19  ;; 4 cycles
+   \   000022                       ; ------------------------------------- Block: 25 cycles
+   \   000022 64                    MOV       A, E               ;; 1 cycle
+   \   000023 70                    MOV       X, A               ;; 1 cycle
+   \   000024 F1                    CLRB      A                  ;; 1 cycle
+   \   000025 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000028 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00002B FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   00002E 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00002F 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000030 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   000033 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000034 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000035 70                    MOV       X, A               ;; 1 cycle
+   \   000036 F1                    CLRB      A                  ;; 1 cycle
+   \   000037 C1                    PUSH      AX                 ;; 1 cycle
+   \   000038 64                    MOV       A, E               ;; 1 cycle
+   \   000039 70                    MOV       X, A               ;; 1 cycle
+   \   00003A F1                    CLRB      A                  ;; 1 cycle
+   \   00003B 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00003E FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000041 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000044 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000045 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000046 B7                    DECW      HL                 ;; 1 cycle
+   \   000047 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000048 70                    MOV       X, A               ;; 1 cycle
+   \   000049 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   00004B C6                    POP       HL                 ;; 1 cycle
+   \   00004C 616F                  OR        A, H               ;; 1 cycle
+   \   00004E 08                    XCH       A, X               ;; 1 cycle
+   \   00004F 616E                  OR        A, L               ;; 1 cycle
+   \   000051 08                    XCH       A, X               ;; 1 cycle
+   \   000052 440800                CMPW      AX, #0x8           ;; 1 cycle
+   \   000055 DD6D                  BZ        ??lib_aci_command_queue_full_20  ;; 4 cycles
+   \   000057                       ; ------------------------------------- Block: 40 cycles
+   \   000057 64                    MOV       A, E               ;; 1 cycle
+   \   000058 70                    MOV       X, A               ;; 1 cycle
+   \   000059 F1                    CLRB      A                  ;; 1 cycle
+   \   00005A 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00005D FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000060 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000063 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000064 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000065 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   000068 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000069 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00006A 70                    MOV       X, A               ;; 1 cycle
+   \   00006B F1                    CLRB      A                  ;; 1 cycle
+   \   00006C C1                    PUSH      AX                 ;; 1 cycle
+   \   00006D 64                    MOV       A, E               ;; 1 cycle
+   \   00006E 70                    MOV       X, A               ;; 1 cycle
+   \   00006F F1                    CLRB      A                  ;; 1 cycle
+   \   000070 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000073 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000076 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000079 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00007A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007B B7                    DECW      HL                 ;; 1 cycle
+   \   00007C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00007D 70                    MOV       X, A               ;; 1 cycle
+   \   00007E 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   000080 C6                    POP       HL                 ;; 1 cycle
+   \   000081 616F                  OR        A, H               ;; 1 cycle
+   \   000083 08                    XCH       A, X               ;; 1 cycle
+   \   000084 616E                  OR        A, L               ;; 1 cycle
+   \   000086 08                    XCH       A, X               ;; 1 cycle
+   \   000087 440004                CMPW      AX, #0x400         ;; 1 cycle
+   \   00008A DD38                  BZ        ??lib_aci_command_queue_full_20  ;; 4 cycles
+   \   00008C                       ; ------------------------------------- Block: 40 cycles
+   \   00008C 64                    MOV       A, E               ;; 1 cycle
+   \   00008D 70                    MOV       X, A               ;; 1 cycle
+   \   00008E F1                    CLRB      A                  ;; 1 cycle
+   \   00008F 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000092 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000095 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000098 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000099 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00009A 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   00009D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00009E 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00009F 70                    MOV       X, A               ;; 1 cycle
+   \   0000A0 F1                    CLRB      A                  ;; 1 cycle
+   \   0000A1 C1                    PUSH      AX                 ;; 1 cycle
+   \   0000A2 64                    MOV       A, E               ;; 1 cycle
+   \   0000A3 70                    MOV       X, A               ;; 1 cycle
+   \   0000A4 F1                    CLRB      A                  ;; 1 cycle
+   \   0000A5 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   0000A8 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   0000AB FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   0000AE 07                    ADDW      AX, HL             ;; 1 cycle
+   \   0000AF 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000B0 B7                    DECW      HL                 ;; 1 cycle
+   \   0000B1 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   0000B2 70                    MOV       X, A               ;; 1 cycle
+   \   0000B3 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   0000B5 C6                    POP       HL                 ;; 1 cycle
+   \   0000B6 616F                  OR        A, H               ;; 1 cycle
+   \   0000B8 08                    XCH       A, X               ;; 1 cycle
+   \   0000B9 616E                  OR        A, L               ;; 1 cycle
+   \   0000BB 08                    XCH       A, X               ;; 1 cycle
+   \   0000BC 441000                CMPW      AX, #0x10          ;; 1 cycle
+   \   0000BF DD03                  BZ        ??lib_aci_command_queue_full_20  ;; 4 cycles
+   \   0000C1                       ; ------------------------------------- Block: 40 cycles
+    477            {
+    478              return false;
+   \                     ??lib_aci_command_queue_full_19:
+   \   0000C1 F1                    CLRB      A                  ;; 1 cycle
+   \   0000C2 EF1E                  BR        S:??lib_aci_command_queue_full_21  ;; 3 cycles
+   \   0000C4                       ; ------------------------------------- Block: 4 cycles
+    479            }
+    480          
+    481            
+    482            {
+    483          
+    484              is_request_operation_pending = true;
+   \                     ??lib_aci_command_queue_full_20:
+   \   0000C4 E5....                ONEB      N:is_request_operation_pending  ;; 1 cycle
+    485              is_open_remote_pipe_pending = true;
+   \   0000C7 E5....                ONEB      N:is_open_remote_pipe_pending  ;; 1 cycle
+    486              request_operation_pipe = pipe;
+   \   0000CA 64                    MOV       A, E               ;; 1 cycle
+   \   0000CB 9F....                MOV       N:request_operation_pipe, A  ;; 1 cycle
+    487              aci_cmd_params_open_remote_pipe.pipe_number = pipe;
+   \   0000CE 9800                  MOV       [SP], A            ;; 1 cycle
+   \   0000D0 74                    MOV       E, A               ;; 1 cycle
+    488              acil_encode_cmd_open_remote_pipe(&(msg_to_send.buffer[0]), &aci_cmd_params_open_remote_pipe);
+   \   0000D1 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000D3 12                    MOVW      BC, AX             ;; 1 cycle
+   \   0000D4 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   0000D7 FD....                CALL      acil_encode_cmd_open_remote_pipe  ;; 3 cycles
+    489              ret_val = hal_aci_tl_send(&msg_to_send);
+   \   0000DA 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   0000DD FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   0000E0 75                    MOV       D, A               ;; 1 cycle
+    490            }
+    491            return ret_val;
+   \   0000E1 65                    MOV       A, D               ;; 1 cycle
+   \   0000E2                       ; ------------------------------------- Block: 18 cycles
+   \                     ??lib_aci_command_queue_full_21:
+   \   0000E2 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   0000E4 C4                    POP       DE                 ;; 1 cycle
+   \   0000E5 C2                    POP       BC                 ;; 1 cycle
+   \   0000E6 D7                    RET                          ;; 6 cycles
+   \   0000E7                       ; ------------------------------------- Block: 9 cycles
+   \   0000E7                       ; ------------------------------------- Total: 176 cycles
+   \   0000E7                       REQUIRE ?CLRL78_V1_0_L00
+    492          }
+    493          
+    494          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    495          bool lib_aci_close_remote_pipe(aci_state_t *aci_stat, uint8_t pipe)
+   \                     lib_aci_close_remote_pipe:
+    496          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 2
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 63                    MOV       A, B               ;; 1 cycle
+   \   000004 74                    MOV       E, A               ;; 1 cycle
+   \   000005 73                    MOV       B, A               ;; 1 cycle
+    497            bool ret_val = false;
+   \   000006 5500                  MOV       D, #0x0            ;; 1 cycle
+    498            aci_cmd_params_close_remote_pipe_t aci_cmd_params_close_remote_pipe;
+    499          
+    500            if(!((p_services_pipe_type_map[pipe-1].location == ACI_STORE_REMOTE)&&
+    501                  ((p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX)||
+    502                   (p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX_ACK_AUTO)||
+    503                   (p_services_pipe_type_map[pipe-1].pipe_type == ACI_RX_ACK))))
+   \   000008 64                    MOV       A, E               ;; 1 cycle
+   \   000009 70                    MOV       X, A               ;; 1 cycle
+   \   00000A F1                    CLRB      A                  ;; 1 cycle
+   \   00000B 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00000E FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000011 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000014 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000015 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000016 04FDFF                ADDW      AX, #0xFFFD        ;; 1 cycle
+   \   000019 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001B 4C02                  CMP       A, #0x2            ;; 1 cycle
+   \   00001D 61E8                  SKZ                          ;; 4 cycles
+   \   00001F ED....                BR        N:??lib_aci_command_queue_full_22  ;; 4 cycles
+   \   000022                       ; ------------------------------------- Block: 25 cycles
+   \   000022 64                    MOV       A, E               ;; 1 cycle
+   \   000023 70                    MOV       X, A               ;; 1 cycle
+   \   000024 F1                    CLRB      A                  ;; 1 cycle
+   \   000025 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000028 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00002B FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   00002E 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00002F 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000030 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   000033 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000034 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000035 70                    MOV       X, A               ;; 1 cycle
+   \   000036 F1                    CLRB      A                  ;; 1 cycle
+   \   000037 C1                    PUSH      AX                 ;; 1 cycle
+   \   000038 64                    MOV       A, E               ;; 1 cycle
+   \   000039 70                    MOV       X, A               ;; 1 cycle
+   \   00003A F1                    CLRB      A                  ;; 1 cycle
+   \   00003B 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00003E FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000041 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000044 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000045 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000046 B7                    DECW      HL                 ;; 1 cycle
+   \   000047 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000048 70                    MOV       X, A               ;; 1 cycle
+   \   000049 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   00004B C6                    POP       HL                 ;; 1 cycle
+   \   00004C 616F                  OR        A, H               ;; 1 cycle
+   \   00004E 08                    XCH       A, X               ;; 1 cycle
+   \   00004F 616E                  OR        A, L               ;; 1 cycle
+   \   000051 08                    XCH       A, X               ;; 1 cycle
+   \   000052 440800                CMPW      AX, #0x8           ;; 1 cycle
+   \   000055 DD6D                  BZ        ??lib_aci_command_queue_full_23  ;; 4 cycles
+   \   000057                       ; ------------------------------------- Block: 40 cycles
+   \   000057 64                    MOV       A, E               ;; 1 cycle
+   \   000058 70                    MOV       X, A               ;; 1 cycle
+   \   000059 F1                    CLRB      A                  ;; 1 cycle
+   \   00005A 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   00005D FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000060 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000063 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000064 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000065 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   000068 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000069 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00006A 70                    MOV       X, A               ;; 1 cycle
+   \   00006B F1                    CLRB      A                  ;; 1 cycle
+   \   00006C C1                    PUSH      AX                 ;; 1 cycle
+   \   00006D 64                    MOV       A, E               ;; 1 cycle
+   \   00006E 70                    MOV       X, A               ;; 1 cycle
+   \   00006F F1                    CLRB      A                  ;; 1 cycle
+   \   000070 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000073 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000076 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000079 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00007A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007B B7                    DECW      HL                 ;; 1 cycle
+   \   00007C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00007D 70                    MOV       X, A               ;; 1 cycle
+   \   00007E 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   000080 C6                    POP       HL                 ;; 1 cycle
+   \   000081 616F                  OR        A, H               ;; 1 cycle
+   \   000083 08                    XCH       A, X               ;; 1 cycle
+   \   000084 616E                  OR        A, L               ;; 1 cycle
+   \   000086 08                    XCH       A, X               ;; 1 cycle
+   \   000087 440004                CMPW      AX, #0x400         ;; 1 cycle
+   \   00008A DD38                  BZ        ??lib_aci_command_queue_full_23  ;; 4 cycles
+   \   00008C                       ; ------------------------------------- Block: 40 cycles
+   \   00008C 64                    MOV       A, E               ;; 1 cycle
+   \   00008D 70                    MOV       X, A               ;; 1 cycle
+   \   00008E F1                    CLRB      A                  ;; 1 cycle
+   \   00008F 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   000092 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000095 FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   000098 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000099 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00009A 04FEFF                ADDW      AX, #0xFFFE        ;; 1 cycle
+   \   00009D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00009E 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00009F 70                    MOV       X, A               ;; 1 cycle
+   \   0000A0 F1                    CLRB      A                  ;; 1 cycle
+   \   0000A1 C1                    PUSH      AX                 ;; 1 cycle
+   \   0000A2 64                    MOV       A, E               ;; 1 cycle
+   \   0000A3 70                    MOV       X, A               ;; 1 cycle
+   \   0000A4 F1                    CLRB      A                  ;; 1 cycle
+   \   0000A5 320300                MOVW      BC, #0x3           ;; 1 cycle
+   \   0000A8 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   0000AB FB....                MOVW      HL, N:p_services_pipe_type_map  ;; 1 cycle
+   \   0000AE 07                    ADDW      AX, HL             ;; 1 cycle
+   \   0000AF 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000B0 B7                    DECW      HL                 ;; 1 cycle
+   \   0000B1 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   0000B2 70                    MOV       X, A               ;; 1 cycle
+   \   0000B3 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   0000B5 C6                    POP       HL                 ;; 1 cycle
+   \   0000B6 616F                  OR        A, H               ;; 1 cycle
+   \   0000B8 08                    XCH       A, X               ;; 1 cycle
+   \   0000B9 616E                  OR        A, L               ;; 1 cycle
+   \   0000BB 08                    XCH       A, X               ;; 1 cycle
+   \   0000BC 441000                CMPW      AX, #0x10          ;; 1 cycle
+   \   0000BF DD03                  BZ        ??lib_aci_command_queue_full_23  ;; 4 cycles
+   \   0000C1                       ; ------------------------------------- Block: 40 cycles
+    504            {
+    505              return false;
+   \                     ??lib_aci_command_queue_full_22:
+   \   0000C1 F1                    CLRB      A                  ;; 1 cycle
+   \   0000C2 EF1E                  BR        S:??lib_aci_command_queue_full_24  ;; 3 cycles
+   \   0000C4                       ; ------------------------------------- Block: 4 cycles
+    506            }  
+    507          
+    508          
+    509            {
+    510          
+    511              is_request_operation_pending = true;
+   \                     ??lib_aci_command_queue_full_23:
+   \   0000C4 E5....                ONEB      N:is_request_operation_pending  ;; 1 cycle
+    512              is_close_remote_pipe_pending = true;
+   \   0000C7 E5....                ONEB      N:is_close_remote_pipe_pending  ;; 1 cycle
+    513              request_operation_pipe = pipe;
+   \   0000CA 64                    MOV       A, E               ;; 1 cycle
+   \   0000CB 9F....                MOV       N:request_operation_pipe, A  ;; 1 cycle
+    514              aci_cmd_params_close_remote_pipe.pipe_number = pipe;
+   \   0000CE 9800                  MOV       [SP], A            ;; 1 cycle
+   \   0000D0 74                    MOV       E, A               ;; 1 cycle
+    515              acil_encode_cmd_close_remote_pipe(&(msg_to_send.buffer[0]), &aci_cmd_params_close_remote_pipe);
+   \   0000D1 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000D3 12                    MOVW      BC, AX             ;; 1 cycle
+   \   0000D4 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   0000D7 FD....                CALL      acil_encode_cmd_close_remote_pipe  ;; 3 cycles
+    516              ret_val = hal_aci_tl_send(&msg_to_send);
+   \   0000DA 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   0000DD FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   0000E0 75                    MOV       D, A               ;; 1 cycle
+    517            }
+    518            return ret_val;
+   \   0000E1 65                    MOV       A, D               ;; 1 cycle
+   \   0000E2                       ; ------------------------------------- Block: 18 cycles
+   \                     ??lib_aci_command_queue_full_24:
+   \   0000E2 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   0000E4 C4                    POP       DE                 ;; 1 cycle
+   \   0000E5 C2                    POP       BC                 ;; 1 cycle
+   \   0000E6 D7                    RET                          ;; 6 cycles
+   \   0000E7                       ; ------------------------------------- Block: 9 cycles
+   \   0000E7                       ; ------------------------------------- Total: 176 cycles
+   \   0000E7                       REQUIRE ?CLRL78_V1_0_L00
+    519          }
+    520          
+    521          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    522          bool lib_aci_set_key(aci_key_type_t key_rsp_type, uint8_t *key, uint8_t len)
+   \                     lib_aci_set_key:
+    523          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 18
+   \   000001 2012                  SUBW      SP, #0x12          ;; 1 cycle
+   \   000003 C3                    PUSH      BC                 ;; 1 cycle
+   \   000004 C4                    POP       DE                 ;; 1 cycle
+    524            aci_cmd_params_set_key_t aci_cmd_params_set_key;
+    525            aci_cmd_params_set_key.key_type = key_rsp_type;
+   \   000005 9800                  MOV       [SP], A            ;; 1 cycle
+    526            memcpy((uint8_t*)&(aci_cmd_params_set_key.key), key, len);
+   \   000007 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000008 F3                    CLRB      B                  ;; 1 cycle
+   \   000009 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00000A AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00000C A1                    INCW      AX                 ;; 1 cycle
+   \   00000D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00000E 13                    MOVW      AX, BC             ;; 1 cycle
+   \   00000F FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    527            acil_encode_cmd_set_key(&(msg_to_send.buffer[0]), &aci_cmd_params_set_key);
+   \   000012 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000014 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000015 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000018 FD....                CALL      acil_encode_cmd_set_key  ;; 3 cycles
+    528            return hal_aci_tl_send(&msg_to_send);
+   \   00001B 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00001E FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000021 1012                  ADDW      SP, #0x12          ;; 1 cycle
+   \   000023 C4                    POP       DE                 ;; 1 cycle
+   \   000024 D7                    RET                          ;; 6 cycles
+   \   000025                       ; ------------------------------------- Block: 33 cycles
+   \   000025                       ; ------------------------------------- Total: 33 cycles
+   \   000025                       REQUIRE ?CLRL78_V1_0_L00
+    529          }
+    530          
+    531          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    532          bool lib_aci_echo_msg(uint8_t msg_size, uint8_t *p_msg_data)
+   \                     lib_aci_echo_msg:
+    533          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C3                    PUSH      BC                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 34
+   \   000003 201E                  SUBW      SP, #0x1E          ;; 1 cycle
+    534            aci_cmd_params_echo_t aci_cmd_params_echo;
+    535            if(msg_size > (ACI_ECHO_DATA_MAX_LEN))
+   \   000005 881F                  MOV       A, [SP+0x1F]       ;; 1 cycle
+   \   000007 4C1E                  CMP       A, #0x1E           ;; 1 cycle
+   \   000009 DC03                  BC        ??lib_aci_command_queue_full_25  ;; 4 cycles
+   \   00000B                       ; ------------------------------------- Block: 10 cycles
+    536            {
+    537              return false;
+   \   00000B F1                    CLRB      A                  ;; 1 cycle
+   \   00000C EF2A                  BR        S:??lib_aci_command_queue_full_26  ;; 3 cycles
+   \   00000E                       ; ------------------------------------- Block: 4 cycles
+    538            }
+    539          
+    540            if (msg_size > (ACI_ECHO_DATA_MAX_LEN))
+   \                     ??lib_aci_command_queue_full_25:
+   \   00000E 881F                  MOV       A, [SP+0x1F]       ;; 1 cycle
+   \   000010 4C1E                  CMP       A, #0x1E           ;; 1 cycle
+   \   000012 DC04                  BC        ??lib_aci_command_queue_full_27  ;; 4 cycles
+   \   000014                       ; ------------------------------------- Block: 6 cycles
+    541            {
+    542              msg_size = ACI_ECHO_DATA_MAX_LEN;
+   \   000014 511D                  MOV       A, #0x1D           ;; 1 cycle
+   \   000016 981F                  MOV       [SP+0x1F], A       ;; 1 cycle
+   \   000018                       ; ------------------------------------- Block: 2 cycles
+    543            }
+    544          
+    545            memcpy(&(aci_cmd_params_echo.echo_data[0]), p_msg_data, msg_size);
+   \                     ??lib_aci_command_queue_full_27:
+   \   000018 881F                  MOV       A, [SP+0x1F]       ;; 1 cycle
+   \   00001A 72                    MOV       C, A               ;; 1 cycle
+   \   00001B F3                    CLRB      B                  ;; 1 cycle
+   \   00001C A820                  MOVW      AX, [SP+0x20]      ;; 1 cycle
+   \   00001E 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00001F AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000021 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000022 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000023 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    546            acil_encode_cmd_echo_msg(&(msg_to_send.buffer[0]), &aci_cmd_params_echo, msg_size);
+   \   000026 881F                  MOV       A, [SP+0x1F]       ;; 1 cycle
+   \   000028 75                    MOV       D, A               ;; 1 cycle
+   \   000029 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00002B 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00002C 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00002F FD....                CALL      acil_encode_cmd_echo_msg  ;; 3 cycles
+    547          
+    548            return hal_aci_tl_send(&msg_to_send);
+   \   000032 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000035 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000038                       ; ------------------------------------- Block: 23 cycles
+   \                     ??lib_aci_command_queue_full_26:
+   \   000038 1022                  ADDW      SP, #0x22          ;; 1 cycle
+   \   00003A C4                    POP       DE                 ;; 1 cycle
+   \   00003B D7                    RET                          ;; 6 cycles
+   \   00003C                       ; ------------------------------------- Block: 8 cycles
+   \   00003C                       ; ------------------------------------- Total: 53 cycles
+   \   00003C                       REQUIRE ?CLRL78_V1_0_L00
+    549          }
+    550          
+    551          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    552          bool lib_aci_bond_request()
+   \                     lib_aci_bond_request:
+    553          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    554            acil_encode_cmd_bond_security_request(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_bond_security_request  ;; 3 cycles
+    555            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    556          }
+    557          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    558          bool lib_aci_event_peek(hal_aci_evt_t *p_aci_evt_data)
+   \                     lib_aci_event_peek:
+    559          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+   \   000000 16                    MOVW      HL, AX             ;; 1 cycle
+    560            return hal_aci_tl_event_peek((hal_aci_data_t *)p_aci_evt_data);
+   \   000001 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000002 FD....                CALL      hal_aci_tl_event_peek  ;; 3 cycles
+   \   000005 D7                    RET                          ;; 6 cycles
+   \   000006                       ; ------------------------------------- Block: 11 cycles
+   \   000006                       ; ------------------------------------- Total: 11 cycles
+   \   000006                       REQUIRE ?CLRL78_V1_0_L00
+    561          }
+    562          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    563          bool lib_aci_event_get(aci_state_t *aci_stat, hal_aci_evt_t *p_aci_evt_data)
+   \                     lib_aci_event_get:
+    564          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002                       ; Auto size: 4
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 C3                    PUSH      BC                 ;; 1 cycle
+   \   000004 C4                    POP       DE                 ;; 1 cycle
+    565            bool status = false;
+   \   000005 F3                    CLRB      B                  ;; 1 cycle
+    566            
+    567            status = hal_aci_tl_event_get((hal_aci_data_t *)p_aci_evt_data);
+   \   000006 15                    MOVW      AX, DE             ;; 1 cycle
+   \   000007 FD....                CALL      hal_aci_tl_event_get  ;; 3 cycles
+   \   00000A 73                    MOV       B, A               ;; 1 cycle
+    568            
+    569            /**
+    570            Update the state of the ACI with the 
+    571            ACI Events -> Pipe Status, Disconnected, Connected, Bond Status, Pipe Error
+    572            */
+    573            if (true == status)
+   \   00000B D3                    CMP0      B                  ;; 1 cycle
+   \   00000C 61F8                  SKNZ                         ;; 4 cycles
+   \   00000E ED....                BR        N:??lib_aci_command_queue_full_28  ;; 4 cycles
+   \   000011                       ; ------------------------------------- Block: 16 cycles
+    574            {
+    575              aci_evt_t * aci_evt;
+    576              
+    577              aci_evt = &p_aci_evt_data->evt;  
+   \   000011 A5                    INCW      DE                 ;; 1 cycle
+   \   000012 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000013 B800                  MOVW      [SP], AX           ;; 1 cycle
+   \   000015 35                    XCHW      AX, DE             ;; 1 cycle
+    578              
+    579              switch(aci_evt->evt_opcode)
+   \   000016 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000018 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000019 A7                    INCW      HL                 ;; 1 cycle
+   \   00001A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001B 2C86                  SUB       A, #0x86           ;; 1 cycle
+   \   00001D DD44                  BZ        ??lib_aci_command_queue_full_29  ;; 4 cycles
+   \   00001F                       ; ------------------------------------- Block: 13 cycles
+   \   00001F 2C02                  SUB       A, #0x2            ;; 1 cycle
+   \   000021 DD06                  BZ        ??lib_aci_command_queue_full_30  ;; 4 cycles
+   \   000023                       ; ------------------------------------- Block: 5 cycles
+   \   000023 91                    DEC       A                  ;; 1 cycle
+   \   000024 DD76                  BZ        ??lib_aci_command_queue_full_31  ;; 4 cycles
+   \   000026                       ; ------------------------------------- Block: 5 cycles
+   \   000026 ED....                BR        N:??lib_aci_command_queue_full_28  ;; 3 cycles
+   \   000029                       ; ------------------------------------- Block: 3 cycles
+    580              {
+    581                  case ACI_EVT_PIPE_STATUS:
+    582                      {
+    583                          uint8_t i=0;
+   \                     ??lib_aci_command_queue_full_30:
+   \   000029 F0                    CLRB      X                  ;; 1 cycle
+    584                          
+    585                          for (i=0; i < PIPES_ARRAY_SIZE; i++)
+   \   00002A F1                    CLRB      A                  ;; 1 cycle
+   \   00002B 70                    MOV       X, A               ;; 1 cycle
+   \   00002C EF2D                  BR        S:??lib_aci_command_queue_full_32  ;; 3 cycles
+   \   00002E                       ; ------------------------------------- Block: 6 cycles
+    586                          {
+    587                            aci_stat->pipes_open_bitmap[i]   = aci_evt->params.pipe_status.pipes_open_bitmap[i];
+   \                     ??lib_aci_event_get_0:
+   \   00002E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00002F 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000031 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000032 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000034 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000035 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000036 C5                    PUSH      DE                 ;; 1 cycle
+   \   000037 C6                    POP       HL                 ;; 1 cycle
+   \   000038 8C02                  MOV       A, [HL+0x02]       ;; 1 cycle
+   \   00003A 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00003B 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   00003D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00003E A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000040 05                    ADDW      AX, DE             ;; 1 cycle
+   \   000041 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000042 9C1C                  MOV       [HL+0x1C], A       ;; 1 cycle
+    588                            aci_stat->pipes_closed_bitmap[i] = aci_evt->params.pipe_status.pipes_closed_bitmap[i];
+   \   000044 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000045 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000047 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000048 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00004A 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00004B 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00004C C5                    PUSH      DE                 ;; 1 cycle
+   \   00004D C6                    POP       HL                 ;; 1 cycle
+   \   00004E 8C0A                  MOV       A, [HL+0x0A]       ;; 1 cycle
+   \   000050 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000051 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   000053 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000054 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000056 05                    ADDW      AX, DE             ;; 1 cycle
+   \   000057 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000058 9C24                  MOV       [HL+0x24], A       ;; 1 cycle
+    589                          }
+   \   00005A 80                    INC       X                  ;; 1 cycle
+   \   00005B                       ; ------------------------------------- Block: 33 cycles
+   \                     ??lib_aci_command_queue_full_32:
+   \   00005B 60                    MOV       A, X               ;; 1 cycle
+   \   00005C 4C08                  CMP       A, #0x8            ;; 1 cycle
+   \   00005E DCCE                  BC        ??lib_aci_event_get_0  ;; 4 cycles
+   \   000060                       ; ------------------------------------- Block: 6 cycles
+    590                      }
+    591                      break;
+   \   000060 ED....                BR        N:??lib_aci_command_queue_full_28  ;; 3 cycles
+   \   000063                       ; ------------------------------------- Block: 3 cycles
+    592                  
+    593                  case ACI_EVT_DISCONNECTED:
+    594                      {
+    595                          uint8_t i=0;
+   \                     ??lib_aci_command_queue_full_29:
+   \   000063 F0                    CLRB      X                  ;; 1 cycle
+    596                          
+    597                          for (i=0; i < PIPES_ARRAY_SIZE; i++)
+   \   000064 F1                    CLRB      A                  ;; 1 cycle
+   \   000065 70                    MOV       X, A               ;; 1 cycle
+   \   000066 EF1B                  BR        S:??lib_aci_command_queue_full_33  ;; 3 cycles
+   \   000068                       ; ------------------------------------- Block: 6 cycles
+    598                          {
+    599                            aci_stat->pipes_open_bitmap[i] = 0;
+   \                     ??lib_aci_event_get_1:
+   \   000068 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000069 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   00006B 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00006C A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00006E 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00006F 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000070 C5                    PUSH      DE                 ;; 1 cycle
+   \   000071 C6                    POP       HL                 ;; 1 cycle
+   \   000072 F1                    CLRB      A                  ;; 1 cycle
+   \   000073 9C1C                  MOV       [HL+0x1C], A       ;; 1 cycle
+    600                            aci_stat->pipes_closed_bitmap[i] = 0;
+   \   000075 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000076 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000078 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000079 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00007B 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00007C 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00007D C5                    PUSH      DE                 ;; 1 cycle
+   \   00007E C6                    POP       HL                 ;; 1 cycle
+   \   00007F F1                    CLRB      A                  ;; 1 cycle
+   \   000080 9C24                  MOV       [HL+0x24], A       ;; 1 cycle
+    601                          }
+   \   000082 80                    INC       X                  ;; 1 cycle
+   \   000083                       ; ------------------------------------- Block: 21 cycles
+   \                     ??lib_aci_command_queue_full_33:
+   \   000083 60                    MOV       A, X               ;; 1 cycle
+   \   000084 4C08                  CMP       A, #0x8            ;; 1 cycle
+   \   000086 DCE0                  BC        ??lib_aci_event_get_1  ;; 4 cycles
+   \   000088                       ; ------------------------------------- Block: 6 cycles
+    602                          aci_stat->confirmation_pending = false;
+   \   000088 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00008A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00008B F1                    CLRB      A                  ;; 1 cycle
+   \   00008C 9C2C                  MOV       [HL+0x2C], A       ;; 1 cycle
+    603                          aci_stat->data_credit_available = aci_stat->data_credit_total;
+   \   00008E A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000090 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000091 8C13                  MOV       A, [HL+0x13]       ;; 1 cycle
+   \   000093 72                    MOV       C, A               ;; 1 cycle
+   \   000094 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000096 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000097 62                    MOV       A, C               ;; 1 cycle
+   \   000098 9C15                  MOV       [HL+0x15], A       ;; 1 cycle
+    604                          
+    605                      }
+    606                      break;
+   \   00009A EF7E                  BR        S:??lib_aci_command_queue_full_28  ;; 3 cycles
+   \   00009C                       ; ------------------------------------- Block: 15 cycles
+    607                      
+    608                  case ACI_EVT_TIMING:            
+    609                          aci_stat->connection_interval = aci_evt->params.timing.conn_rf_interval;
+   \                     ??lib_aci_command_queue_full_31:
+   \   00009C A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00009E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00009F 8C02                  MOV       A, [HL+0x02]       ;; 1 cycle
+   \   0000A1 74                    MOV       E, A               ;; 1 cycle
+   \   0000A2 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   0000A4 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0000A6 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000A7 8C03                  MOV       A, [HL+0x03]       ;; 1 cycle
+   \   0000A9 70                    MOV       X, A               ;; 1 cycle
+   \   0000AA 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   0000AC 616D                  OR        A, D               ;; 1 cycle
+   \   0000AE 08                    XCH       A, X               ;; 1 cycle
+   \   0000AF 616C                  OR        A, E               ;; 1 cycle
+   \   0000B1 08                    XCH       A, X               ;; 1 cycle
+   \   0000B2 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000B3 64                    MOV       A, E               ;; 1 cycle
+   \   0000B4 72                    MOV       C, A               ;; 1 cycle
+   \   0000B5 74                    MOV       E, A               ;; 1 cycle
+   \   0000B6 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   0000B8 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000B9 62                    MOV       A, C               ;; 1 cycle
+   \   0000BA 9C16                  MOV       [HL+0x16], A       ;; 1 cycle
+   \   0000BC 15                    MOVW      AX, DE             ;; 1 cycle
+   \   0000BD F0                    CLRB      X                  ;; 1 cycle
+   \   0000BE 72                    MOV       C, A               ;; 1 cycle
+   \   0000BF 70                    MOV       X, A               ;; 1 cycle
+   \   0000C0 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   0000C2 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000C3 62                    MOV       A, C               ;; 1 cycle
+   \   0000C4 9C17                  MOV       [HL+0x17], A       ;; 1 cycle
+    610                          aci_stat->slave_latency       = aci_evt->params.timing.conn_slave_rf_latency;
+   \   0000C6 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0000C8 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000C9 8C04                  MOV       A, [HL+0x04]       ;; 1 cycle
+   \   0000CB 74                    MOV       E, A               ;; 1 cycle
+   \   0000CC 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   0000CE A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0000D0 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000D1 8C05                  MOV       A, [HL+0x05]       ;; 1 cycle
+   \   0000D3 70                    MOV       X, A               ;; 1 cycle
+   \   0000D4 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   0000D6 616D                  OR        A, D               ;; 1 cycle
+   \   0000D8 08                    XCH       A, X               ;; 1 cycle
+   \   0000D9 616C                  OR        A, E               ;; 1 cycle
+   \   0000DB 08                    XCH       A, X               ;; 1 cycle
+   \   0000DC 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000DD 64                    MOV       A, E               ;; 1 cycle
+   \   0000DE 72                    MOV       C, A               ;; 1 cycle
+   \   0000DF 74                    MOV       E, A               ;; 1 cycle
+   \   0000E0 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   0000E2 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000E3 62                    MOV       A, C               ;; 1 cycle
+   \   0000E4 9C18                  MOV       [HL+0x18], A       ;; 1 cycle
+   \   0000E6 15                    MOVW      AX, DE             ;; 1 cycle
+   \   0000E7 F0                    CLRB      X                  ;; 1 cycle
+   \   0000E8 72                    MOV       C, A               ;; 1 cycle
+   \   0000E9 70                    MOV       X, A               ;; 1 cycle
+   \   0000EA A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   0000EC 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000ED 62                    MOV       A, C               ;; 1 cycle
+   \   0000EE 9C19                  MOV       [HL+0x19], A       ;; 1 cycle
+    611                          aci_stat->supervision_timeout = aci_evt->params.timing.conn_rf_timeout;
+   \   0000F0 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0000F2 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000F3 8C06                  MOV       A, [HL+0x06]       ;; 1 cycle
+   \   0000F5 74                    MOV       E, A               ;; 1 cycle
+   \   0000F6 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   0000F8 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0000FA 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000FB 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   0000FD 70                    MOV       X, A               ;; 1 cycle
+   \   0000FE 318D                  SHLW      AX, 0x8            ;; 1 cycle
+   \   000100 616D                  OR        A, D               ;; 1 cycle
+   \   000102 08                    XCH       A, X               ;; 1 cycle
+   \   000103 616C                  OR        A, E               ;; 1 cycle
+   \   000105 08                    XCH       A, X               ;; 1 cycle
+   \   000106 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000107 64                    MOV       A, E               ;; 1 cycle
+   \   000108 72                    MOV       C, A               ;; 1 cycle
+   \   000109 74                    MOV       E, A               ;; 1 cycle
+   \   00010A A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00010C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00010D 62                    MOV       A, C               ;; 1 cycle
+   \   00010E 9C1A                  MOV       [HL+0x1A], A       ;; 1 cycle
+   \   000110 15                    MOVW      AX, DE             ;; 1 cycle
+   \   000111 F0                    CLRB      X                  ;; 1 cycle
+   \   000112 72                    MOV       C, A               ;; 1 cycle
+   \   000113 70                    MOV       X, A               ;; 1 cycle
+   \   000114 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000116 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000117 62                    MOV       A, C               ;; 1 cycle
+   \   000118 9C1B                  MOV       [HL+0x1B], A       ;; 1 cycle
+    612                      break;
+   \   00011A                       ; ------------------------------------- Block: 90 cycles
+    613          
+    614                  default:
+    615                      /* Need default case to avoid compiler warnings about missing enum
+    616                       * values on some platforms.
+    617                       */
+    618                      break;
+    619          
+    620                
+    621                
+    622              }
+    623            }
+    624            return status;
+   \                     ??lib_aci_command_queue_full_28:
+   \   00011A 63                    MOV       A, B               ;; 1 cycle
+   \   00011B 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00011D C4                    POP       DE                 ;; 1 cycle
+   \   00011E D7                    RET                          ;; 6 cycles
+   \   00011F                       ; ------------------------------------- Block: 9 cycles
+   \   00011F                       ; ------------------------------------- Total: 237 cycles
+   \   00011F                       REQUIRE ?CLRL78_V1_0_L00
+    625          }
+    626          
+    627          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    628          bool lib_aci_send_ack(aci_state_t *aci_stat, const uint8_t pipe)
+   \                     lib_aci_send_ack:
+    629          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+    630            bool ret_val = false;
+   \   000001 F2                    CLRB      C                  ;; 1 cycle
+    631            {
+    632              acil_encode_cmd_send_data_ack(&(msg_to_send.buffer[0]), pipe);
+   \   000002 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000005 FD....                CALL      acil_encode_cmd_send_data_ack  ;; 3 cycles
+    633              
+    634              ret_val = hal_aci_tl_send(&msg_to_send);
+   \   000008 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00000B FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000E 72                    MOV       C, A               ;; 1 cycle
+    635            }
+    636            return ret_val;
+   \   00000F 62                    MOV       A, C               ;; 1 cycle
+   \   000010 C2                    POP       BC                 ;; 1 cycle
+   \   000011 D7                    RET                          ;; 6 cycles
+   \   000012                       ; ------------------------------------- Block: 19 cycles
+   \   000012                       ; ------------------------------------- Total: 19 cycles
+   \   000012                       REQUIRE ?CLRL78_V1_0_L00
+    637          }
+    638          
+    639          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    640          bool lib_aci_send_nack(aci_state_t *aci_stat, const uint8_t pipe, const uint8_t error_code)
+   \                     lib_aci_send_nack:
+    641          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+    642            bool ret_val = false;
+   \   000001 5500                  MOV       D, #0x0            ;; 1 cycle
+    643            
+    644            {
+    645              
+    646              acil_encode_cmd_send_data_nack(&(msg_to_send.buffer[0]), pipe, error_code);
+   \   000003 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000006 FD....                CALL      acil_encode_cmd_send_data_nack  ;; 3 cycles
+    647              ret_val = hal_aci_tl_send(&msg_to_send);
+   \   000009 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00000C FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000F 75                    MOV       D, A               ;; 1 cycle
+    648            }
+    649            return ret_val;
+   \   000010 65                    MOV       A, D               ;; 1 cycle
+   \   000011 C4                    POP       DE                 ;; 1 cycle
+   \   000012 D7                    RET                          ;; 6 cycles
+   \   000013                       ; ------------------------------------- Block: 19 cycles
+   \   000013                       ; ------------------------------------- Total: 19 cycles
+   \   000013                       REQUIRE ?CLRL78_V1_0_L00
+    650          }
+    651          
+    652          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    653          bool lib_aci_broadcast(const uint16_t timeout, const uint16_t adv_interval)
+   \                     lib_aci_broadcast:
+    654          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 4
+   \   000000 2004                  SUBW      SP, #0x4           ;; 1 cycle
+   \   000002 16                    MOVW      HL, AX             ;; 1 cycle
+    655            aci_cmd_params_broadcast_t aci_cmd_params_broadcast;
+    656            if (timeout > 16383)
+   \   000003 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000004 440040                CMPW      AX, #0x4000        ;; 1 cycle
+   \   000007 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000008 DC03                  BC        ??lib_aci_command_queue_full_34  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 9 cycles
+    657            {
+    658              return false;
+   \   00000A F1                    CLRB      A                  ;; 1 cycle
+   \   00000B EF2D                  BR        S:??lib_aci_command_queue_full_35  ;; 3 cycles
+   \   00000D                       ; ------------------------------------- Block: 4 cycles
+    659            }  
+    660            
+    661            // The adv_interval should be between 160 and 16384 (which translates to the advertisement 
+    662            // interval values 100 ms and 10.24 s.
+    663            if ((160 > adv_interval) || (adv_interval > 16384))
+   \                     ??lib_aci_command_queue_full_34:
+   \   00000D 13                    MOVW      AX, BC             ;; 1 cycle
+   \   00000E 24A000                SUBW      AX, #0xA0          ;; 1 cycle
+   \   000011 44613F                CMPW      AX, #0x3F61        ;; 1 cycle
+   \   000014 DC03                  BC        ??lib_aci_command_queue_full_36  ;; 4 cycles
+   \   000016                       ; ------------------------------------- Block: 7 cycles
+    664            {
+    665              return false;
+   \   000016 F1                    CLRB      A                  ;; 1 cycle
+   \   000017 EF21                  BR        S:??lib_aci_command_queue_full_35  ;; 3 cycles
+   \   000019                       ; ------------------------------------- Block: 4 cycles
+    666            }
+    667          
+    668            aci_cmd_params_broadcast.timeout = timeout;
+   \                     ??lib_aci_command_queue_full_36:
+   \   000019 66                    MOV       A, L               ;; 1 cycle
+   \   00001A 9800                  MOV       [SP], A            ;; 1 cycle
+   \   00001C 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00001D F0                    CLRB      X                  ;; 1 cycle
+   \   00001E 70                    MOV       X, A               ;; 1 cycle
+   \   00001F 60                    MOV       A, X               ;; 1 cycle
+   \   000020 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+    669            aci_cmd_params_broadcast.adv_interval = adv_interval;
+   \   000022 62                    MOV       A, C               ;; 1 cycle
+   \   000023 9802                  MOV       [SP+0x02], A       ;; 1 cycle
+   \   000025 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000026 F0                    CLRB      X                  ;; 1 cycle
+   \   000027 70                    MOV       X, A               ;; 1 cycle
+   \   000028 60                    MOV       A, X               ;; 1 cycle
+   \   000029 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+    670            acil_encode_cmd_broadcast(&(msg_to_send.buffer[0]), &aci_cmd_params_broadcast);
+   \   00002B AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00002D 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00002E 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000031 FD....                CALL      acil_encode_cmd_broadcast  ;; 3 cycles
+    671            return hal_aci_tl_send(&msg_to_send);
+   \   000034 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000037 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00003A                       ; ------------------------------------- Block: 24 cycles
+   \                     ??lib_aci_command_queue_full_35:
+   \   00003A 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00003C D7                    RET                          ;; 6 cycles
+   \   00003D                       ; ------------------------------------- Block: 7 cycles
+   \   00003D                       ; ------------------------------------- Total: 55 cycles
+   \   00003D                       REQUIRE ?CLRL78_V1_0_L00
+    672          }
+    673          
+    674          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    675          bool lib_aci_open_adv_pipes(const uint8_t * const adv_service_data_pipes)
+   \                     lib_aci_open_adv_pipes:
+    676          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    677            uint8_t i;
+    678              
+    679            for (i = 0; i < PIPES_ARRAY_SIZE; i++)
+   \   000003 F3                    CLRB      B                  ;; 1 cycle
+   \   000004 EF08                  BR        S:??lib_aci_command_queue_full_37  ;; 3 cycles
+   \   000006                       ; ------------------------------------- Block: 7 cycles
+    680            {
+    681              aci_cmd_params_open_adv_pipe.pipes[i] = adv_service_data_pipes[i];
+   \                     ??lib_aci_open_adv_pipes_0:
+   \   000006 C5                    PUSH      DE                 ;; 1 cycle
+   \   000007 C6                    POP       HL                 ;; 1 cycle
+   \   000008 61C9                  MOV       A, [HL+B]          ;; 1 cycle
+   \   00000A 18....                MOV       (aci_cmd_params_open_adv_pipe & 0xFFFF)[B], A  ;; 1 cycle
+    682            }
+   \   00000D 83                    INC       B                  ;; 1 cycle
+   \   00000E                       ; ------------------------------------- Block: 5 cycles
+   \                     ??lib_aci_command_queue_full_37:
+   \   00000E 63                    MOV       A, B               ;; 1 cycle
+   \   00000F 4C08                  CMP       A, #0x8            ;; 1 cycle
+   \   000011 DCF3                  BC        ??lib_aci_open_adv_pipes_0  ;; 4 cycles
+   \   000013                       ; ------------------------------------- Block: 6 cycles
+    683          
+    684            acil_encode_cmd_open_adv_pipes(&(msg_to_send.buffer[0]), &aci_cmd_params_open_adv_pipe);
+   \   000013 32....                MOVW      BC, #aci_cmd_params_open_adv_pipe  ;; 1 cycle
+   \   000016 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000019 FD....                CALL      acil_encode_cmd_open_adv_pipes  ;; 3 cycles
+    685            return hal_aci_tl_send(&msg_to_send);
+   \   00001C 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00001F FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000022 C4                    POP       DE                 ;; 1 cycle
+   \   000023 C2                    POP       BC                 ;; 1 cycle
+   \   000024 D7                    RET                          ;; 6 cycles
+   \   000025                       ; ------------------------------------- Block: 17 cycles
+   \   000025                       ; ------------------------------------- Total: 35 cycles
+   \   000025                       REQUIRE ?CLRL78_V1_0_L00
+    686          }
+    687          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    688          bool lib_aci_open_adv_pipe(const uint8_t pipe)
+   \                     lib_aci_open_adv_pipe:
+    689          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 73                    MOV       B, A               ;; 1 cycle
+    690            uint8_t byte_idx = pipe / 8;
+   \   000003 5008                  MOV       X, #0x8            ;; 1 cycle
+   \   000005 63                    MOV       A, B               ;; 1 cycle
+   \   000006 FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   000009 74                    MOV       E, A               ;; 1 cycle
+    691            
+    692            aci_cmd_params_open_adv_pipe.pipes[byte_idx] |= (0x01 << (pipe % 8));
+   \   00000A 5008                  MOV       X, #0x8            ;; 1 cycle
+   \   00000C 63                    MOV       A, B               ;; 1 cycle
+   \   00000D FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000010 72                    MOV       C, A               ;; 1 cycle
+   \   000011 E6                    ONEW      AX                 ;; 1 cycle
+   \   000012 FD....                CALL      N:?I_LSH_L02       ;; 3 cycles
+   \   000015 60                    MOV       A, X               ;; 1 cycle
+   \   000016 73                    MOV       B, A               ;; 1 cycle
+   \   000017 70                    MOV       X, A               ;; 1 cycle
+   \   000018 64                    MOV       A, E               ;; 1 cycle
+   \   000019 70                    MOV       X, A               ;; 1 cycle
+   \   00001A F1                    CLRB      A                  ;; 1 cycle
+   \   00001B 04....                ADDW      AX, #aci_cmd_params_open_adv_pipe  ;; 1 cycle
+   \   00001E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001F 63                    MOV       A, B               ;; 1 cycle
+   \   000020 6D                    OR        A, [HL]            ;; 1 cycle
+   \   000021 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000022 73                    MOV       B, A               ;; 1 cycle
+    693            acil_encode_cmd_open_adv_pipes(&(msg_to_send.buffer[0]), &aci_cmd_params_open_adv_pipe);
+   \   000023 32....                MOVW      BC, #aci_cmd_params_open_adv_pipe  ;; 1 cycle
+   \   000026 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000029 FD....                CALL      acil_encode_cmd_open_adv_pipes  ;; 3 cycles
+    694            return hal_aci_tl_send(&msg_to_send);
+   \   00002C 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00002F FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000032 C4                    POP       DE                 ;; 1 cycle
+   \   000033 C2                    POP       BC                 ;; 1 cycle
+   \   000034 D7                    RET                          ;; 6 cycles
+   \   000035                       ; ------------------------------------- Block: 48 cycles
+   \   000035                       ; ------------------------------------- Total: 48 cycles
+   \   000035                       REQUIRE ?CLRL78_V1_0_L00
+    695          }
+    696          
+    697          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    698          bool lib_aci_read_dynamic_data()
+   \                     lib_aci_read_dynamic_data:
+    699          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    700            acil_encode_cmd_read_dynamic_data(&(msg_to_send.buffer[0]));
+   \   000000 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   000003 FD....                CALL      acil_encode_cmd_read_dynamic_data  ;; 3 cycles
+    701            return hal_aci_tl_send(&msg_to_send);
+   \   000006 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000009 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   00000C D7                    RET                          ;; 6 cycles
+   \   00000D                       ; ------------------------------------- Block: 14 cycles
+   \   00000D                       ; ------------------------------------- Total: 14 cycles
+   \   00000D                       REQUIRE ?CLRL78_V1_0_L00
+    702          }
+    703          
+    704          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    705          bool lib_aci_write_dynamic_data(uint8_t sequence_number, uint8_t* dynamic_data, uint8_t length)
+   \                     lib_aci_write_dynamic_data:
+    706          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+   \   000001 77                    MOV       H, A               ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003 C4                    POP       DE                 ;; 1 cycle
+    707            acil_encode_cmd_write_dynamic_data(&(msg_to_send.buffer[0]), sequence_number, dynamic_data, length);
+   \   000004 60                    MOV       A, X               ;; 1 cycle
+   \   000005 72                    MOV       C, A               ;; 1 cycle
+   \   000006 67                    MOV       A, H               ;; 1 cycle
+   \   000007 73                    MOV       B, A               ;; 1 cycle
+   \   000008 77                    MOV       H, A               ;; 1 cycle
+   \   000009 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00000C FD....                CALL      acil_encode_cmd_write_dynamic_data  ;; 3 cycles
+    708            return hal_aci_tl_send(&msg_to_send);
+   \   00000F 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000012 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000015 C4                    POP       DE                 ;; 1 cycle
+   \   000016 D7                    RET                          ;; 6 cycles
+   \   000017                       ; ------------------------------------- Block: 24 cycles
+   \   000017                       ; ------------------------------------- Total: 24 cycles
+   \   000017                       REQUIRE ?CLRL78_V1_0_L00
+    709          }
+    710          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    711          bool lib_aci_dtm_command(uint8_t dtm_command_msbyte, uint8_t dtm_command_lsbyte)
+   \                     lib_aci_dtm_command:
+    712          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 2
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+    713            aci_cmd_params_dtm_cmd_t aci_cmd_params_dtm_cmd;
+    714            aci_cmd_params_dtm_cmd.cmd_msb = dtm_command_msbyte;
+   \   000002 9800                  MOV       [SP], A            ;; 1 cycle
+    715            aci_cmd_params_dtm_cmd.cmd_lsb = dtm_command_lsbyte;
+   \   000004 63                    MOV       A, B               ;; 1 cycle
+   \   000005 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   000007 73                    MOV       B, A               ;; 1 cycle
+    716            acil_encode_cmd_dtm_cmd(&(msg_to_send.buffer[0]), &aci_cmd_params_dtm_cmd);
+   \   000008 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00000A 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00000B 30....                MOVW      AX, #msg_to_send+1  ;; 1 cycle
+   \   00000E FD....                CALL      acil_encode_cmd_dtm_cmd  ;; 3 cycles
+    717            return hal_aci_tl_send(&msg_to_send);
+   \   000011 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   000014 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000017 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   000019 C2                    POP       BC                 ;; 1 cycle
+   \   00001A D7                    RET                          ;; 6 cycles
+   \   00001B                       ; ------------------------------------- Block: 24 cycles
+   \   00001B                       ; ------------------------------------- Total: 24 cycles
+   \   00001B                       REQUIRE ?CLRL78_V1_0_L00
+    718          }
+    719          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    720          void lib_aci_flush(void)
+   \                     lib_aci_flush:
+    721          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    722            hal_aci_tl_q_flush();
+   \   000000 FD....                CALL      hal_aci_tl_q_flush  ;; 3 cycles
+    723          }
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    724          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    725          void lib_aci_debug_print(bool enable)
+   \                     lib_aci_debug_print:
+    726          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    727            hal_aci_tl_debug_print(enable);
+   \   000000 FD....                CALL      hal_aci_tl_debug_print  ;; 3 cycles
+    728          
+    729          }
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    730          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    731          void lib_aci_pin_reset(void)
+   \                     lib_aci_pin_reset:
+    732          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    733              hal_aci_tl_pin_reset();
+   \   000000 FD....                CALL      hal_aci_tl_pin_reset  ;; 3 cycles
+    734          }
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    735          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    736          bool lib_aci_event_queue_empty(void)
+   \                     lib_aci_event_queue_empty:
+    737          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    738            return hal_aci_tl_rx_q_empty();
+   \   000000 FD....                CALL      hal_aci_tl_rx_q_empty  ;; 3 cycles
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    739          }
+    740          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    741          bool lib_aci_event_queue_full(void)
+   \                     lib_aci_event_queue_full:
+    742          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    743            return hal_aci_tl_rx_q_full();
+   \   000000 FD....                CALL      hal_aci_tl_rx_q_full  ;; 3 cycles
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    744          }
+    745          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    746          bool lib_aci_command_queue_empty(void)
+   \                     lib_aci_command_queue_empty:
+    747          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    748            return hal_aci_tl_tx_q_empty();
+   \   000000 FD....                CALL      hal_aci_tl_tx_q_empty  ;; 3 cycles
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    749          }
+    750          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    751          bool lib_aci_command_queue_full(void)
+   \                     lib_aci_command_queue_full:
+    752          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    753            return hal_aci_tl_tx_q_full();
+   \   000000 FD....                CALL      hal_aci_tl_tx_q_full  ;; 3 cycles
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    754          }
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      6   lib_aci_board_init
+        6   -> aci_queue_enqueue
+        6   -> delay
+        6   -> lib_aci_event_get
+        6   -> lib_aci_radio_reset
+      6   lib_aci_bond
+        6   -> acil_encode_cmd_bond
+        6   -> hal_aci_tl_send
+      0   lib_aci_bond_request
+        0   -> acil_encode_cmd_bond_security_request
+        0   -> hal_aci_tl_send
+      4   lib_aci_broadcast
+        4   -> acil_encode_cmd_broadcast
+        4   -> hal_aci_tl_send
+     10   lib_aci_change_timing
+        8   -> acil_encode_cmd_change_timing_req
+        8   -> hal_aci_tl_send
+      0   lib_aci_change_timing_GAP_PPCP
+        0   -> acil_encode_cmd_change_timing_req_GAP_PPCP
+        0   -> hal_aci_tl_send
+      8   lib_aci_close_remote_pipe
+        6   -> acil_encode_cmd_close_remote_pipe
+        6   -> hal_aci_tl_send
+      0   lib_aci_command_queue_empty
+        0   -> hal_aci_tl_tx_q_empty
+      0   lib_aci_command_queue_full
+        0   -> hal_aci_tl_tx_q_full
+      6   lib_aci_connect
+        6   -> acil_encode_cmd_connect
+        6   -> hal_aci_tl_send
+      0   lib_aci_debug_print
+        0   -> hal_aci_tl_debug_print
+      0   lib_aci_device_version
+        0   -> acil_encode_cmd_get_device_version
+        0   -> hal_aci_tl_send
+      0   lib_aci_direct_connect
+        0   -> acil_encode_direct_connect
+        0   -> hal_aci_tl_send
+      8   lib_aci_disconnect
+        8   -> acil_encode_cmd_disconnect
+        8   -> hal_aci_tl_send
+      4   lib_aci_dtm_command
+        4   -> acil_encode_cmd_dtm_cmd
+        4   -> hal_aci_tl_send
+     36   lib_aci_echo_msg
+       36   -> acil_encode_cmd_echo_msg
+       36   -> hal_aci_tl_send
+      6   lib_aci_event_get
+        6   -> hal_aci_tl_event_get
+      0   lib_aci_event_peek
+        0   -> hal_aci_tl_event_peek
+      0   lib_aci_event_queue_empty
+        0   -> hal_aci_tl_rx_q_empty
+      0   lib_aci_event_queue_full
+        0   -> hal_aci_tl_rx_q_full
+      0   lib_aci_flush
+        0   -> hal_aci_tl_q_flush
+      0   lib_aci_get_address
+        0   -> acil_encode_cmd_get_address
+        0   -> hal_aci_tl_send
+      0   lib_aci_get_battery_level
+        0   -> acil_encode_cmd_battery_level
+        0   -> hal_aci_tl_send
+      2   lib_aci_get_cx_interval
+      8   lib_aci_get_cx_interval_ms
+      0   lib_aci_get_nb_available_credits
+      2   lib_aci_get_slave_latency
+      0   lib_aci_get_temperature
+        0   -> acil_encode_cmd_temparature
+        0   -> hal_aci_tl_send
+     10   lib_aci_init
+       10   -> hal_aci_tl_init
+       10   -> lib_aci_board_init
+      0   lib_aci_is_discovery_finished
+      4   lib_aci_is_pipe_available
+      4   lib_aci_is_pipe_closed
+      4   lib_aci_open_adv_pipe
+        4   -> acil_encode_cmd_open_adv_pipes
+        4   -> hal_aci_tl_send
+      4   lib_aci_open_adv_pipes
+        4   -> acil_encode_cmd_open_adv_pipes
+        4   -> hal_aci_tl_send
+      8   lib_aci_open_remote_pipe
+        6   -> acil_encode_cmd_open_remote_pipe
+        6   -> hal_aci_tl_send
+      0   lib_aci_pin_reset
+        0   -> hal_aci_tl_pin_reset
+      0   lib_aci_radio_reset
+        0   -> acil_encode_baseband_reset
+        0   -> hal_aci_tl_send
+      0   lib_aci_read_dynamic_data
+        0   -> acil_encode_cmd_read_dynamic_data
+        0   -> hal_aci_tl_send
+      8   lib_aci_request_data
+        6   -> acil_encode_cmd_request_data
+        6   -> hal_aci_tl_send
+      2   lib_aci_send_ack
+        2   -> acil_encode_cmd_send_data_ack
+        2   -> hal_aci_tl_send
+     30   lib_aci_send_data
+       28   -> acil_encode_cmd_send_data
+       28   -> hal_aci_tl_send
+      2   lib_aci_send_nack
+        2   -> acil_encode_cmd_send_data_nack
+        2   -> hal_aci_tl_send
+      6   lib_aci_set_app_latency
+        6   -> acil_encode_cmd_set_app_latency
+        6   -> hal_aci_tl_send
+     20   lib_aci_set_key
+       20   -> acil_encode_cmd_set_key
+       20   -> hal_aci_tl_send
+     26   lib_aci_set_local_data
+       26   -> acil_encode_cmd_set_local_data
+       26   -> hal_aci_tl_send
+      4   lib_aci_set_tx_power
+        4   -> acil_encode_cmd_set_radio_tx_power
+        4   -> hal_aci_tl_send
+      0   lib_aci_sleep
+        0   -> acil_encode_cmd_sleep
+        0   -> hal_aci_tl_send
+      4   lib_aci_test
+        4   -> acil_encode_cmd_set_test_mode
+        4   -> hal_aci_tl_send
+      0   lib_aci_wakeup
+        0   -> acil_encode_cmd_wakeup
+        0   -> hal_aci_tl_send
+      2   lib_aci_write_dynamic_data
+        2   -> acil_encode_cmd_write_dynamic_data
+        2   -> hal_aci_tl_send
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       8  aci_cmd_params_open_adv_pipe
+       1  indicate_operation_pipe
+       1  is_close_remote_pipe_pending
+       1  is_indicate_operation_pending
+       1  is_open_remote_pipe_pending
+       1  is_request_operation_pending
+     157  lib_aci_board_init
+      44  lib_aci_bond
+      13  lib_aci_bond_request
+      61  lib_aci_broadcast
+      70  lib_aci_change_timing
+      13  lib_aci_change_timing_GAP_PPCP
+     231  lib_aci_close_remote_pipe
+       4  lib_aci_command_queue_empty
+       4  lib_aci_command_queue_full
+      44  lib_aci_connect
+       4  lib_aci_debug_print
+      13  lib_aci_device_version
+      13  lib_aci_direct_connect
+      68  lib_aci_disconnect
+      27  lib_aci_dtm_command
+      60  lib_aci_echo_msg
+     287  lib_aci_event_get
+       6  lib_aci_event_peek
+       4  lib_aci_event_queue_empty
+       4  lib_aci_event_queue_full
+       4  lib_aci_flush
+      13  lib_aci_get_address
+      13  lib_aci_get_battery_level
+      20  lib_aci_get_cx_interval
+      45  lib_aci_get_cx_interval_ms
+       4  lib_aci_get_nb_available_credits
+      20  lib_aci_get_slave_latency
+      13  lib_aci_get_temperature
+     139  lib_aci_init
+      10  lib_aci_is_discovery_finished
+      40  lib_aci_is_pipe_available
+      40  lib_aci_is_pipe_closed
+      53  lib_aci_open_adv_pipe
+      37  lib_aci_open_adv_pipes
+     231  lib_aci_open_remote_pipe
+       4  lib_aci_pin_reset
+      13  lib_aci_radio_reset
+      13  lib_aci_read_dynamic_data
+     113  lib_aci_request_data
+      18  lib_aci_send_ack
+     170  lib_aci_send_data
+      19  lib_aci_send_nack
+      40  lib_aci_set_app_latency
+      37  lib_aci_set_key
+      80  lib_aci_set_local_data
+      23  lib_aci_set_tx_power
+      13  lib_aci_sleep
+      23  lib_aci_test
+      13  lib_aci_wakeup
+      23  lib_aci_write_dynamic_data
+      33  msg_to_send
+       2  p_services_pipe_type_map
+       2  p_setup_msgs
+       1  request_operation_pipe
+
+ 
+ 2 411 bytes in segment CODE
+    51 bytes in segment NEAR_Z
+ 
+ 2 411 bytes of CODE memory
+    51 bytes of DATA memory
+
+Errors: none
+Warnings: 7

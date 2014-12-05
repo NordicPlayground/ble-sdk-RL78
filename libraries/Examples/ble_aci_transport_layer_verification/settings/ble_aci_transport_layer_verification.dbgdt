@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Project>
+  <Desktop>
+    <Static>
+      <Debug-Log>
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>1307</ColumnWidth1></Debug-Log>
+      <Build>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>980</ColumnWidth1><ColumnWidth2>261</ColumnWidth2><ColumnWidth3>65</ColumnWidth3></Build>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>178</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+      </Workspace>
+      <Disassembly>
+        <col-names>
+          
+          
+        <item>Disassembly</item><item>_I0</item></col-names>
+        <col-widths>
+          
+          
+        <item>500</item><item>20</item></col-widths>
+        <DisasmHistory/>
+        
+        
+      <PreferedWindows><Position>2</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows><ShowCodeCoverage>1</ShowCodeCoverage><ShowInstrProfiling>1</ShowInstrProfiling></Disassembly>
+    <WATCH_1><expressions><item>aci_evt</item><item>aci_tx_q</item><item>aci_rx_q</item><item>received_data</item><item>data_to_send</item><item>aci_cmd_params_echo</item><item>aci_echo_cmd</item><item/></expressions><col-names><item>Expression</item><item>Location</item><item>Type</item><item>Value</item></col-names><col-widths><item>129</item><item>133</item><item>100</item><item>167</item></col-widths></WATCH_1><Register/><Memory><FindDirection>1</FindDirection><FindAsHex>0</FindAsHex></Memory><STACK_1><col-names><item>Data</item><item>Frame</item><item>Location</item><item>Type</item><item>Value</item><item>Variable</item></col-names><col-widths><item>100</item><item>100</item><item>100</item><item>100</item><item>100</item><item>100</item></col-widths><stack>Stack</stack><width>4</width><vars>1</vars><offset>0</offset></STACK_1></Static>
+    <Windows>
+      
+      
+      
+    <Wnd3>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-29755-3143</Identity>
+            <TabName>Debug Log</TabName>
+            <Factory>Debug-Log</Factory>
+            <Session/>
+          </Tab>
+          <Tab>
+            <Identity>TabID-29232-3153</Identity>
+            <TabName>Build</TabName>
+            <Factory>Build</Factory>
+            <Session/>
+          </Tab>
+        <Tab><Identity>TabID-906-7549</Identity><TabName>Memory</TabName><Factory>Memory</Factory><Session><ZoneNumber>5</ZoneNumber><SelectionAnchor>1044820</SelectionAnchor><SelectionEnd>1044820</SelectionEnd><UnitsPerGroup>1</UnitsPerGroup><EndianMode>0</EndianMode><DataCovEnabled>0</DataCovEnabled><DataCovShown>0</DataCovShown><AutoRefresh>0</AutoRefresh><HScroll>0</HScroll><VScroll>65310</VScroll></Session></Tab></Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd3><Wnd6>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-7735-3147</Identity>
+            <TabName>Workspace</TabName>
+            <Factory>Workspace</Factory>
+            <Session>
+              
+            <NodeDict><ExpandedNode>&lt;ws&gt;</ExpandedNode><ExpandedNode>&lt;ws&gt;/ble_aci_transport_layer_verification</ExpandedNode><ExpandedNode>&lt;ws&gt;/ble_aci_transport_layer_verification/BLE</ExpandedNode><ExpandedNode>&lt;ws&gt;/ble_aci_transport_layer_verification/RL78_common</ExpandedNode><ExpandedNode>ble_aci_transport_layer_verification</ExpandedNode><ExpandedNode>ble_aci_transport_layer_verification/BLE</ExpandedNode><ExpandedNode>ble_aci_transport_layer_verification/Output</ExpandedNode><ExpandedNode>ble_aci_transport_layer_verification/RL78_common</ExpandedNode></NodeDict></Session>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd6><Wnd7><Tabs><Tab><Identity>TabID-20213-11142</Identity><TabName>Register</TabName><Factory>Register</Factory><Session><REG1>0</REG1><REG2>0</REG2><Group>3</Group><States>0</States></Session></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd7><Wnd8><Tabs><Tab><Identity>TabID-27534-21240</Identity><TabName>Disassembly</TabName><Factory>Disassembly</Factory><Session/></Tab><Tab><Identity>TabID-21947-261</Identity><TabName>Watch 1</TabName><Factory>WATCH_1</Factory></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd8><Wnd9><Tabs><Tab><Identity>TabID-12373-27171</Identity><TabName>Stack 1</TabName><Factory>STACK_1</Factory><Session/></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd9></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\hal_platform.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>92</YPos2><SelStart2>0</SelStart2><SelEnd2>0</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\aci_queue.cpp</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>37</YPos2><SelStart2>1652</SelStart2><SelEnd2>1652</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\RL78\CG_port.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>128</YPos2><SelStart2>4188</SelStart2><SelEnd2>4188</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\aci_setup.cpp</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>60</YPos2><SelStart2>3352</SelStart2><SelEnd2>3352</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\hal_platform.cpp</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>21</YPos2><SelStart2>1296</SelStart2><SelEnd2>1296</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\ble_aci_transport_layer_verification\Debug\List\ble_aci_transport_layer_verification.map</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>2415</YPos2><SelStart2>0</SelStart2><SelEnd2>0</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\RL78\CG_timer.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>170</YPos2><SelStart2>6186</SelStart2><SelEnd2>6186</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\ble_my_project_template\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>271</YPos2><SelStart2>10580</SelStart2><SelEnd2>10580</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\ble_aci_transport_layer_verification\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>212</YPos2><SelStart2>8228</SelStart2><SelEnd2>8228</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\lib_aci.cpp</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>152</YPos2><SelStart2>5538</SelStart2><SelEnd2>5550</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\acilib.cpp</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>525</YPos2><SelStart2>0</SelStart2><SelEnd2>0</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\BLE\hal_aci_tl.cpp</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>58</YPos2><SelStart2>2955</SelStart2><SelEnd2>2962</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\RL78\CG_serial.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>260</YPos2><SelStart2>8833</SelStart2><SelEnd2>8833</SelEnd2></Tab><ActiveTab>12</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-030A0700><key>iaridepm.enu1</key></Toolbar-030A0700></Sizes></Row0><Row1><Sizes><Toolbar-048444B0><key>debuggergui.enu1</key></Toolbar-048444B0></Sizes></Row1><Row2><Sizes><Toolbar-04844320><key>rl78ocd.enu1</key></Toolbar-04844320></Sizes></Row2></Top><Left><Row0><Sizes><Wnd6><Rect><Top>-2</Top><Left>-2</Left><Bottom>470</Bottom><Right>252</Right><x>-2</x><y>-2</y><xscreen>772</xscreen><yscreen>32</yscreen><sizeHorzCX>565154</sizeHorzCX><sizeHorzCY>46715</sizeHorzCY><sizeVertCX>185944</sizeVertCX><sizeVertCY>689051</sizeVertCY></Rect></Wnd6></Sizes></Row0><Row1><Sizes><Wnd9><Rect><Top>-2</Top><Left>250</Left><Bottom>470</Bottom><Right>435</Right><x>250</x><y>-2</y><xscreen>59</xscreen><yscreen>43</yscreen><sizeHorzCX>43192</sizeHorzCX><sizeHorzCY>62774</sizeHorzCY><sizeVertCX>135432</sizeVertCX><sizeVertCY>689051</sizeVertCY></Rect></Wnd9></Sizes></Row1></Left><Right><Row0><Sizes><Wnd7><Rect><Top>-2</Top><Left>-2</Left><Bottom>470</Bottom><Right>51</Right><x>-2</x><y>-2</y><xscreen>249</xscreen><yscreen>45</yscreen><sizeHorzCX>182284</sizeHorzCX><sizeHorzCY>65693</sizeHorzCY><sizeVertCX>38799</sizeVertCX><sizeVertCY>689051</sizeVertCY></Rect></Wnd7></Sizes></Row0><Row1><Sizes><Wnd8><Rect><Top>-2</Top><Left>49</Left><Bottom>470</Bottom><Right>166</Right><x>49</x><y>-2</y><xscreen>59</xscreen><yscreen>43</yscreen><sizeHorzCX>43192</sizeHorzCX><sizeHorzCY>62774</sizeHorzCY><sizeVertCX>85652</sizeVertCX><sizeVertCY>689051</sizeVertCY></Rect></Wnd8></Sizes></Row1></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>122</Bottom><Right>1368</Right><x>-2</x><y>-2</y><xscreen>1370</xscreen><yscreen>124</yscreen><sizeHorzCX>1002928</sizeHorzCX><sizeHorzCY>181022</sizeHorzCY><sizeVertCX>565154</sizeVertCX><sizeVertCY>46715</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Project>
+
+

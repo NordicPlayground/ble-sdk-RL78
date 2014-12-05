@@ -1,0 +1,172 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:41
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_system.c
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\RL78\CG_system.c" --core rl78_1
+#        --code_model near --data_model near --near_const_location rom0 -o
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\CG_system.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_system.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_system.c
+      1          /*
+      2          *******************************************************************************
+      3          * Copyright(C) 2011 Renesas Electronics Corporation
+      4          * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
+      5          * This program must be used solely for the purpose for which
+      6          * it was furnished by Renesas Electronics Corporation. No part of this
+      7          * program may be reproduced or disclosed to others, in any
+      8          * form, without the prior written permission of Renesas Electronics
+      9          * Corporation. 
+     10          *
+     11          * This device driver was created by Applilet3 for RL78/G13
+     12          * 16-Bit Single-Chip Microcontrollers
+     13          * Filename: CG_system.c
+     14          * Abstract: This file implements device driver for System module.
+     15          * APIlib: Applilet3 for RL78/G13 E1.00b [14 Jan 2011]
+     16          * Device: R5F100LE
+     17          * Compiler: IAR Systems iccrl78
+     18          * Creation date:  25/10/2014
+     19          *******************************************************************************
+     20          */
+     21          
+     22          /*
+     23          *******************************************************************************
+     24          ** Include files
+     25          *******************************************************************************
+     26          */
+     27          
+     28          #include "CG_macrodriver.h"
+
+   \                                 In  segment NEAR_A, at 0xfffa0
+   \   union <unnamed> volatile __sfr __no_bit_access _A_CMC
+   \                     _A_CMC:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xfffa1
+   \   union <unnamed> volatile __sfr _A_CSC
+   \                     _A_CSC:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xfffa4
+   \   union <unnamed> volatile __sfr _A_CKC
+   \                     _A_CKC:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf00f3
+   \   union <unnamed> volatile __no_bit_access _A_OSMC
+   \                     _A_OSMC:
+   \   000000                       DS 1
+     29          #include "CG_system.h"
+     30          
+     31          /*
+     32          *******************************************************************************
+     33          **  Global define
+     34          *******************************************************************************
+     35          */
+     36          
+     37          /*
+     38          **-----------------------------------------------------------------------------
+     39          **
+     40          **  Abstract:
+     41          **  This function initializes the clock generator.
+     42          **
+     43          **  Parameters:
+     44          **  None
+     45          **
+     46          **  Returns:
+     47          **  None
+     48          **
+     49          **-----------------------------------------------------------------------------
+     50          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     51          void CLOCK_Init(void)
+   \                     CLOCK_Init:
+     52          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     53            /* Set fMX */
+     54            CMC = _00_CG_HISYS_PORT | _00_CG_SUB_PORT | _00_CG_SYSOSC_DEFAULT | _00_CG_SUBMODE_DEFAULT;   //Set all pins for crystal as normal I/O
+   \   000000 CEA000                MOV       0xFFFA0, #0x0      ;; 1 cycle
+     55            
+     56            //MSTOP = 1U;   //Stop X1
+     57            /* Set fSUB */
+     58            //XTSTOP = 1U;  //Stop fSUB
+     59            /* Set fIH */
+     60            //HIOSTOP = 0U; //Run On-Chip Oscillator
+     61            CSC = _80_CG_HISYS_STOP | _40_CG_SUB_STOP | _00_CG_HIO_OPER;
+   \   000003 CEA1C0                MOV       0xFFFA1, #0xC0     ;; 1 cycle
+     62          
+     63            /* Set fMAIN */
+     64            //MCM0 = 0U;    //Select HOCO as fMAIN
+     65            /* Set fCLK */
+     66            //CSS = 0U;     //Select fMAIN as CPU and peripheral clock
+     67            CKC = _00_CG_CPUCLK_SELMAIN | _00_CG_MAINCLK_SELHIO;
+   \   000006 CEA400                MOV       0xFFFA4, #0x0      ;; 1 cycle
+     68          
+     69            OSMC = _10_CG_RTC_CLK_FIL;      //Select Low-speed on-chip oscillator for RTC and Interval timer
+   \   000009 CFF30010              MOV       0xF3, #0x10        ;; 1 cycle
+     70          }
+   \   00000D D7                    RET                          ;; 6 cycles
+   \   00000E                       ; ------------------------------------- Block: 10 cycles
+   \   00000E                       ; ------------------------------------- Total: 10 cycles
+   \   00000E                       REQUIRE ?CLRL78_V1_0_L00
+   \   00000E                       REQUIRE _A_CMC
+   \   00000E                       REQUIRE _A_CSC
+   \   00000E                       REQUIRE _A_CKC
+   \   00000E                       REQUIRE _A_OSMC
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      0   CLOCK_Init
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      14  CLOCK_Init
+       1  _A_CKC
+       1  _A_CMC
+       1  _A_CSC
+       1  _A_OSMC
+
+ 
+ 14 bytes in segment CODE
+  4 bytes in segment NEAR_A
+ 
+ 14 bytes of CODE memory
+  0 bytes of DATA memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none

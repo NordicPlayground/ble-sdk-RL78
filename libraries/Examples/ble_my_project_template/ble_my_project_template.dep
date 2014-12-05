@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>3152938930</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\BLE\hal_platform.cpp</file>
+      <file>$PROJ_DIR$\..\..\BLE\acilib.cpp</file>
+      <file>$PROJ_DIR$\..\..\BLE\lib_aci.cpp</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_setup.cpp</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_queue.cpp</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_port.c</file>
+      <file>$PROJ_DIR$\..\..\BLE\hal_aci_tl.cpp</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_system.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_timer.r87</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_timer.c</file>
+      <file>$TOOLKIT_DIR$\lib\dlrl78nn1f.h</file>
+      <file>$PROJ_DIR$\..\..\BLE\acilib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$PROJ_DIR$\..\..\BLE\boards.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_evts.h</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_systeminit.c</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_cmds.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_timer.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\aci_queue.pbi</file>
+      <file>$PROJ_DIR$\include\services.h</file>
+      <file>$TOOLKIT_DIR$\lib\dlrl78nn1f.r87</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_system.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\aci_setup.r87</file>
+      <file>$PROJ_DIR$\..\..\BLE\acilib_if.h</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_serial.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_platform.pbi</file>
+      <file>$PROJ_DIR$\..\..\BLE\lib_aci.h</file>
+      <file>$PROJ_DIR$\..\..\BLE\ble_assert.h</file>
+      <file>$PROJ_DIR$\..\ble_A_Hello_World_Program\main.c</file>
+      <file>$TOOLKIT_DIR$\inc\ior5f100le.h</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_setup.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_aci_tl.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\acilib.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_system.pbi</file>
+      <file>$PROJ_DIR$\..\..\BLE\acilib_types.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\acilib.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\LibReplacement.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_port.pbi</file>
+      <file>$PROJ_DIR$\..\..\BLE\hal_aci_tl.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_system.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_port.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\ble_my_project_template.pbd</file>
+      <file>$PROJ_DIR$\..\ble_aci_transport_layer_verification\main.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_aci.pbi</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_queue.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\LibReplacement.s87</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_port.h</file>
+      <file>$PROJ_DIR$\Debug\Exe\ble_my_project_template.d87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_serial.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product.h</file>
+      <file>$TOOLKIT_DIR$\inc\ior5f100le_ext.h</file>
+      <file>$PROJ_DIR$\..\..\BLE\hal_platform.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\aci_setup.pbi</file>
+      <file>$PROJ_DIR$\..\..\BLE\aci_protocol_defines.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_timer.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_systeminit.pbi</file>
+      <file>$PROJ_DIR$\..\..\BLE\acilib_defs.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\aci_queue.r87</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\config\lnkr5f100le.xcl</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_macrodriver.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_platform.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_systeminit.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_aci.r87</file>
+      <file>$PROJ_DIR$\Debug\List\ble_my_project_template.map</file>
+      <file>$PROJ_DIR$\..\..\RL78\CG_serial.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\hal_aci_tl.r87</file>
+      <file>$PROJ_DIR$\Debug\Obj\CG_serial.r87</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\..\..\BLE\hal_platform.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 72</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\BLE\acilib.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 37</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52 9 20 17 13 60 66 28 39</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\BLE\lib_aci.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 74</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52 9 20 17 60 66 28 44 15 50 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\BLE\aci_setup.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 27</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 59</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 31 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52 44 9 15 50 20 17 35</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\BLE\aci_queue.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 67</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 44 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52 9 15 50 32</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\RL78\CG_port.c</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 46</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 71 34 57 10 52 68 16 40 62 12 56 70 21</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\BLE\hal_aci_tl.cpp</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 78</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52 44 9 15 50</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\RL78\CG_timer.c</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 8</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 61</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 71 34 57 10 22 68 16 40 62 12 56 70 21</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\RL78\CG_systeminit.c</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 73</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 65</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 71 34 57 10 7 76 68 16 40 62 12 56 70 21 77 14 55 22 52</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 64</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 63</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 31 58 68 16 40 62 12 56 70 21 77 14 55 71 34 57 10 7 76 22 52 44 9 15 50 20 17 35 24</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\RL78\CG_system.c</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 71 34 57 10 7</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\RL78\CG_serial.c</name>
+      <outputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 79</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 54</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCRL78</name>
+          <file> 71 34 57 10 58 68 16 40 62 12 56 70 21 77 14 55 7 76 22 52</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 53 75</file>
+        </tool>
+        <tool>
+          <name>INTERNAL_HWSUPPORT</name>
+          <file> 51</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\LibReplacement.s87</name>
+      <outputs>
+        <tool>
+          <name>ARL78</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ARL78</name>
+          <file> 34 57</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\ble_my_project_template.d87</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 75</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 69 67 27 37 46 79 45 73 8 78 72 74 64 25</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs/>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>XLINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

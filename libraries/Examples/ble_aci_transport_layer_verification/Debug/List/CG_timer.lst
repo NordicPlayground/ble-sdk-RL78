@@ -1,0 +1,530 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:41
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_timer.c
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\RL78\CG_timer.c" --core rl78_1
+#        --code_model near --data_model near --near_const_location rom0 -o
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\CG_timer.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_timer.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_timer.c
+      1          /*
+      2          *******************************************************************************
+      3          * Copyright(C) 2011 Renesas Electronics Corporation
+      4          * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
+      5          * This program must be used solely for the purpose for which
+      6          * it was furnished by Renesas Electronics Corporation. No part of this
+      7          * program may be reproduced or disclosed to others, in any
+      8          * form, without the prior written permission of Renesas Electronics
+      9          * Corporation. 
+     10          *
+     11          * This device driver was created by Applilet3 for RL78/G13
+     12          * 16-Bit Single-Chip Microcontrollers
+     13          * Filename: CG_timer.c
+     14          * Abstract: This file implements device driver for TAU module.
+     15          * APIlib: Applilet3 for RL78/G13 E1.00b [14 Jan 2011]
+     16          * Device: R5F100LE
+     17          * Compiler: IAR Systems iccrl78
+     18          * Creation date:  25/10/2014
+     19          *******************************************************************************
+     20          */
+     21          
+     22          /*
+     23          *******************************************************************************
+     24          ** Include files
+     25          *******************************************************************************
+     26          */
+     27          
+     28          #include "CG_macrodriver.h"
+
+   \                                 In  segment SADDR_A, at 0xfff18
+   \   union <unnamed> volatile __saddr __no_bit_access _A_TDR00
+   \                     _A_TDR00:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffd0
+   \   union <unnamed> volatile __sfr _A_IF2
+   \                     _A_IF2:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffd4
+   \   union <unnamed> volatile __sfr _A_MK2
+   \                     _A_MK2:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffea
+   \   union <unnamed> volatile __sfr _A_PR01
+   \                     _A_PR01:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffee
+   \   union <unnamed> volatile __sfr _A_PR11
+   \                     _A_PR11:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf00f0
+   \   union <unnamed> volatile _A_PER0
+   \                     _A_PER0:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf0190
+   \   union <unnamed> volatile __no_bit_access _A_TMR00
+   \                     _A_TMR00:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf01b2
+   \   union <unnamed> volatile _A_TS0
+   \                     _A_TS0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf01b4
+   \   union <unnamed> volatile _A_TT0
+   \                     _A_TT0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf01b6
+   \   union <unnamed> volatile __no_bit_access _A_TPS0
+   \                     _A_TPS0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf01b8
+   \   union <unnamed> volatile __no_bit_access _A_TO0
+   \                     _A_TO0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf01ba
+   \   union <unnamed> volatile _A_TOE0
+   \                     _A_TOE0:
+   \   000000                       DS 2
+     29          #include "CG_timer.h"
+     30          
+     31          /*
+     32          *******************************************************************************
+     33          **  Global define
+     34          *******************************************************************************
+     35          */
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     36          volatile uint16_t delay_counter;
+   \                     delay_counter:
+   \   000000                       DS 2
+   \   000002                       REQUIRE __INIT_NEAR_Z
+     37          
+     38          
+     39          void TAU0_Channel0_Start(void);
+     40          void TAU0_Channel0_Stop(void);
+     41          void TAU0_Channel0_ChangeTimerCondition(USHORT regvalue);
+     42          __interrupt void MD_INTTM00(void);
+     43          
+     44          
+     45          /*
+     46          **-----------------------------------------------------------------------------
+     47          **
+     48          **  Abstract:
+     49          **  This function initializes the TAU0 module.
+     50          **
+     51          **  Parameters:
+     52          **  None
+     53          **
+     54          **  Returns:
+     55          **  None
+     56          **
+     57          **-----------------------------------------------------------------------------
+     58          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     59          void TAU0_Init(void)
+   \                     TAU0_Init:
+     60          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     61            TAU0EN = 1U;    /* supplies input clock */
+   \   000000 36F000                MOVW      HL, #0xF0          ;; 1 cycle
+   \   000003 7182                  SET1      [HL].0             ;; 2 cycles
+     62            TPS0 = _0005_TAU_CKM0_FCLK_5 | _0000_TAU_CKM1_FCLK_0 | _0000_TAU_CKM2_FCLK_1 | _0000_TAU_CKM3_FCLK_8;   
+   \   000005 300500                MOVW      AX, #0x5           ;; 1 cycle
+   \   000008 BFB601                MOVW      0x1B6, AX          ;; 1 cycle
+     63            //Due to fCLK 32MHz. Prescaler selected fCKL/2^5 = 1 MHz for CKM0. Other CKMx ignored
+     64            /* Stop all channels */
+     65            TT0 = _0001_TAU_CH0_STOP_TRG_ON | _0002_TAU_CH1_STOP_TRG_ON | _0004_TAU_CH2_STOP_TRG_ON | _0008_TAU_CH3_STOP_TRG_ON | _0010_TAU_CH4_STOP_TRG_ON | _0020_TAU_CH5_STOP_TRG_ON | _0040_TAU_CH6_STOP_TRG_ON | _0080_TAU_CH7_STOP_TRG_ON | _0200_TAU_CH1_H8_STOP_TRG_ON | _0800_TAU_CH3_H8_STOP_TRG_ON;
+   \   00000B 30FF0A                MOVW      AX, #0xAFF         ;; 1 cycle
+   \   00000E BFB401                MOVW      0x1B4, AX          ;; 1 cycle
+     66            /* Mask channel 0 interrupt */
+     67            TMMK00 = 1U;  /* disable INTTM00 interrupt */
+   \   000011 714AE6                SET1      0xFFFE6.4          ;; 2 cycles
+     68            TMIF00 = 0U;  /* clear INTTM00 interrupt flag */
+   \   000014 714BE2                CLR1      0xFFFE2.4          ;; 2 cycles
+     69            /* Mask channel 1 interrupt */
+     70            TMMK01 = 1U;  /* disable INTTM01 interrupt */
+   \   000017 715AE6                SET1      0xFFFE6.5          ;; 2 cycles
+     71            TMIF01 = 0U;  /* clear INTTM01 interrupt flag */
+   \   00001A 715BE2                CLR1      0xFFFE2.5          ;; 2 cycles
+     72            /* Mask channel 1 higher 8 bits interrupt */
+     73            TMMK01H = 1U; /* disable INTTM01H interrupt */
+   \   00001D 717AE5                SET1      0xFFFE5.7          ;; 2 cycles
+     74            TMIF01H = 0U; /* clear INTTM01H interrupt flag */
+   \   000020 717BE1                CLR1      0xFFFE1.7          ;; 2 cycles
+     75            /* Mask channel 2 interrupt */
+     76            TMMK02 = 1U;  /* disable INTTM02 interrupt */
+   \   000023 716AE6                SET1      0xFFFE6.6          ;; 2 cycles
+     77            TMIF02 = 0U;  /* clear INTTM02 interrupt flag */
+   \   000026 716BE2                CLR1      0xFFFE2.6          ;; 2 cycles
+     78            /* Mask channel 3 interrupt */
+     79            TMMK03 = 1U;  /* disable INTTM03 interrupt */
+   \   000029 717AE6                SET1      0xFFFE6.7          ;; 2 cycles
+     80            TMIF03 = 0U;  /* clear INTTM03 interrupt flag */
+   \   00002C 717BE2                CLR1      0xFFFE2.7          ;; 2 cycles
+     81            /* Mask channel 3 higher 8 bits interrupt */
+     82            TMMK03H = 1U; /* disable INTTM03H interrupt */
+   \   00002F 712AE6                SET1      0xFFFE6.2          ;; 2 cycles
+     83            TMIF03H = 0U; /* clear INTTM03H interrupt flag */
+   \   000032 712BE2                CLR1      0xFFFE2.2          ;; 2 cycles
+     84            /* Mask channel 4 interrupt */
+     85            TMMK04 = 1U;  /* disable INTTM04 interrupt */
+   \   000035 717AE7                SET1      0xFFFE7.7          ;; 2 cycles
+     86            TMIF04 = 0U;  /* clear INTTM04 interrupt flag */
+   \   000038 717BE3                CLR1      0xFFFE3.7          ;; 2 cycles
+     87            /* Mask channel 5 interrupt */
+     88            TMMK05 = 1U;  /* disable INTTM05 interrupt */
+   \   00003B 710AD4                SET1      0xFFFD4.0          ;; 2 cycles
+     89            TMIF05 = 0U;  /* clear INTTM05 interrupt flag */
+   \   00003E 710BD0                CLR1      0xFFFD0.0          ;; 2 cycles
+     90            /* Mask channel 6 interrupt */
+     91            TMMK06 = 1U;  /* disable INTTM06 interrupt */
+   \   000041 711AD4                SET1      0xFFFD4.1          ;; 2 cycles
+     92            TMIF06 = 0U;  /* clear INTTM06 interrupt flag */
+   \   000044 711BD0                CLR1      0xFFFD0.1          ;; 2 cycles
+     93            /* Mask channel 7 interrupt */
+     94            TMMK07 = 1U;  /* disable INTTM07 interrupt */
+   \   000047 712AD4                SET1      0xFFFD4.2          ;; 2 cycles
+     95            TMIF07 = 0U;  /* clear INTTM07 interrupt flag */
+   \   00004A 712BD0                CLR1      0xFFFD0.2          ;; 2 cycles
+     96            /* Set INTTM00 low priority */
+     97            TMPR100 = 1U;
+   \   00004D 714AEE                SET1      0xFFFEE.4          ;; 2 cycles
+     98            TMPR000 = 1U;
+   \   000050 714AEA                SET1      0xFFFEA.4          ;; 2 cycles
+     99            /* Channel 0 used as interval timer */
+    100            TMR00 = _0000_TAU_CLOCK_SELECT_CKM0 | _0000_TAU_CLOCK_MODE_CKS | _0000_TAU_TRIGGER_SOFTWARE | _0000_TAU_MODE_INTERVAL_TIMER | _0000_TAU_START_INT_UNUSED;
+   \   000053 F6                    CLRW      AX                 ;; 1 cycle
+   \   000054 BF9001                MOVW      0x190, AX          ;; 1 cycle
+    101            TDR00 = 0x03E7U;   //999 counts plus 1. Each count es every 1us = 1ms.
+   \   000057 C918E703              MOVW      S:0xFFF18, #0x3E7  ;; 1 cycle
+    102            TO0 = _0000_TAU_CH0_OUTPUT_VALUE_0;
+   \   00005B F6                    CLRW      AX                 ;; 1 cycle
+   \   00005C BFB801                MOVW      0x1B8, AX          ;; 1 cycle
+    103            TOE0 = _0000_TAU_CH0_OUTPUT_DISABLE;
+   \   00005F F6                    CLRW      AX                 ;; 1 cycle
+   \   000060 BFBA01                MOVW      0x1BA, AX          ;; 1 cycle
+    104          }
+   \   000063 D7                    RET                          ;; 6 cycles
+   \   000064                       ; ------------------------------------- Block: 64 cycles
+   \   000064                       ; ------------------------------------- Total: 64 cycles
+   \   000064                       REQUIRE ?CLRL78_V1_0_L00
+   \   000064                       REQUIRE _A_PER0
+   \   000064                       REQUIRE _A_TPS0
+   \   000064                       REQUIRE _A_TT0
+   \   000064                       REQUIRE _A_MK1
+   \   000064                       REQUIRE _A_IF1
+   \   000064                       REQUIRE _A_MK0
+   \   000064                       REQUIRE _A_IF0
+   \   000064                       REQUIRE _A_MK2
+   \   000064                       REQUIRE _A_IF2
+   \   000064                       REQUIRE _A_PR11
+   \   000064                       REQUIRE _A_PR01
+   \   000064                       REQUIRE _A_TMR00
+   \   000064                       REQUIRE _A_TDR00
+   \   000064                       REQUIRE _A_TO0
+   \   000064                       REQUIRE _A_TOE0
+    105          /*
+    106          **-----------------------------------------------------------------------------
+    107          **
+    108          **  Abstract:
+    109          **  This function starts TAU0 channel 0 counter.
+    110          **
+    111          **  Parameters:
+    112          **  None
+    113          **
+    114          **  Returns:
+    115          **  None
+    116          **
+    117          **-----------------------------------------------------------------------------
+    118          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    119          void TAU0_Channel0_Start(void)
+   \                     TAU0_Channel0_Start:
+    120          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    121            TMIF00 = 0U;  /* clear INTTM00 interrupt flag */
+   \   000000 714BE2                CLR1      0xFFFE2.4          ;; 2 cycles
+    122            TMMK00 = 0U;  /* enable INTTM00 interrupt */
+   \   000003 714BE6                CLR1      0xFFFE6.4          ;; 2 cycles
+    123            TS0 = _0001_TAU_CH0_START_TRG_ON;   //Start Channel 0 from Timer Array 0
+   \   000006 E6                    ONEW      AX                 ;; 1 cycle
+   \   000007 BFB201                MOVW      0x1B2, AX          ;; 1 cycle
+    124          }
+   \   00000A D7                    RET                          ;; 6 cycles
+   \   00000B                       ; ------------------------------------- Block: 12 cycles
+   \   00000B                       ; ------------------------------------- Total: 12 cycles
+   \   00000B                       REQUIRE ?CLRL78_V1_0_L00
+   \   00000B                       REQUIRE _A_IF1
+   \   00000B                       REQUIRE _A_MK1
+   \   00000B                       REQUIRE _A_TS0
+    125          /*
+    126          **-----------------------------------------------------------------------------
+    127          **
+    128          **  Abstract:
+    129          **  This function stops TAU0 channel 0 counter.
+    130          **
+    131          **  Parameters:
+    132          **  None
+    133          **
+    134          **  Returns:
+    135          **  None
+    136          **
+    137          **-----------------------------------------------------------------------------
+    138          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    139          void TAU0_Channel0_Stop(void)
+   \                     TAU0_Channel0_Stop:
+    140          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    141            TT0 |= _0001_TAU_CH0_STOP_TRG_ON;  //Stop Channel 0 from Timer Array 0
+   \   000000 36B401                MOVW      HL, #0x1B4         ;; 1 cycle
+   \   000003 7182                  SET1      [HL].0             ;; 2 cycles
+    142            /* Mask channel 0 interrupt */
+    143            TMMK00 = 1U;  /* disable INTTM00 interrupt */
+   \   000005 714AE6                SET1      0xFFFE6.4          ;; 2 cycles
+    144            TMIF00 = 0U;  /* clear INTTM00 interrupt flag */
+   \   000008 714BE2                CLR1      0xFFFE2.4          ;; 2 cycles
+    145          }
+   \   00000B D7                    RET                          ;; 6 cycles
+   \   00000C                       ; ------------------------------------- Block: 13 cycles
+   \   00000C                       ; ------------------------------------- Total: 13 cycles
+   \   00000C                       REQUIRE ?CLRL78_V1_0_L00
+   \   00000C                       REQUIRE _A_TT0
+   \   00000C                       REQUIRE _A_MK1
+   \   00000C                       REQUIRE _A_IF1
+    146          /*
+    147          **-----------------------------------------------------------------------------
+    148          **
+    149          **  Abstract:
+    150          **  This function changes TAU0 channel 0 register value.
+    151          **
+    152          **  Parameters:
+    153          **  regvalue: value for data register
+    154          **
+    155          **  Returns:
+    156          **  None
+    157          **
+    158          **-----------------------------------------------------------------------------
+    159          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    160          void TAU0_Channel0_ChangeTimerCondition(USHORT regvalue)
+   \                     TAU0_Channel0_ChangeTimerCondition:
+    161          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    162            TDR00 = regvalue;
+   \   000000 BD18                  MOVW      S:0xFFF18, AX      ;; 1 cycle
+    163          }
+   \   000002 D7                    RET                          ;; 6 cycles
+   \   000003                       ; ------------------------------------- Block: 7 cycles
+   \   000003                       ; ------------------------------------- Total: 7 cycles
+   \   000003                       REQUIRE ?CLRL78_V1_0_L00
+   \   000003                       REQUIRE _A_TDR00
+    164          
+    165          /*
+    166          **-----------------------------------------------------------------------------
+    167          **
+    168          **  Abstract:
+    169          **  This function performs a delay based on the number of miliseconds as input.
+    170          **
+    171          **  Parameters:
+    172          **  None
+    173          **
+    174          **  Returns:
+    175          **  None
+    176          **
+    177          **-----------------------------------------------------------------------------
+    178          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    179          void delay(uint16_t number_ms)
+   \                     delay:
+    180          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+   \   000001 14                    MOVW      DE, AX             ;; 1 cycle
+    181            delay_counter = 0;
+   \   000002 F6                    CLRW      AX                 ;; 1 cycle
+   \   000003 BF....                MOVW      N:delay_counter, AX  ;; 1 cycle
+    182            TAU0_Channel0_Start();
+   \   000006 FD....                CALL      TAU0_Channel0_Start  ;; 3 cycles
+   \   000009                       ; ------------------------------------- Block: 7 cycles
+    183            while(delay_counter < number_ms);
+   \                     ??delay_0:
+   \   000009 AF....                MOVW      AX, N:delay_counter  ;; 1 cycle
+   \   00000C 45                    CMPW      AX, DE             ;; 1 cycle
+   \   00000D DCFA                  BC        ??delay_0          ;; 4 cycles
+   \   00000F                       ; ------------------------------------- Block: 6 cycles
+    184            TAU0_Channel0_Stop();
+   \   00000F FD....                CALL      TAU0_Channel0_Stop  ;; 3 cycles
+    185          }
+   \   000012 C4                    POP       DE                 ;; 1 cycle
+   \   000013 D7                    RET                          ;; 6 cycles
+   \   000014                       ; ------------------------------------- Block: 10 cycles
+   \   000014                       ; ------------------------------------- Total: 23 cycles
+   \   000014                       REQUIRE ?CLRL78_V1_0_L00
+    186          
+    187          
+    188          /*
+    189          **-----------------------------------------------------------------------------
+    190          **
+    191          **  Abstract:
+    192          **  This function is INTTM00 interrupt service routine.
+    193          **
+    194          **  Parameters:
+    195          **  None
+    196          **
+    197          **  Returns:
+    198          **  None
+    199          **
+    200          **-----------------------------------------------------------------------------
+    201          */
+    202          
+    203          #pragma vector = INTTM00_vect
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    204          __interrupt void MD_INTTM00(void)
+   \                     MD_INTTM00:
+    205          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    206            delay_counter++;
+   \   000000 A2....                INCW      N:delay_counter    ;; 2 cycles
+    207          }
+   \   000003 61FC                  RETI                         ;; 6 cycles
+   \   000005                       ; ------------------------------------- Block: 8 cycles
+   \   000005                       ; ------------------------------------- Total: 8 cycles
+   \   000005                       REQUIRE ?CLRL78_V1_0_L00
+
+   \                                 In  segment INTVEC, offset 0x2c, root
+   \                     `??MD_INTTM00??INTVEC 44`:
+   \   00002C ....                  DW MD_INTTM00
+    208          
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      0   MD_INTTM00
+      0   TAU0_Channel0_ChangeTimerCondition
+      0   TAU0_Channel0_Start
+      0   TAU0_Channel0_Stop
+      0   TAU0_Init
+      2   delay
+        2   -> TAU0_Channel0_Start
+        2   -> TAU0_Channel0_Stop
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       2  ??MD_INTTM00??INTVEC 44
+       5  MD_INTTM00
+       3  TAU0_Channel0_ChangeTimerCondition
+      11  TAU0_Channel0_Start
+      12  TAU0_Channel0_Stop
+     100  TAU0_Init
+       2  _A_IF0
+       2  _A_IF1
+       2  _A_IF2
+       2  _A_MK0
+       2  _A_MK1
+       2  _A_MK2
+       1  _A_PER0
+       2  _A_PR01
+       2  _A_PR11
+       2  _A_TDR00
+       2  _A_TMR00
+       2  _A_TO0
+       2  _A_TOE0
+       2  _A_TPS0
+       2  _A_TS0
+       2  _A_TT0
+      20  delay
+       2  delay_counter
+
+ 
+ 151 bytes in segment CODE
+   2 bytes in segment INTVEC
+  29 bytes in segment NEAR_A
+   2 bytes in segment NEAR_Z
+   2 bytes in segment SADDR_A
+ 
+ 151 bytes of CODE memory (+  2 bytes shared)
+   2 bytes of DATA memory (+ 31 bytes shared)
+
+Errors: none
+Warnings: none

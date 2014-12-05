@@ -1,0 +1,1038 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:40
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\aci_queue.cpp
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\aci_queue.cpp" --core rl78_1
+#        --code_model near --data_model near --near_const_location rom0 -o
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\aci_queue.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\aci_queue.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\BLE\aci_queue.cpp
+      1          /* Copyright (c) 2014, Nordic Semiconductor ASA
+      2           *
+      3           * Permission is hereby granted, free of charge, to any person obtaining a copy
+      4           * of this software and associated documentation files (the "Software"), to deal
+      5           * in the Software without restriction, including without limitation the rights
+      6           * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      7           * copies of the Software, and to permit persons to whom the Software is
+      8           * furnished to do so, subject to the following conditions:
+      9           *
+     10           * The above copyright notice and this permission notice shall be included in all
+     11           * copies or substantial portions of the Software.
+     12           *
+     13           * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     14           * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     15           * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     16           * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     17           * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     18           * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+     19           * SOFTWARE.
+     20           */
+     21          
+     22           /** @file
+     23          @brief Implementation of a circular queue for ACI data
+     24          */
+     25          
+     26          #include "hal_aci_tl.h"
+     27          #include "aci_queue.h"
+     28          #include "ble_assert.h"
+     29          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     30          void aci_queue_init(aci_queue_t *aci_q)
+   \                     aci_queue_init:
+     31          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 2
+     32            uint8_t loop;
+     33          
+     34            ble_assert(NULL != aci_q);
+   \   000003 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000005 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_0  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 9 cycles
+   \   00000A 322200                MOVW      BC, #0x22          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+     35          
+     36            aci_q->head = 0;
+   \                     ??aci_queue_peek_from_isr_0:
+   \   000013 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000015 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000016 F1                    CLRB      A                  ;; 1 cycle
+   \   000017 9C84                  MOV       [HL+0x84], A       ;; 1 cycle
+     37            aci_q->tail = 0;
+   \   000019 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00001B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001C F1                    CLRB      A                  ;; 1 cycle
+   \   00001D 9C85                  MOV       [HL+0x85], A       ;; 1 cycle
+     38            for(loop=0; loop<ACI_QUEUE_SIZE; loop++)
+   \   00001F 5400                  MOV       E, #0x0            ;; 1 cycle
+   \   000021 EF27                  BR        S:??aci_queue_peek_from_isr_1  ;; 3 cycles
+   \   000023                       ; ------------------------------------- Block: 12 cycles
+     39            {
+     40              aci_q->aci_data[loop].buffer[0] = 0x00;
+   \                     ??aci_queue_init_0:
+   \   000023 64                    MOV       A, E               ;; 1 cycle
+   \   000024 70                    MOV       X, A               ;; 1 cycle
+   \   000025 F1                    CLRB      A                  ;; 1 cycle
+   \   000026 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   000029 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00002C 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00002D A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00002F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000030 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000031 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000032 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000033 A7                    INCW      HL                 ;; 1 cycle
+   \   000034 F1                    CLRB      A                  ;; 1 cycle
+   \   000035 9B                    MOV       [HL], A            ;; 1 cycle
+     41              aci_q->aci_data[loop].buffer[1] = 0x00;
+   \   000036 64                    MOV       A, E               ;; 1 cycle
+   \   000037 70                    MOV       X, A               ;; 1 cycle
+   \   000038 F1                    CLRB      A                  ;; 1 cycle
+   \   000039 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   00003C FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00003F 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000040 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000042 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000043 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000044 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000045 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000046 F1                    CLRB      A                  ;; 1 cycle
+   \   000047 9C02                  MOV       [HL+0x02], A       ;; 1 cycle
+     42            }
+   \   000049 84                    INC       E                  ;; 1 cycle
+   \   00004A                       ; ------------------------------------- Block: 32 cycles
+   \                     ??aci_queue_peek_from_isr_1:
+   \   00004A 64                    MOV       A, E               ;; 1 cycle
+   \   00004B 4C04                  CMP       A, #0x4            ;; 1 cycle
+   \   00004D DCD4                  BC        ??aci_queue_init_0  ;; 4 cycles
+   \   00004F                       ; ------------------------------------- Block: 6 cycles
+     43          }
+   \   00004F 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   000051 C4                    POP       DE                 ;; 1 cycle
+   \   000052 C2                    POP       BC                 ;; 1 cycle
+   \   000053 D7                    RET                          ;; 6 cycles
+   \   000054                       ; ------------------------------------- Block: 9 cycles
+   \   000054                       ; ------------------------------------- Total: 73 cycles
+   \   000054                       REQUIRE ?CLRL78_V1_0_L00
+     44          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     45          bool aci_queue_dequeue(aci_queue_t *aci_q, hal_aci_data_t *p_data)
+   \                     aci_queue_dequeue:
+     46          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+     47            ble_assert(NULL != aci_q);
+   \   000003 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000005 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_2  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 9 cycles
+   \   00000A 322F00                MOVW      BC, #0x2F          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+     48            ble_assert(NULL != p_data);
+   \                     ??aci_queue_peek_from_isr_2:
+   \   000013 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000015 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000018 DF09                  BNZ       ??aci_queue_peek_from_isr_3  ;; 4 cycles
+   \   00001A                       ; ------------------------------------- Block: 6 cycles
+   \   00001A 323000                MOVW      BC, #0x30          ;; 1 cycle
+   \   00001D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000020 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000023                       ; ------------------------------------- Block: 5 cycles
+     49          
+     50            if (aci_queue_is_empty(aci_q))
+   \                     ??aci_queue_peek_from_isr_3:
+   \   000023 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000025 FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   000028 D1                    CMP0      A                  ;; 1 cycle
+   \   000029 DD03                  BZ        ??aci_queue_peek_from_isr_4  ;; 4 cycles
+   \   00002B                       ; ------------------------------------- Block: 9 cycles
+     51            {
+     52              return false;
+   \   00002B F1                    CLRB      A                  ;; 1 cycle
+   \   00002C EF32                  BR        S:??aci_queue_peek_from_isr_5  ;; 3 cycles
+   \   00002E                       ; ------------------------------------- Block: 4 cycles
+     53            }
+     54          
+     55            memcpy((uint8_t *)p_data, (uint8_t *)&(aci_q->aci_data[aci_q->head % ACI_QUEUE_SIZE]), sizeof(hal_aci_data_t));
+   \                     ??aci_queue_peek_from_isr_4:
+   \   00002E 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   000030 60                    MOV       A, X               ;; 1 cycle
+   \   000031 73                    MOV       B, A               ;; 1 cycle
+   \   000032 70                    MOV       X, A               ;; 1 cycle
+   \   000033 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000035 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000036 8C84                  MOV       A, [HL+0x84]       ;; 1 cycle
+   \   000038 618B                  XCH       A, B               ;; 1 cycle
+   \   00003A 70                    MOV       X, A               ;; 1 cycle
+   \   00003B 63                    MOV       A, B               ;; 1 cycle
+   \   00003C FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00003F 72                    MOV       C, A               ;; 1 cycle
+   \   000040 62                    MOV       A, C               ;; 1 cycle
+   \   000041 70                    MOV       X, A               ;; 1 cycle
+   \   000042 F1                    CLRB      A                  ;; 1 cycle
+   \   000043 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   000046 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000049 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00004A A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00004C 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00004D 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00004E A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000050 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000051 5321                  MOV       B, #0x21           ;; 1 cycle
+   \   000053 FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+     56            ++aci_q->head;
+   \   000056 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000058 048400                ADDW      AX, #0x84          ;; 1 cycle
+   \   00005B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00005C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00005D 81                    INC       A                  ;; 1 cycle
+   \   00005E 9B                    MOV       [HL], A            ;; 1 cycle
+     57          
+     58            return true;
+   \   00005F E1                    ONEB      A                  ;; 1 cycle
+   \   000060                       ; ------------------------------------- Block: 38 cycles
+   \                     ??aci_queue_peek_from_isr_5:
+   \   000060 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000062 C4                    POP       DE                 ;; 1 cycle
+   \   000063 D7                    RET                          ;; 6 cycles
+   \   000064                       ; ------------------------------------- Block: 8 cycles
+   \   000064                       ; ------------------------------------- Total: 84 cycles
+   \   000064                       REQUIRE ?CLRL78_V1_0_L00
+     59          }
+     60          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     61          bool aci_queue_dequeue_from_isr(aci_queue_t *aci_q, hal_aci_data_t *p_data)
+   \                     aci_queue_dequeue_from_isr:
+     62          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+     63            ble_assert(NULL != aci_q);
+   \   000003 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000005 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_6  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 9 cycles
+   \   00000A 323F00                MOVW      BC, #0x3F          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+     64            ble_assert(NULL != p_data);
+   \                     ??aci_queue_peek_from_isr_6:
+   \   000013 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000015 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000018 DF09                  BNZ       ??aci_queue_peek_from_isr_7  ;; 4 cycles
+   \   00001A                       ; ------------------------------------- Block: 6 cycles
+   \   00001A 324000                MOVW      BC, #0x40          ;; 1 cycle
+   \   00001D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000020 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000023                       ; ------------------------------------- Block: 5 cycles
+     65          
+     66            if (aci_queue_is_empty_from_isr(aci_q))
+   \                     ??aci_queue_peek_from_isr_7:
+   \   000023 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000025 FD....                CALL      aci_queue_is_empty_from_isr  ;; 3 cycles
+   \   000028 D1                    CMP0      A                  ;; 1 cycle
+   \   000029 DD03                  BZ        ??aci_queue_peek_from_isr_8  ;; 4 cycles
+   \   00002B                       ; ------------------------------------- Block: 9 cycles
+     67            {
+     68              return false;
+   \   00002B F1                    CLRB      A                  ;; 1 cycle
+   \   00002C EF32                  BR        S:??aci_queue_peek_from_isr_9  ;; 3 cycles
+   \   00002E                       ; ------------------------------------- Block: 4 cycles
+     69            }
+     70          
+     71            memcpy((uint8_t *)p_data, (uint8_t *)&(aci_q->aci_data[aci_q->head % ACI_QUEUE_SIZE]), sizeof(hal_aci_data_t));
+   \                     ??aci_queue_peek_from_isr_8:
+   \   00002E 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   000030 60                    MOV       A, X               ;; 1 cycle
+   \   000031 73                    MOV       B, A               ;; 1 cycle
+   \   000032 70                    MOV       X, A               ;; 1 cycle
+   \   000033 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000035 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000036 8C84                  MOV       A, [HL+0x84]       ;; 1 cycle
+   \   000038 618B                  XCH       A, B               ;; 1 cycle
+   \   00003A 70                    MOV       X, A               ;; 1 cycle
+   \   00003B 63                    MOV       A, B               ;; 1 cycle
+   \   00003C FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00003F 72                    MOV       C, A               ;; 1 cycle
+   \   000040 62                    MOV       A, C               ;; 1 cycle
+   \   000041 70                    MOV       X, A               ;; 1 cycle
+   \   000042 F1                    CLRB      A                  ;; 1 cycle
+   \   000043 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   000046 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000049 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00004A A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00004C 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00004D 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00004E A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000050 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000051 5321                  MOV       B, #0x21           ;; 1 cycle
+   \   000053 FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+     72            ++aci_q->head;
+   \   000056 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000058 048400                ADDW      AX, #0x84          ;; 1 cycle
+   \   00005B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00005C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00005D 81                    INC       A                  ;; 1 cycle
+   \   00005E 9B                    MOV       [HL], A            ;; 1 cycle
+     73          
+     74            return true;
+   \   00005F E1                    ONEB      A                  ;; 1 cycle
+   \   000060                       ; ------------------------------------- Block: 38 cycles
+   \                     ??aci_queue_peek_from_isr_9:
+   \   000060 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000062 C4                    POP       DE                 ;; 1 cycle
+   \   000063 D7                    RET                          ;; 6 cycles
+   \   000064                       ; ------------------------------------- Block: 8 cycles
+   \   000064                       ; ------------------------------------- Total: 84 cycles
+   \   000064                       REQUIRE ?CLRL78_V1_0_L00
+     75          }
+     76          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     77          bool aci_queue_enqueue(aci_queue_t *aci_q, hal_aci_data_t *p_data)
+   \                     aci_queue_enqueue:
+     78          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+     79            const uint8_t length = p_data->buffer[0];
+   \   000003 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000005 A1                    INCW      AX                 ;; 1 cycle
+   \   000006 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000007 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000008 74                    MOV       E, A               ;; 1 cycle
+     80          
+     81            ble_assert(NULL != aci_q);
+   \   000009 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00000B 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   00000E DF09                  BNZ       ??aci_queue_peek_from_isr_10  ;; 4 cycles
+   \   000010                       ; ------------------------------------- Block: 14 cycles
+   \   000010 325100                MOVW      BC, #0x51          ;; 1 cycle
+   \   000013 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000016 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000019                       ; ------------------------------------- Block: 5 cycles
+     82            ble_assert(NULL != p_data);
+   \                     ??aci_queue_peek_from_isr_10:
+   \   000019 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00001B 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   00001E DF09                  BNZ       ??aci_queue_peek_from_isr_11  ;; 4 cycles
+   \   000020                       ; ------------------------------------- Block: 6 cycles
+   \   000020 325200                MOVW      BC, #0x52          ;; 1 cycle
+   \   000023 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000026 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000029                       ; ------------------------------------- Block: 5 cycles
+     83          
+     84            if (aci_queue_is_full(aci_q))
+   \                     ??aci_queue_peek_from_isr_11:
+   \   000029 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00002B FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   00002E D1                    CMP0      A                  ;; 1 cycle
+   \   00002F DD03                  BZ        ??aci_queue_peek_from_isr_12  ;; 4 cycles
+   \   000031                       ; ------------------------------------- Block: 9 cycles
+     85            {
+     86              return false;
+   \   000031 F1                    CLRB      A                  ;; 1 cycle
+   \   000032 EF5B                  BR        S:??aci_queue_peek_from_isr_13  ;; 3 cycles
+   \   000034                       ; ------------------------------------- Block: 4 cycles
+     87            }
+     88          
+     89            aci_q->aci_data[aci_q->tail % ACI_QUEUE_SIZE].status_byte = 0;
+   \                     ??aci_queue_peek_from_isr_12:
+   \   000034 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   000036 60                    MOV       A, X               ;; 1 cycle
+   \   000037 73                    MOV       B, A               ;; 1 cycle
+   \   000038 70                    MOV       X, A               ;; 1 cycle
+   \   000039 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00003B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003C 8C85                  MOV       A, [HL+0x85]       ;; 1 cycle
+   \   00003E 618B                  XCH       A, B               ;; 1 cycle
+   \   000040 70                    MOV       X, A               ;; 1 cycle
+   \   000041 63                    MOV       A, B               ;; 1 cycle
+   \   000042 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000045 72                    MOV       C, A               ;; 1 cycle
+   \   000046 62                    MOV       A, C               ;; 1 cycle
+   \   000047 70                    MOV       X, A               ;; 1 cycle
+   \   000048 F1                    CLRB      A                  ;; 1 cycle
+   \   000049 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   00004C FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00004F 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000050 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000052 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000053 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000054 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000055 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000056 F1                    CLRB      A                  ;; 1 cycle
+   \   000057 9B                    MOV       [HL], A            ;; 1 cycle
+     90            memcpy((uint8_t *)&(aci_q->aci_data[aci_q->tail % ACI_QUEUE_SIZE].buffer[0]), (uint8_t *)&p_data->buffer[0], length + 1);
+   \   000058 C5                    PUSH      DE                 ;; 1 cycle
+   \   000059 C2                    POP       BC                 ;; 1 cycle
+   \   00005A F3                    CLRB      B                  ;; 1 cycle
+   \   00005B A3                    INCW      BC                 ;; 1 cycle
+   \   00005C A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00005E A1                    INCW      AX                 ;; 1 cycle
+   \   00005F 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000060 C5                    PUSH      DE                 ;; 1 cycle
+   \   000061 C3                    PUSH      BC                 ;; 1 cycle
+   \   000062 C4                    POP       DE                 ;; 1 cycle
+   \   000063 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   000065 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000066 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000068 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000069 8C85                  MOV       A, [HL+0x85]       ;; 1 cycle
+   \   00006B FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00006E 72                    MOV       C, A               ;; 1 cycle
+   \   00006F 62                    MOV       A, C               ;; 1 cycle
+   \   000070 70                    MOV       X, A               ;; 1 cycle
+   \   000071 F1                    CLRB      A                  ;; 1 cycle
+   \   000072 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   000075 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000078 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000079 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00007B 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00007C A1                    INCW      AX                 ;; 1 cycle
+   \   00007D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007E C5                    PUSH      DE                 ;; 1 cycle
+   \   00007F C2                    POP       BC                 ;; 1 cycle
+   \   000080 C4                    POP       DE                 ;; 1 cycle
+   \   000081 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000082 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+     91            ++aci_q->tail;
+   \   000085 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000087 048500                ADDW      AX, #0x85          ;; 1 cycle
+   \   00008A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00008B 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00008C 81                    INC       A                  ;; 1 cycle
+   \   00008D 9B                    MOV       [HL], A            ;; 1 cycle
+     92          
+     93            return true;
+   \   00008E E1                    ONEB      A                  ;; 1 cycle
+   \   00008F                       ; ------------------------------------- Block: 74 cycles
+   \                     ??aci_queue_peek_from_isr_13:
+   \   00008F 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000091 C4                    POP       DE                 ;; 1 cycle
+   \   000092 D7                    RET                          ;; 6 cycles
+   \   000093                       ; ------------------------------------- Block: 8 cycles
+   \   000093                       ; ------------------------------------- Total: 125 cycles
+   \   000093                       REQUIRE ?CLRL78_V1_0_L00
+     94          }
+     95          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     96          bool aci_queue_enqueue_from_isr(aci_queue_t *aci_q, hal_aci_data_t *p_data)
+   \                     aci_queue_enqueue_from_isr:
+     97          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+     98            const uint8_t length = p_data->buffer[0];
+   \   000003 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000005 A1                    INCW      AX                 ;; 1 cycle
+   \   000006 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000007 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000008 74                    MOV       E, A               ;; 1 cycle
+     99          
+    100            ble_assert(NULL != aci_q);
+   \   000009 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00000B 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   00000E DF09                  BNZ       ??aci_queue_peek_from_isr_14  ;; 4 cycles
+   \   000010                       ; ------------------------------------- Block: 14 cycles
+   \   000010 326400                MOVW      BC, #0x64          ;; 1 cycle
+   \   000013 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000016 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000019                       ; ------------------------------------- Block: 5 cycles
+    101            ble_assert(NULL != p_data);
+   \                     ??aci_queue_peek_from_isr_14:
+   \   000019 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00001B 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   00001E DF09                  BNZ       ??aci_queue_peek_from_isr_15  ;; 4 cycles
+   \   000020                       ; ------------------------------------- Block: 6 cycles
+   \   000020 326500                MOVW      BC, #0x65          ;; 1 cycle
+   \   000023 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000026 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000029                       ; ------------------------------------- Block: 5 cycles
+    102          
+    103            if (aci_queue_is_full_from_isr(aci_q))
+   \                     ??aci_queue_peek_from_isr_15:
+   \   000029 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00002B FD....                CALL      aci_queue_is_full_from_isr  ;; 3 cycles
+   \   00002E D1                    CMP0      A                  ;; 1 cycle
+   \   00002F DD03                  BZ        ??aci_queue_peek_from_isr_16  ;; 4 cycles
+   \   000031                       ; ------------------------------------- Block: 9 cycles
+    104            {
+    105              return false;
+   \   000031 F1                    CLRB      A                  ;; 1 cycle
+   \   000032 EF5B                  BR        S:??aci_queue_peek_from_isr_17  ;; 3 cycles
+   \   000034                       ; ------------------------------------- Block: 4 cycles
+    106            }
+    107          
+    108            aci_q->aci_data[aci_q->tail % ACI_QUEUE_SIZE].status_byte = 0;
+   \                     ??aci_queue_peek_from_isr_16:
+   \   000034 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   000036 60                    MOV       A, X               ;; 1 cycle
+   \   000037 73                    MOV       B, A               ;; 1 cycle
+   \   000038 70                    MOV       X, A               ;; 1 cycle
+   \   000039 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00003B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003C 8C85                  MOV       A, [HL+0x85]       ;; 1 cycle
+   \   00003E 618B                  XCH       A, B               ;; 1 cycle
+   \   000040 70                    MOV       X, A               ;; 1 cycle
+   \   000041 63                    MOV       A, B               ;; 1 cycle
+   \   000042 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000045 72                    MOV       C, A               ;; 1 cycle
+   \   000046 62                    MOV       A, C               ;; 1 cycle
+   \   000047 70                    MOV       X, A               ;; 1 cycle
+   \   000048 F1                    CLRB      A                  ;; 1 cycle
+   \   000049 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   00004C FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00004F 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000050 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000052 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000053 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000054 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000055 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000056 F1                    CLRB      A                  ;; 1 cycle
+   \   000057 9B                    MOV       [HL], A            ;; 1 cycle
+    109            memcpy((uint8_t *)&(aci_q->aci_data[aci_q->tail % ACI_QUEUE_SIZE].buffer[0]), (uint8_t *)&p_data->buffer[0], length + 1);
+   \   000058 C5                    PUSH      DE                 ;; 1 cycle
+   \   000059 C2                    POP       BC                 ;; 1 cycle
+   \   00005A F3                    CLRB      B                  ;; 1 cycle
+   \   00005B A3                    INCW      BC                 ;; 1 cycle
+   \   00005C A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00005E A1                    INCW      AX                 ;; 1 cycle
+   \   00005F 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000060 C5                    PUSH      DE                 ;; 1 cycle
+   \   000061 C3                    PUSH      BC                 ;; 1 cycle
+   \   000062 C4                    POP       DE                 ;; 1 cycle
+   \   000063 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   000065 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000066 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000068 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000069 8C85                  MOV       A, [HL+0x85]       ;; 1 cycle
+   \   00006B FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00006E 72                    MOV       C, A               ;; 1 cycle
+   \   00006F 62                    MOV       A, C               ;; 1 cycle
+   \   000070 70                    MOV       X, A               ;; 1 cycle
+   \   000071 F1                    CLRB      A                  ;; 1 cycle
+   \   000072 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   000075 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000078 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000079 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00007B 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00007C A1                    INCW      AX                 ;; 1 cycle
+   \   00007D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007E C5                    PUSH      DE                 ;; 1 cycle
+   \   00007F C2                    POP       BC                 ;; 1 cycle
+   \   000080 C4                    POP       DE                 ;; 1 cycle
+   \   000081 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000082 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    110            ++aci_q->tail;
+   \   000085 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000087 048500                ADDW      AX, #0x85          ;; 1 cycle
+   \   00008A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00008B 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00008C 81                    INC       A                  ;; 1 cycle
+   \   00008D 9B                    MOV       [HL], A            ;; 1 cycle
+    111          
+    112            return true;
+   \   00008E E1                    ONEB      A                  ;; 1 cycle
+   \   00008F                       ; ------------------------------------- Block: 74 cycles
+   \                     ??aci_queue_peek_from_isr_17:
+   \   00008F 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000091 C4                    POP       DE                 ;; 1 cycle
+   \   000092 D7                    RET                          ;; 6 cycles
+   \   000093                       ; ------------------------------------- Block: 8 cycles
+   \   000093                       ; ------------------------------------- Total: 125 cycles
+   \   000093                       REQUIRE ?CLRL78_V1_0_L00
+    113          }
+    114          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    115          bool aci_queue_is_empty(aci_queue_t *aci_q)
+   \                     aci_queue_is_empty:
+    116          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 2
+    117            bool state = false;
+   \   000003 5500                  MOV       D, #0x0            ;; 1 cycle
+    118          
+    119            ble_assert(NULL != aci_q);
+   \   000005 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000007 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   00000A DF09                  BNZ       ??aci_queue_peek_from_isr_18  ;; 4 cycles
+   \   00000C                       ; ------------------------------------- Block: 10 cycles
+   \   00000C 327700                MOVW      BC, #0x77          ;; 1 cycle
+   \   00000F 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000012 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000015                       ; ------------------------------------- Block: 5 cycles
+    120          
+    121            //Critical section
+    122            noInterrupts();
+   \                     ??aci_queue_peek_from_isr_18:
+   \   000015 FD....                CALL      noInterrupts       ;; 3 cycles
+    123            if (aci_q->head == aci_q->tail)
+   \   000018 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00001A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001B 8C84                  MOV       A, [HL+0x84]       ;; 1 cycle
+   \   00001D 73                    MOV       B, A               ;; 1 cycle
+   \   00001E A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000020 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000021 8C85                  MOV       A, [HL+0x85]       ;; 1 cycle
+   \   000023 6143                  CMP       B, A               ;; 1 cycle
+   \   000025 61F8                  SKNZ                         ;; 4 cycles
+   \   000027                       ; ------------------------------------- Block: 15 cycles
+    124            {
+    125              state = true;
+   \   000027 5501                  MOV       D, #0x1            ;; 1 cycle
+   \   000029                       ; ------------------------------------- Block: 1 cycles
+    126            }
+    127            interrupts();
+   \                     ??aci_queue_is_empty_0:
+   \   000029 FD....                CALL      interrupts         ;; 3 cycles
+    128          
+    129            return state;
+   \   00002C 65                    MOV       A, D               ;; 1 cycle
+   \   00002D 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   00002F C4                    POP       DE                 ;; 1 cycle
+   \   000030 C2                    POP       BC                 ;; 1 cycle
+   \   000031 D7                    RET                          ;; 6 cycles
+   \   000032                       ; ------------------------------------- Block: 13 cycles
+   \   000032                       ; ------------------------------------- Total: 44 cycles
+   \   000032                       REQUIRE ?CLRL78_V1_0_L00
+    130          }
+    131          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    132          bool aci_queue_is_empty_from_isr(aci_queue_t *aci_q)
+   \                     aci_queue_is_empty_from_isr:
+    133          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    134            ble_assert(NULL != aci_q);
+   \   000003 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000004 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000007 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_19  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 10 cycles
+   \   00000A 328600                MOVW      BC, #0x86          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+    135          
+    136            return aci_q->head == aci_q->tail;
+   \                     ??aci_queue_peek_from_isr_19:
+   \   000013 8A84                  MOV       A, [DE+0x84]       ;; 1 cycle
+   \   000015 70                    MOV       X, A               ;; 1 cycle
+   \   000016 8A85                  MOV       A, [DE+0x85]       ;; 1 cycle
+   \   000018 6140                  CMP       X, A               ;; 1 cycle
+   \   00001A E1                    ONEB      A                  ;; 1 cycle
+   \   00001B 61E8                  SKZ                          ;; 4 cycles
+   \   00001D                       ; ------------------------------------- Block: 9 cycles
+   \   00001D F1                    CLRB      A                  ;; 1 cycle
+   \   00001E                       ; ------------------------------------- Block: 1 cycles
+   \                     ??aci_queue_is_empty_from_isr_0:
+   \   00001E C4                    POP       DE                 ;; 1 cycle
+   \   00001F C2                    POP       BC                 ;; 1 cycle
+   \   000020 D7                    RET                          ;; 6 cycles
+   \   000021                       ; ------------------------------------- Block: 8 cycles
+   \   000021                       ; ------------------------------------- Total: 33 cycles
+   \   000021                       REQUIRE ?CLRL78_V1_0_L00
+    137          }
+    138          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    139          bool aci_queue_is_full(aci_queue_t *aci_q)
+   \                     aci_queue_is_full:
+    140          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    141            bool state;
+    142          
+    143            ble_assert(NULL != aci_q);
+   \   000003 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000004 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000007 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_20  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 10 cycles
+   \   00000A 328F00                MOVW      BC, #0x8F          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+    144          
+    145            //This should be done in a critical section
+    146            noInterrupts();
+   \                     ??aci_queue_peek_from_isr_20:
+   \   000013 FD....                CALL      noInterrupts       ;; 3 cycles
+    147            
+    148            state = (aci_q->tail == aci_q->head + ACI_QUEUE_SIZE);
+   \   000016 8A84                  MOV       A, [DE+0x84]       ;; 1 cycle
+   \   000018 70                    MOV       X, A               ;; 1 cycle
+   \   000019 F1                    CLRB      A                  ;; 1 cycle
+   \   00001A 040400                ADDW      AX, #0x4           ;; 1 cycle
+   \   00001D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001E 8A85                  MOV       A, [DE+0x85]       ;; 1 cycle
+   \   000020 70                    MOV       X, A               ;; 1 cycle
+   \   000021 F1                    CLRB      A                  ;; 1 cycle
+   \   000022 47                    CMPW      AX, HL             ;; 1 cycle
+   \   000023 E1                    ONEB      A                  ;; 1 cycle
+   \   000024 61E8                  SKZ                          ;; 4 cycles
+   \   000026                       ; ------------------------------------- Block: 17 cycles
+   \   000026 F1                    CLRB      A                  ;; 1 cycle
+   \   000027                       ; ------------------------------------- Block: 1 cycles
+   \                     ??aci_queue_is_full_0:
+   \   000027 73                    MOV       B, A               ;; 1 cycle
+    149          
+    150            interrupts();
+   \   000028 FD....                CALL      interrupts         ;; 3 cycles
+    151            //end
+    152          
+    153            return state;
+   \   00002B 63                    MOV       A, B               ;; 1 cycle
+   \   00002C C4                    POP       DE                 ;; 1 cycle
+   \   00002D C2                    POP       BC                 ;; 1 cycle
+   \   00002E D7                    RET                          ;; 6 cycles
+   \   00002F                       ; ------------------------------------- Block: 13 cycles
+   \   00002F                       ; ------------------------------------- Total: 46 cycles
+   \   00002F                       REQUIRE ?CLRL78_V1_0_L00
+    154          }
+    155          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    156          bool aci_queue_is_full_from_isr(aci_queue_t *aci_q)
+   \                     aci_queue_is_full_from_isr:
+    157          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    158            ble_assert(NULL != aci_q);
+   \   000003 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000004 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000007 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_21  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 10 cycles
+   \   00000A 329E00                MOVW      BC, #0x9E          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+    159          
+    160            return (aci_q->tail == aci_q->head + ACI_QUEUE_SIZE);
+   \                     ??aci_queue_peek_from_isr_21:
+   \   000013 8A84                  MOV       A, [DE+0x84]       ;; 1 cycle
+   \   000015 70                    MOV       X, A               ;; 1 cycle
+   \   000016 F1                    CLRB      A                  ;; 1 cycle
+   \   000017 040400                ADDW      AX, #0x4           ;; 1 cycle
+   \   00001A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001B 8A85                  MOV       A, [DE+0x85]       ;; 1 cycle
+   \   00001D 70                    MOV       X, A               ;; 1 cycle
+   \   00001E F1                    CLRB      A                  ;; 1 cycle
+   \   00001F 47                    CMPW      AX, HL             ;; 1 cycle
+   \   000020 E1                    ONEB      A                  ;; 1 cycle
+   \   000021 61E8                  SKZ                          ;; 4 cycles
+   \   000023                       ; ------------------------------------- Block: 14 cycles
+   \   000023 F1                    CLRB      A                  ;; 1 cycle
+   \   000024                       ; ------------------------------------- Block: 1 cycles
+   \                     ??aci_queue_is_full_from_isr_0:
+   \   000024 C4                    POP       DE                 ;; 1 cycle
+   \   000025 C2                    POP       BC                 ;; 1 cycle
+   \   000026 D7                    RET                          ;; 6 cycles
+   \   000027                       ; ------------------------------------- Block: 8 cycles
+   \   000027                       ; ------------------------------------- Total: 38 cycles
+   \   000027                       REQUIRE ?CLRL78_V1_0_L00
+    161          }
+    162          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    163          bool aci_queue_peek(aci_queue_t *aci_q, hal_aci_data_t *p_data)
+   \                     aci_queue_peek:
+    164          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C3                    PUSH      BC                 ;; 1 cycle
+   \   000002                       ; Auto size: 2
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    165            ble_assert(NULL != aci_q);
+   \   000003 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000004 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000007 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_22  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 10 cycles
+   \   00000A 32A500                MOVW      BC, #0xA5          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+    166            ble_assert(NULL != p_data);
+   \                     ??aci_queue_peek_from_isr_22:
+   \   000013 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000015 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000018 DF09                  BNZ       ??aci_queue_peek_from_isr_23  ;; 4 cycles
+   \   00001A                       ; ------------------------------------- Block: 6 cycles
+   \   00001A 32A600                MOVW      BC, #0xA6          ;; 1 cycle
+   \   00001D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000020 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000023                       ; ------------------------------------- Block: 5 cycles
+    167          
+    168            if (aci_queue_is_empty(aci_q))
+   \                     ??aci_queue_peek_from_isr_23:
+   \   000023 15                    MOVW      AX, DE             ;; 1 cycle
+   \   000024 FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   000027 D1                    CMP0      A                  ;; 1 cycle
+   \   000028 DD03                  BZ        ??aci_queue_peek_from_isr_24  ;; 4 cycles
+   \   00002A                       ; ------------------------------------- Block: 9 cycles
+    169            {
+    170              return false;
+   \   00002A F1                    CLRB      A                  ;; 1 cycle
+   \   00002B EF1C                  BR        S:??aci_queue_peek_from_isr_25  ;; 3 cycles
+   \   00002D                       ; ------------------------------------- Block: 4 cycles
+    171            }
+    172          
+    173            memcpy((uint8_t *)p_data, (uint8_t *)&(aci_q->aci_data[aci_q->head % ACI_QUEUE_SIZE]), sizeof(hal_aci_data_t));
+   \                     ??aci_queue_peek_from_isr_24:
+   \   00002D 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   00002F 8A84                  MOV       A, [DE+0x84]       ;; 1 cycle
+   \   000031 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000034 72                    MOV       C, A               ;; 1 cycle
+   \   000035 62                    MOV       A, C               ;; 1 cycle
+   \   000036 70                    MOV       X, A               ;; 1 cycle
+   \   000037 F1                    CLRB      A                  ;; 1 cycle
+   \   000038 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   00003B FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00003E 05                    ADDW      AX, DE             ;; 1 cycle
+   \   00003F 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000040 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000042 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000043 5321                  MOV       B, #0x21           ;; 1 cycle
+   \   000045 FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+    174          
+    175            return true;
+   \   000048 E1                    ONEB      A                  ;; 1 cycle
+   \   000049                       ; ------------------------------------- Block: 22 cycles
+   \                     ??aci_queue_peek_from_isr_25:
+   \   000049 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   00004B C4                    POP       DE                 ;; 1 cycle
+   \   00004C D7                    RET                          ;; 6 cycles
+   \   00004D                       ; ------------------------------------- Block: 8 cycles
+   \   00004D                       ; ------------------------------------- Total: 69 cycles
+   \   00004D                       REQUIRE ?CLRL78_V1_0_L00
+    176          }
+    177          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    178          bool aci_queue_peek_from_isr(aci_queue_t *aci_q, hal_aci_data_t *p_data)
+   \                     aci_queue_peek_from_isr:
+    179          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C3                    PUSH      BC                 ;; 1 cycle
+   \   000002                       ; Auto size: 2
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    180            ble_assert(NULL != aci_q);
+   \   000003 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000004 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000007 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000008 DF09                  BNZ       ??aci_queue_peek_from_isr_26  ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 10 cycles
+   \   00000A 32B400                MOVW      BC, #0xB4          ;; 1 cycle
+   \   00000D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000010 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+    181            ble_assert(NULL != p_data);
+   \                     ??aci_queue_peek_from_isr_26:
+   \   000013 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000015 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   000018 DF09                  BNZ       ??aci_queue_peek_from_isr_27  ;; 4 cycles
+   \   00001A                       ; ------------------------------------- Block: 6 cycles
+   \   00001A 32B500                MOVW      BC, #0xB5          ;; 1 cycle
+   \   00001D 30....                MOVW      AX, #`?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`  ;; 1 cycle
+   \   000020 FD....                CALL      __ble_assert       ;; 3 cycles
+   \   000023                       ; ------------------------------------- Block: 5 cycles
+    182          
+    183            if (aci_queue_is_empty_from_isr(aci_q))
+   \                     ??aci_queue_peek_from_isr_27:
+   \   000023 15                    MOVW      AX, DE             ;; 1 cycle
+   \   000024 FD....                CALL      aci_queue_is_empty_from_isr  ;; 3 cycles
+   \   000027 D1                    CMP0      A                  ;; 1 cycle
+   \   000028 DD03                  BZ        ??aci_queue_peek_from_isr_28  ;; 4 cycles
+   \   00002A                       ; ------------------------------------- Block: 9 cycles
+    184            {
+    185              return false;
+   \   00002A F1                    CLRB      A                  ;; 1 cycle
+   \   00002B EF1C                  BR        S:??aci_queue_peek_from_isr_29  ;; 3 cycles
+   \   00002D                       ; ------------------------------------- Block: 4 cycles
+    186            }
+    187          
+    188            memcpy((uint8_t *)p_data, (uint8_t *)&(aci_q->aci_data[aci_q->head % ACI_QUEUE_SIZE]), sizeof(hal_aci_data_t));
+   \                     ??aci_queue_peek_from_isr_28:
+   \   00002D 5004                  MOV       X, #0x4            ;; 1 cycle
+   \   00002F 8A84                  MOV       A, [DE+0x84]       ;; 1 cycle
+   \   000031 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000034 72                    MOV       C, A               ;; 1 cycle
+   \   000035 62                    MOV       A, C               ;; 1 cycle
+   \   000036 70                    MOV       X, A               ;; 1 cycle
+   \   000037 F1                    CLRB      A                  ;; 1 cycle
+   \   000038 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   00003B FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   00003E 05                    ADDW      AX, DE             ;; 1 cycle
+   \   00003F 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000040 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000042 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000043 5321                  MOV       B, #0x21           ;; 1 cycle
+   \   000045 FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+    189          
+    190            return true;
+   \   000048 E1                    ONEB      A                  ;; 1 cycle
+   \   000049                       ; ------------------------------------- Block: 22 cycles
+   \                     ??aci_queue_peek_from_isr_29:
+   \   000049 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   00004B C4                    POP       DE                 ;; 1 cycle
+   \   00004C D7                    RET                          ;; 6 cycles
+   \   00004D                       ; ------------------------------------- Block: 8 cycles
+   \   00004D                       ; ------------------------------------- Total: 69 cycles
+   \   00004D                       REQUIRE ?CLRL78_V1_0_L00
+    191          }
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "C:\\\\Users\\\\Emilio Garc\\355...">`:
+   \   000000 433A5C557365          DB 43H, 3AH, 5CH, 55H, 73H, 65H, 72H, 73H
+   \   000008 5C456D696C69          DB 5CH, 45H, 6DH, 69H, 6CH, 69H, 6FH, 20H
+   \   000010 47617263ED61          DB 47H, 61H, 72H, 63H, 0EDH, 61H, 5CH, 44H
+   \   000018 65736B746F70          DB 65H, 73H, 6BH, 74H, 6FH, 70H, 5CH, 62H
+   \   000020 6C652D73646B          DB 6CH, 65H, 2DH, 73H, 64H, 6BH, 2DH, 72H
+   \   000028 6C37385C6C69          DB 6CH, 37H, 38H, 5CH, 6CH, 69H, 62H, 72H
+   \   000030 61726965735C          DB 61H, 72H, 69H, 65H, 73H, 5CH, 42H, 4CH
+   \   000038 455C6163695F          DB 45H, 5CH, 61H, 63H, 69H, 5FH, 71H, 75H
+   \   000040 6575652E6370          DB 65H, 75H, 65H, 2EH, 63H, 70H, 70H, 0
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      6   aci_queue_dequeue
+        6   -> __ble_assert
+        6   -> aci_queue_is_empty
+      6   aci_queue_dequeue_from_isr
+        6   -> __ble_assert
+        6   -> aci_queue_is_empty_from_isr
+      8   aci_queue_enqueue
+        6   -> __ble_assert
+        6   -> aci_queue_is_full
+      8   aci_queue_enqueue_from_isr
+        6   -> __ble_assert
+        6   -> aci_queue_is_full_from_isr
+      6   aci_queue_init
+        6   -> __ble_assert
+      6   aci_queue_is_empty
+        6   -> __ble_assert
+        6   -> interrupts
+        6   -> noInterrupts
+      4   aci_queue_is_empty_from_isr
+        4   -> __ble_assert
+      4   aci_queue_is_full
+        4   -> __ble_assert
+        4   -> interrupts
+        4   -> noInterrupts
+      4   aci_queue_is_full_from_isr
+        4   -> __ble_assert
+      4   aci_queue_peek
+        4   -> __ble_assert
+        4   -> aci_queue_is_empty
+      4   aci_queue_peek_from_isr
+        4   -> __ble_assert
+        4   -> aci_queue_is_empty_from_isr
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      72  ?<Constant "C:\\Users\\Emilio Garc\355...">
+     100  aci_queue_dequeue
+     100  aci_queue_dequeue_from_isr
+     147  aci_queue_enqueue
+     147  aci_queue_enqueue_from_isr
+      84  aci_queue_init
+      50  aci_queue_is_empty
+      33  aci_queue_is_empty_from_isr
+      47  aci_queue_is_full
+      39  aci_queue_is_full_from_isr
+      77  aci_queue_peek
+      77  aci_queue_peek_from_isr
+
+ 
+ 901 bytes in segment CODE
+  72 bytes in segment NEAR_CONST
+ 
+ 901 bytes of CODE  memory
+  72 bytes of CONST memory
+
+Errors: none
+Warnings: none

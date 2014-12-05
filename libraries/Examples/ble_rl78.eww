@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\ble_A_Hello_World_Program\ble_A_Hello_World_Program.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\ble_aci_transport_layer_verification\ble_aci_transport_layer_verification.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\ble_my_project_template\ble_my_project_template.ewp</path>
+  </project>
+  <batchBuild/>
+</workspace>
+
+

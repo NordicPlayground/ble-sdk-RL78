@@ -1,0 +1,442 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:41
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_port.c
+#    Command line =  
+#        "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_port.c"
+#        --core rl78_1 --code_model near --data_model near
+#        --near_const_location rom0 -o "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\CG_port.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_port.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_port.c
+      1          /*
+      2          *******************************************************************************
+      3          * Copyright(C) 2011 Renesas Electronics Corporation
+      4          * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
+      5          * This program must be used solely for the purpose for which
+      6          * it was furnished by Renesas Electronics Corporation. No part of this
+      7          * program may be reproduced or disclosed to others, in any
+      8          * form, without the prior written permission of Renesas Electronics
+      9          * Corporation. 
+     10          *
+     11          * This device driver was created by Applilet3 for RL78/G13
+     12          * 16-Bit Single-Chip Microcontrollers
+     13          * Filename: CG_port.c
+     14          * Abstract: This file implements device driver for PORT module.
+     15          * APIlib: Applilet3 for RL78/G13 E1.00b [14 Jan 2011]
+     16          * Device: R5F100LE
+     17          * Compiler: IAR Systems iccrl78
+     18          * Creation date:  26/10/2014
+     19          *******************************************************************************
+     20          */
+     21          
+     22          /*
+     23          *******************************************************************************
+     24          ** Include files
+     25          *******************************************************************************
+     26          */
+     27          #include "CG_macrodriver.h"
+
+   \                                 In  segment SADDR_A, at 0xfff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   000000                       DS 1
+
+   \                                 In  segment SADDR_A, at 0xfff07
+   \   union <unnamed> volatile __saddr _A_P7
+   \                     _A_P7:
+   \   000000                       DS 1
+
+   \                                 In  segment SADDR_A, at 0xfff0e
+   \   union <unnamed> volatile __saddr _A_P14
+   \                     _A_P14:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xfff27
+   \   union <unnamed> volatile __sfr _A_PM7
+   \                     _A_PM7:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xfff2e
+   \   union <unnamed> volatile __sfr _A_PM14
+   \                     _A_PM14:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf003e
+   \   union <unnamed> volatile _A_PU14
+   \                     _A_PU14:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf006e
+   \   union <unnamed> volatile _A_PMC14
+   \                     _A_PMC14:
+   \   000000                       DS 1
+     28          #include "CG_port.h"
+     29          
+     30          
+     31          /*
+     32          *******************************************************************************
+     33          **  Global define
+     34          *******************************************************************************
+     35          */
+     36          
+     37          /*
+     38          **-----------------------------------------------------------------------------
+     39          **
+     40          **  Abstract:
+     41          **  This function initializes the Port I/O.
+     42          **
+     43          **  Parameters:
+     44          **  None
+     45          **
+     46          **  Returns:
+     47          **  None
+     48          **
+     49          **-----------------------------------------------------------------------------
+     50          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     51          void PORT_Init(void)
+   \                     PORT_Init:
+     52          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     53            //For the LED2
+     54            P7 = _80_Pn7_OUTPUT_1;      
+   \   000000 CD0780                MOV       S:0xFFF07, #0x80   ;; 1 cycle
+     55            PM7 = _01_PMn0_NOT_USE | _02_PMn1_NOT_USE | _04_PMn2_NOT_USE | _08_PMn3_NOT_USE | _10_PMn4_NOT_USE | _20_PMn5_NOT_USE | _40_PMn6_NOT_USE | _00_PMn7_MODE_OUTPUT;
+   \   000003 CE277F                MOV       0xFFF27, #0x7F     ;; 1 cycle
+     56            //For SPI lines of nRF8001
+     57            P14 = _01_Pn0_OUTPUT_1 | _02_Pn1_OUTPUT_1;    
+   \   000006 CD0E03                MOV       S:0xFFF0E, #0x3    ;; 1 cycle
+     58            PM14 = _00_PMn0_MODE_OUTPUT | _00_PMn1_MODE_OUTPUT | _40_PMn6_NOT_USE | _80_PMn7_MODE_INPUT | _3C_PM14_DEFAULT;
+   \   000009 CE2EFC                MOV       0xFFF2E, #0xFC     ;; 1 cycle
+     59            PU14 = _80_PUn7_PULLUP_ON;
+   \   00000C CF3E0080              MOV       0x3E, #0x80        ;; 1 cycle
+     60            PMC14 = _00_PMCn7_DI_ON | _7F_PMC14_DEFAULT;
+   \   000010 CF6E007F              MOV       0x6E, #0x7F        ;; 1 cycle
+     61            
+     62            /*
+     63            MOSI  Port1.2
+     64            MISO  Port1.1
+     65            SCLK  Port1.0
+     66            REQN  Port14.1
+     67            RDYN  Port14.7
+     68            RESET Port14.0
+     69            */
+     70          }
+   \   000014 D7                    RET                          ;; 6 cycles
+   \   000015                       ; ------------------------------------- Block: 12 cycles
+   \   000015                       ; ------------------------------------- Total: 12 cycles
+   \   000015                       REQUIRE ?CLRL78_V1_0_L00
+   \   000015                       REQUIRE _A_P7
+   \   000015                       REQUIRE _A_PM7
+   \   000015                       REQUIRE _A_P14
+   \   000015                       REQUIRE _A_PM14
+   \   000015                       REQUIRE _A_PU14
+   \   000015                       REQUIRE _A_PMC14
+     71          /*
+     72          **-----------------------------------------------------------------------------
+     73          **
+     74          **  Abstract:
+     75          **  This function implements a reading from an input pin
+     76          **
+     77          **  Parameters:
+     78          **  pin: pin to be read
+     79          **
+     80          **  Returns:
+     81          **  value read from the pin. Either 0 or 1
+     82          **
+     83          **-----------------------------------------------------------------------------
+     84          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     85          uint8_t digitalRead(uint8_t pin)
+   \                     digitalRead:
+     86          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     87            uint8_t result = 0xFF;
+   \   000000 50FF                  MOV       X, #0xFF           ;; 1 cycle
+     88            
+     89            //The only pin that will be use is ACI_RDYN
+     90            switch (pin){
+   \   000002 D1                    CMP0      A                  ;; 1 cycle
+   \   000003 DD11                  BZ        ??digitalWrite_0   ;; 4 cycles
+   \   000005                       ; ------------------------------------- Block: 6 cycles
+   \   000005 91                    DEC       A                  ;; 1 cycle
+   \   000006 DD17                  BZ        ??digitalWrite_1   ;; 4 cycles
+   \   000008                       ; ------------------------------------- Block: 5 cycles
+   \   000008 91                    DEC       A                  ;; 1 cycle
+   \   000009 DD1D                  BZ        ??digitalWrite_2   ;; 4 cycles
+   \   00000B                       ; ------------------------------------- Block: 5 cycles
+   \   00000B 91                    DEC       A                  ;; 1 cycle
+   \   00000C DD23                  BZ        ??digitalWrite_3   ;; 4 cycles
+   \   00000E                       ; ------------------------------------- Block: 5 cycles
+   \   00000E 91                    DEC       A                  ;; 1 cycle
+   \   00000F DD29                  BZ        ??digitalWrite_4   ;; 4 cycles
+   \   000011                       ; ------------------------------------- Block: 5 cycles
+   \   000011 91                    DEC       A                  ;; 1 cycle
+   \   000012 DD2D                  BZ        ??digitalWrite_5   ;; 4 cycles
+   \   000014                       ; ------------------------------------- Block: 5 cycles
+   \   000014 EF32                  BR        S:??digitalWrite_6  ;; 3 cycles
+   \   000016                       ; ------------------------------------- Block: 3 cycles
+     91              case ACI_MOSI:
+     92                result = (uint8_t)P1_bit.no2;
+   \                     ??digitalWrite_0:
+   \   000016 F1                    CLRB      A                  ;; 1 cycle
+   \   000017 712401                MOV1      CY, S:0xFFF01.2    ;; 1 cycle
+   \   00001A 61DC                  ROLC      A, 0x1             ;; 1 cycle
+   \   00001C 70                    MOV       X, A               ;; 1 cycle
+     93                break;
+   \   00001D EF29                  BR        S:??digitalWrite_6  ;; 3 cycles
+   \   00001F                       ; ------------------------------------- Block: 7 cycles
+     94              case ACI_MISO:
+     95                result = (uint8_t)P1_bit.no1;
+   \                     ??digitalWrite_1:
+   \   00001F F1                    CLRB      A                  ;; 1 cycle
+   \   000020 711401                MOV1      CY, S:0xFFF01.1    ;; 1 cycle
+   \   000023 61DC                  ROLC      A, 0x1             ;; 1 cycle
+   \   000025 70                    MOV       X, A               ;; 1 cycle
+     96                break;
+   \   000026 EF20                  BR        S:??digitalWrite_6  ;; 3 cycles
+   \   000028                       ; ------------------------------------- Block: 7 cycles
+     97              case ACI_SCLK:
+     98                result = (uint8_t)P1_bit.no0;
+   \                     ??digitalWrite_2:
+   \   000028 F1                    CLRB      A                  ;; 1 cycle
+   \   000029 710401                MOV1      CY, S:0xFFF01.0    ;; 1 cycle
+   \   00002C 61DC                  ROLC      A, 0x1             ;; 1 cycle
+   \   00002E 70                    MOV       X, A               ;; 1 cycle
+     99                break;
+   \   00002F EF17                  BR        S:??digitalWrite_6  ;; 3 cycles
+   \   000031                       ; ------------------------------------- Block: 7 cycles
+    100              case ACI_REQN:
+    101                result = (uint8_t)P14_bit.no1;
+   \                     ??digitalWrite_3:
+   \   000031 F1                    CLRB      A                  ;; 1 cycle
+   \   000032 71140E                MOV1      CY, S:0xFFF0E.1    ;; 1 cycle
+   \   000035 61DC                  ROLC      A, 0x1             ;; 1 cycle
+   \   000037 70                    MOV       X, A               ;; 1 cycle
+    102                break;
+   \   000038 EF0E                  BR        S:??digitalWrite_6  ;; 3 cycles
+   \   00003A                       ; ------------------------------------- Block: 7 cycles
+    103              case ACI_RDYN:
+    104                result = (uint8_t)P14_bit.no7;
+   \                     ??digitalWrite_4:
+   \   00003A 8D0E                  MOV       A, S:0xFFF0E       ;; 1 cycle
+   \   00003C 317A                  SHR       A, 0x7             ;; 1 cycle
+   \   00003E 70                    MOV       X, A               ;; 1 cycle
+    105                break;
+   \   00003F EF07                  BR        S:??digitalWrite_6  ;; 3 cycles
+   \   000041                       ; ------------------------------------- Block: 6 cycles
+    106              case ACI_RESET:
+    107                result = (uint8_t)P14_bit.no0;
+   \                     ??digitalWrite_5:
+   \   000041 F1                    CLRB      A                  ;; 1 cycle
+   \   000042 71040E                MOV1      CY, S:0xFFF0E.0    ;; 1 cycle
+   \   000045 61DC                  ROLC      A, 0x1             ;; 1 cycle
+   \   000047 70                    MOV       X, A               ;; 1 cycle
+    108                break;
+   \   000048                       ; ------------------------------------- Block: 4 cycles
+    109              default:
+    110                break;
+    111            }
+    112            return result;
+   \                     ??digitalWrite_6:
+   \   000048 60                    MOV       A, X               ;; 1 cycle
+   \   000049 D7                    RET                          ;; 6 cycles
+   \   00004A                       ; ------------------------------------- Block: 7 cycles
+   \   00004A                       ; ------------------------------------- Total: 79 cycles
+   \   00004A                       REQUIRE ?CLRL78_V1_0_L00
+   \   00004A                       REQUIRE _A_P1
+   \   00004A                       REQUIRE _A_P14
+    113          }
+    114          /*
+    115          **-----------------------------------------------------------------------------
+    116          **
+    117          **  Abstract:
+    118          **  This function implements a writing to an output pin
+    119          **
+    120          **  Parameters:
+    121          **  pin:   pin to be read
+    122          **  value: the value to be written to the pin
+    123          **
+    124          **  Returns:
+    125          **  None
+    126          **
+    127          **-----------------------------------------------------------------------------
+    128          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    129          void digitalWrite(uint8_t pin, uint8_t value)
+   \                     digitalWrite:
+    130          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 2
+    131            //The only pin that will be use is ACI_REQN
+    132            //MOSI, MISO and Clk have to be  in 1 for the SPI to work properly
+    133            switch (pin){
+   \   000001 D1                    CMP0      A                  ;; 1 cycle
+   \   000002 DD11                  BZ        ??digitalWrite_7   ;; 4 cycles
+   \   000004                       ; ------------------------------------- Block: 6 cycles
+   \   000004 91                    DEC       A                  ;; 1 cycle
+   \   000005 DD1C                  BZ        ??digitalWrite_8   ;; 4 cycles
+   \   000007                       ; ------------------------------------- Block: 5 cycles
+   \   000007 91                    DEC       A                  ;; 1 cycle
+   \   000008 DD27                  BZ        ??digitalWrite_9   ;; 4 cycles
+   \   00000A                       ; ------------------------------------- Block: 5 cycles
+   \   00000A 91                    DEC       A                  ;; 1 cycle
+   \   00000B DD32                  BZ        ??digitalWrite_10  ;; 4 cycles
+   \   00000D                       ; ------------------------------------- Block: 5 cycles
+   \   00000D 91                    DEC       A                  ;; 1 cycle
+   \   00000E DD49                  BZ        ??digitalWrite_11  ;; 4 cycles
+   \   000010                       ; ------------------------------------- Block: 5 cycles
+   \   000010 91                    DEC       A                  ;; 1 cycle
+   \   000011 DD3A                  BZ        ??digitalWrite_12  ;; 4 cycles
+   \   000013                       ; ------------------------------------- Block: 5 cycles
+   \   000013 EF44                  BR        S:??digitalWrite_11  ;; 3 cycles
+   \   000015                       ; ------------------------------------- Block: 3 cycles
+    134              case ACI_MOSI:
+    135                P1_bit.no2 = value;
+   \                     ??digitalWrite_7:
+   \   000015 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000017 73                    MOV       B, A               ;; 1 cycle
+   \   000018 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00001A A1                    INCW      AX                 ;; 1 cycle
+   \   00001B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001C 7184                  MOV1      CY, [HL].0         ;; 1 cycle
+   \   00001E 712101                MOV1      S:0xFFF01.2, CY    ;; 2 cycles
+    136                break;
+   \   000021 EF36                  BR        S:??digitalWrite_11  ;; 3 cycles
+   \   000023                       ; ------------------------------------- Block: 11 cycles
+    137              case ACI_MISO:
+    138                P1_bit.no1 = value;
+   \                     ??digitalWrite_8:
+   \   000023 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000025 73                    MOV       B, A               ;; 1 cycle
+   \   000026 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000028 A1                    INCW      AX                 ;; 1 cycle
+   \   000029 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00002A 7184                  MOV1      CY, [HL].0         ;; 1 cycle
+   \   00002C 711101                MOV1      S:0xFFF01.1, CY    ;; 2 cycles
+    139                break;
+   \   00002F EF28                  BR        S:??digitalWrite_11  ;; 3 cycles
+   \   000031                       ; ------------------------------------- Block: 11 cycles
+    140              case ACI_SCLK:
+    141                P1_bit.no0 = value;
+   \                     ??digitalWrite_9:
+   \   000031 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000033 73                    MOV       B, A               ;; 1 cycle
+   \   000034 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000036 A1                    INCW      AX                 ;; 1 cycle
+   \   000037 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000038 7184                  MOV1      CY, [HL].0         ;; 1 cycle
+   \   00003A 710101                MOV1      S:0xFFF01.0, CY    ;; 2 cycles
+    142                break;
+   \   00003D EF1A                  BR        S:??digitalWrite_11  ;; 3 cycles
+   \   00003F                       ; ------------------------------------- Block: 11 cycles
+    143              case ACI_REQN:
+    144                P14_bit.no1 = value;
+   \                     ??digitalWrite_10:
+   \   00003F 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000041 73                    MOV       B, A               ;; 1 cycle
+   \   000042 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000044 A1                    INCW      AX                 ;; 1 cycle
+   \   000045 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000046 7184                  MOV1      CY, [HL].0         ;; 1 cycle
+   \   000048 71110E                MOV1      S:0xFFF0E.1, CY    ;; 2 cycles
+    145                break;
+   \   00004B EF0C                  BR        S:??digitalWrite_11  ;; 3 cycles
+   \   00004D                       ; ------------------------------------- Block: 11 cycles
+    146              case ACI_RDYN:
+    147                //P14_bit.no7 = value;
+    148                break;
+    149              case ACI_RESET:
+    150                P14_bit.no0 = value;
+   \                     ??digitalWrite_12:
+   \   00004D 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   00004F 73                    MOV       B, A               ;; 1 cycle
+   \   000050 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000052 A1                    INCW      AX                 ;; 1 cycle
+   \   000053 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000054 7184                  MOV1      CY, [HL].0         ;; 1 cycle
+   \   000056 71010E                MOV1      S:0xFFF0E.0, CY    ;; 2 cycles
+    151                break;
+   \   000059                       ; ------------------------------------- Block: 8 cycles
+    152              default:
+    153                break;
+    154            }
+    155          }
+   \                     ??digitalWrite_11:
+   \   000059 1002                  ADDW      SP, #0x2           ;; 1 cycle
+   \   00005B D7                    RET                          ;; 6 cycles
+   \   00005C                       ; ------------------------------------- Block: 7 cycles
+   \   00005C                       ; ------------------------------------- Total: 93 cycles
+   \   00005C                       REQUIRE ?CLRL78_V1_0_L00
+   \   00005C                       REQUIRE _A_P1
+   \   00005C                       REQUIRE _A_P14
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      0   PORT_Init
+      0   digitalRead
+      2   digitalWrite
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      21  PORT_Init
+       1  _A_P1
+       1  _A_P14
+       1  _A_P7
+       1  _A_PM14
+       1  _A_PM7
+       1  _A_PMC14
+       1  _A_PU14
+      74  digitalRead
+      92  digitalWrite
+
+ 
+ 187 bytes in segment CODE
+   4 bytes in segment NEAR_A
+   3 bytes in segment SADDR_A
+ 
+ 187 bytes of CODE memory
+   0 bytes of DATA memory (+ 7 bytes shared)
+
+Errors: none
+Warnings: none

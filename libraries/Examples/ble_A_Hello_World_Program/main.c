@@ -66,12 +66,12 @@ The following instructions describe the steps to be made on the Windows PC:
 */
 #include <lib_aci.h>
 #include <aci_setup.h>
-#include "ble_A_Hello_World_Program_inc\uart_over_ble.h"
+#include "uart_over_ble.h"
  
 /**
 Put the nRF8001 setup in the RAM of the nRF8001.
 */
-#include "ble_A_Hello_World_Program_inc\services.h"
+#include "services.h"
 /**
 Include the services_lock.h to put the setup in the OTP memory of the nRF8001.
 This would mean that the setup cannot be changed once put in.
@@ -108,7 +108,8 @@ __root const UCHAR secuid[10] =
 #endif
 
 /* Store the setup for the nRF8001 in the flash of the AVR to save on RAM */
-static hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] PROGMEM = SETUP_MESSAGES_CONTENT;
+//static hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] PROGMEM = SETUP_MESSAGES_CONTENT;
+const hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] PROGMEM = SETUP_MESSAGES_CONTENT;
 
 // aci_struct that will contain
 // total initial credits
@@ -205,7 +206,7 @@ void setup(void)
     aci_state.aci_setup_info.services_pipe_type_mapping = NULL;
   }
   aci_state.aci_setup_info.number_of_pipes    = NUMBER_OF_PIPES;
-  aci_state.aci_setup_info.setup_msgs         = setup_msgs;
+  aci_state.aci_setup_info.setup_msgs         = (hal_aci_data_t *)setup_msgs;
   aci_state.aci_setup_info.num_setup_msgs     = NB_SETUP_MESSAGES;
   
   /*

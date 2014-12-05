@@ -79,7 +79,7 @@ static struct aci_state_t aci_state;
 
 static hal_aci_evt_t aci_data;
 
-static uint8_t echo_data[] = { 0x00, 0xaa, 0x55, 0xff, 0x77, 0x55, 0x33, 0x22, 0x11, 0x44, 0x66, 0x88, 0x99, 0xbb, 0xdd, 0xcc, 0x00, 0xaa, 0x55, 0xff };
+const uint8_t echo_data[] = { 0x00, 0xaa, 0x55, 0xff, 0x77, 0x55, 0x33, 0x22, 0x11, 0x44, 0x66, 0x88, 0x99, 0xbb, 0xdd, 0xcc, 0x00, 0xaa, 0x55, 0xff };
 static uint8_t aci_echo_cmd = 0;
 
 #define NUM_ECHO_CMDS    3
@@ -178,7 +178,7 @@ void loop()
             delay(4000);
             for(i=0; i<NUM_ECHO_CMDS; i++)
             {
-              lib_aci_echo_msg(sizeof(echo_data), &echo_data[0]);
+              lib_aci_echo_msg(sizeof(echo_data), (uint8_t *)&echo_data[0]);
               aci_echo_cmd++;
             }
           }
@@ -214,7 +214,7 @@ void loop()
           aci_echo_cmd = 0;
           for(i=0; i<NUM_ECHO_CMDS; i++)
           {
-            lib_aci_echo_msg(sizeof(echo_data), &echo_data[0]);
+            lib_aci_echo_msg(sizeof(echo_data), (uint8_t *)&echo_data[0]);
             aci_echo_cmd++;
           }
         }

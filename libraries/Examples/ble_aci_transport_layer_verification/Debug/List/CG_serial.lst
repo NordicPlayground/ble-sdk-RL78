@@ -1,0 +1,2775 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:41
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_serial.c
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\RL78\CG_serial.c" --core rl78_1
+#        --code_model near --data_model near --near_const_location rom0 -o
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\CG_serial.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_serial.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_serial.c
+      1          /*
+      2          *******************************************************************************
+      3          * Copyright(C) 2011 Renesas Electronics Corporation
+      4          * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
+      5          * This program must be used solely for the purpose for which
+      6          * it was furnished by Renesas Electronics Corporation. No part of this
+      7          * program may be reproduced or disclosed to others, in any
+      8          * form, without the prior written permission of Renesas Electronics
+      9          * Corporation. 
+     10          *
+     11          * This device driver was created by Applilet3 for RL78/G13
+     12          * 16-Bit Single-Chip Microcontrollers
+     13          * Filename: CG_serial.c
+     14          * Abstract: This file implements device driver for Serial module.
+     15          * APIlib: Applilet3 for RL78/G13 E1.00b [14 Jan 2011]
+     16          * Device: R5F100LE
+     17          * Compiler: IAR Systems iccrl78
+     18          * Creation date:  29/10/2014
+     19          *******************************************************************************
+     20          */
+     21          
+     22          /*
+     23          *******************************************************************************
+     24          ** Include files
+     25          *******************************************************************************
+     26          */
+     27          #include "CG_macrodriver.h"
+
+   \                                 In  segment SADDR_A, at 0xfff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   000000                       DS 1
+
+   \                                 In  segment SADDR_A, at 0xfff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   000000                       DS 1
+
+   \                                 In  segment SADDR_A, at 0xfff10
+   \   union <unnamed> volatile __saddr __no_bit_access _A_SDR00
+   \                     _A_SDR00:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfff20
+   \   union <unnamed> volatile __sfr _A_PM0
+   \                     _A_PM0:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xfff21
+   \   union <unnamed> volatile __sfr _A_PM1
+   \                     _A_PM1:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xfff44
+   \   union <unnamed> volatile __sfr __no_bit_access _A_SDR02
+   \                     _A_SDR02:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfff46
+   \   union <unnamed> volatile __sfr __no_bit_access _A_SDR03
+   \                     _A_SDR03:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffe8
+   \   union <unnamed> volatile __sfr _A_PR00
+   \                     _A_PR00:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffea
+   \   union <unnamed> volatile __sfr _A_PR01
+   \                     _A_PR01:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffec
+   \   union <unnamed> volatile __sfr _A_PR10
+   \                     _A_PR10:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xfffee
+   \   union <unnamed> volatile __sfr _A_PR11
+   \                     _A_PR11:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0060
+   \   union <unnamed> volatile _A_PMC0
+   \                     _A_PMC0:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf0070
+   \   union <unnamed> volatile _A_NFEN0
+   \                     _A_NFEN0:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf00f0
+   \   union <unnamed> volatile _A_PER0
+   \                     _A_PER0:
+   \   000000                       DS 1
+
+   \                                 In  segment NEAR_A, at 0xf0110
+   \   union <unnamed> volatile __no_bit_access _A_SMR00
+   \                     _A_SMR00:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0114
+   \   union <unnamed> volatile __no_bit_access _A_SMR02
+   \                     _A_SMR02:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0116
+   \   union <unnamed> volatile __no_bit_access _A_SMR03
+   \                     _A_SMR03:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0118
+   \   union <unnamed> volatile __no_bit_access _A_SCR00
+   \                     _A_SCR00:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf011c
+   \   union <unnamed> volatile __no_bit_access _A_SCR02
+   \                     _A_SCR02:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf011e
+   \   union <unnamed> volatile __no_bit_access _A_SCR03
+   \                     _A_SCR03:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0122
+   \   union <unnamed> volatile _A_SS0
+   \                     _A_SS0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0124
+   \   union <unnamed> volatile _A_ST0
+   \                     _A_ST0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0126
+   \   union <unnamed> volatile __no_bit_access _A_SPS0
+   \                     _A_SPS0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0128
+   \   union <unnamed> volatile __no_bit_access _A_SO0
+   \                     _A_SO0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf012a
+   \   union <unnamed> volatile _A_SOE0
+   \                     _A_SOE0:
+   \   000000                       DS 2
+
+   \                                 In  segment NEAR_A, at 0xf0134
+   \   union <unnamed> volatile __no_bit_access _A_SOL0
+   \                     _A_SOL0:
+   \   000000                       DS 2
+     28          #include "hal_platform.h"
+     29          #include "CG_serial.h"
+     30          
+     31          #define BUFFER_SIZE 128
+     32          
+     33          #define SPI_NO_INTERRUPT
+     34          //#define SPI_INTERRUPT
+     35          
+     36          /*
+     37          *******************************************************************************
+     38          **  Global define
+     39          *******************************************************************************
+     40          */
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     41          volatile uint8_t * addByte;    //Address of the next byte to be transmitted
+   \                     addByte:
+   \   000000                       DS 2
+   \   000002                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     42          volatile uint8_t TXcnt;       //Number of pending bytes to be transmitted
+   \                     TXcnt:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     43          volatile uint8_t RXcnt;       //Number of received bytes
+   \                     RXcnt:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+     44          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     45          uint8_t bufferUARTtx[BUFFER_SIZE];     //Can transmit up to 128 bytes.
+   \                     bufferUARTtx:
+   \   000000                       DS 128
+   \   000080                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     46          uint8_t bufferUARTrx[BUFFER_SIZE];     //Can receive up to 128 bytes.
+   \                     bufferUARTrx:
+   \   000000                       DS 128
+   \   000080                       REQUIRE __INIT_NEAR_Z
+     47          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     48          SerialAdapter Serial;          //Structure used to convert the Arduino Serial commands into plain C
+   \                     Serial:
+   \   000000                       DS 6
+   \   000006                       REQUIRE __INIT_NEAR_Z
+     49          
+
+   \                                 In  segment NEAR_CONST, align 2
+     50          const uint8_t tableAscii[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+   \                     tableAscii:
+   \   000000 303132333435          DB 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70
+     51          
+     52          #if defined (SPI_INTERRUPT)
+     53            volatile bool flagSPIdone;
+     54          #endif
+     55          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     56          volatile uint8_t RxSPIByte;
+   \                     RxSPIByte:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+     57          
+     58          void UART1_Init(void);
+     59          void UART1_Start(void);
+     60          void UART1_Stop(void);
+     61          __interrupt void UARTtxInterrupt(void);
+     62          __interrupt void UARTrxInterrupt(void);
+     63          void CSI00_Init(void);
+     64          void CSI00_Start(void);
+     65          void CSI00_Stop(void);
+     66          #if defined (SPI_INTERRUPT)
+     67            __interrupt void MD_INTCSI00(void);
+     68          #endif
+     69          
+     70          /*
+     71          **-----------------------------------------------------------------------------
+     72          **
+     73          **  Abstract:
+     74          **  This function initializes the SAU0 module.
+     75          **
+     76          **  Parameters:
+     77          **  None
+     78          **
+     79          **  Returns:
+     80          **  None
+     81          **
+     82          **-----------------------------------------------------------------------------
+     83          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     84          void SAU0_Init(void)
+   \                     SAU0_Init:
+     85          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     86            SAU0EN = 1U;  /* supply SAU0 clock */
+   \   000000 36F000                MOVW      HL, #0xF0          ;; 1 cycle
+   \   000003 71A2                  SET1      [HL].2             ;; 2 cycles
+     87            NOP();
+   \   000005 00                    NOP                          ;; 1 cycle
+     88            NOP();
+   \   000006 00                    NOP                          ;; 1 cycle
+     89            NOP();
+   \   000007 00                    NOP                          ;; 1 cycle
+     90            NOP();
+   \   000008 00                    NOP                          ;; 1 cycle
+     91            SPS0 = _0003_SAU_CK00_FCLK_3 | _0010_SAU_CK01_FCLK_1;
+   \   000009 301300                MOVW      AX, #0x13          ;; 1 cycle
+   \   00000C BF2601                MOVW      0x126, AX          ;; 1 cycle
+     92            //CK0 set to 4Mhz due fCLK 32Mhz and divisor 2^3 (8). For SPI
+     93            //Final SPI freq 2Mhz
+     94            //CK1 set to 16Mhz due fCLK 32Mhz and divisor 2^1 (2). For UART
+     95            //Final UART freq 115 200bps
+     96            UART1_Init();
+   \   00000F FD....                CALL      UART1_Init         ;; 3 cycles
+     97            UART1_Start();
+   \   000012 FD....                CALL      UART1_Start        ;; 3 cycles
+     98            CSI00_Init();
+   \   000015 FD....                CALL      CSI00_Init         ;; 3 cycles
+     99            CSI00_Start();
+   \   000018 FD....                CALL      CSI00_Start        ;; 3 cycles
+    100          }
+   \   00001B D7                    RET                          ;; 6 cycles
+   \   00001C                       ; ------------------------------------- Block: 27 cycles
+   \   00001C                       ; ------------------------------------- Total: 27 cycles
+   \   00001C                       REQUIRE ?CLRL78_V1_0_L00
+   \   00001C                       REQUIRE _A_PER0
+   \   00001C                       REQUIRE _A_SPS0
+    101          /*
+    102          **-----------------------------------------------------------------------------
+    103          **
+    104          **  Abstract:
+    105          **  This function initializes the UART1 module.
+    106          **
+    107          **  Parameters:
+    108          **  None
+    109          **
+    110          **  Returns:
+    111          **  None
+    112          **
+    113          **-----------------------------------------------------------------------------
+    114          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    115          void UART1_Init(void)
+   \                     UART1_Init:
+    116          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    117            ST0 |= _0008_SAU_CH3_STOP_TRG_ON | _0004_SAU_CH2_STOP_TRG_ON; /* disable UART1 receive and transmit */
+   \   000000 AF2401                MOVW      AX, 0x124          ;; 1 cycle
+   \   000003 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   000005 08                    XCH       A, X               ;; 1 cycle
+   \   000006 6C0C                  OR        A, #0xC            ;; 1 cycle
+   \   000008 08                    XCH       A, X               ;; 1 cycle
+   \   000009 BF2401                MOVW      0x124, AX          ;; 1 cycle
+    118            STMK1 = 1U; /* disable INTST1 interrupt */
+   \   00000C 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    119            STIF1 = 0U; /* clear INTST1 interrupt flag */
+   \   00000F 710BE2                CLR1      0xFFFE2.0          ;; 2 cycles
+    120            SRMK1 = 1U; /* disable INTSR1 interrupt */
+   \   000012 711AE6                SET1      0xFFFE6.1          ;; 2 cycles
+    121            SRIF1 = 0U; /* clear INTSR1 interrupt flag */
+   \   000015 711BE2                CLR1      0xFFFE2.1          ;; 2 cycles
+    122            /* Set INTST1 low priority */
+    123            STPR11 = 1U;
+   \   000018 710AEE                SET1      0xFFFEE.0          ;; 2 cycles
+    124            STPR01 = 1U;
+   \   00001B 710AEA                SET1      0xFFFEA.0          ;; 2 cycles
+    125            /* Set INTSR1 low priority */
+    126            SRPR11 = 1U;
+   \   00001E 711AEE                SET1      0xFFFEE.1          ;; 2 cycles
+    127            SRPR01 = 1U;
+   \   000021 711AEA                SET1      0xFFFEA.1          ;; 2 cycles
+    128            //Start configuration of UART TX
+    129            SMR02 = _0020_SAU_SMRMN_INITIALVALUE | _8000_SAU_CLOCK_SELECT_CK01 | _0000_SAU_TRIGGER_SOFTWARE | _0002_SAU_MODE_UART | _0000_SAU_TRANSFER_END;
+   \   000024 302280                MOVW      AX, #0x8022        ;; 1 cycle
+   \   000027 BF1401                MOVW      0x114, AX          ;; 1 cycle
+    130            SCR02 = _8000_SAU_TRANSMISSION | _0000_SAU_INTSRE_MASK | _0000_SAU_PARITY_NONE | _0080_SAU_LSB | _0010_SAU_STOP_1 | _0007_SAU_LENGTH_8;
+   \   00002A 309780                MOVW      AX, #0x8097        ;; 1 cycle
+   \   00002D BF1C01                MOVW      0x11C, AX          ;; 1 cycle
+    131            SDR02 = _8800_UART1_TRANSMIT_DIVISOR; //Set baudrate frequency for 115 200bps
+   \   000030 CB440088              MOVW      0xFFF44, #0x8800   ;; 1 cycle
+    132            //16 000 000Mhz/115 200bps = 138.8 = 138 counts ==> transforming into register number 138-2=136. Shifting LSB to zero = 0x88
+    133            //Start configuration of UART RX
+    134            NFEN0 |= _04_SAU_RXD1_FILTER_ON;
+   \   000034 367000                MOVW      HL, #0x70          ;; 1 cycle
+   \   000037 71A2                  SET1      [HL].2             ;; 2 cycles
+    135            SMR03 = _0020_SAU_SMRMN_INITIALVALUE | _8000_SAU_CLOCK_SELECT_CK01 | _0100_SAU_TRIGGER_RXD | _0000_SAU_EDGE_FALL | _0002_SAU_MODE_UART | _0000_SAU_TRANSFER_END;
+   \   000039 302281                MOVW      AX, #0x8122        ;; 1 cycle
+   \   00003C BF1601                MOVW      0x116, AX          ;; 1 cycle
+    136            SCR03 = _4000_SAU_RECEPTION | _0000_SAU_INTSRE_MASK | _0000_SAU_PARITY_NONE | _0080_SAU_LSB | _0010_SAU_STOP_1 | _0007_SAU_LENGTH_8;
+   \   00003F 309740                MOVW      AX, #0x4097        ;; 1 cycle
+   \   000042 BF1E01                MOVW      0x11E, AX          ;; 1 cycle
+    137            SDR03 = _8800_UART1_RECEIVE_DIVISOR;  //Set baudrate frequency for 115 200bps
+   \   000045 CB460088              MOVW      0xFFF46, #0x8800   ;; 1 cycle
+    138            SO0 |= _0004_SAU_CH2_DATA_OUTPUT_1;
+   \   000049 AF2801                MOVW      AX, 0x128          ;; 1 cycle
+   \   00004C 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   00004E 08                    XCH       A, X               ;; 1 cycle
+   \   00004F 6C04                  OR        A, #0x4            ;; 1 cycle
+   \   000051 08                    XCH       A, X               ;; 1 cycle
+   \   000052 BF2801                MOVW      0x128, AX          ;; 1 cycle
+    139            SOL0 |= _0000_SAU_CHANNEL2_NORMAL;  /* output level normal */
+   \   000055 AF3401                MOVW      AX, 0x134          ;; 1 cycle
+   \   000058 BF3401                MOVW      0x134, AX          ;; 1 cycle
+    140            SOE0 |= _0004_SAU_CH2_OUTPUT_ENABLE;  /* enable UART1 output */
+   \   00005B 362A01                MOVW      HL, #0x12A         ;; 1 cycle
+   \   00005E 71A2                  SET1      [HL].2             ;; 2 cycles
+    141            /* Set RxD1 pin */
+    142            PMC0 &= 0xF7U;
+   \   000060 366000                MOVW      HL, #0x60          ;; 1 cycle
+   \   000063 71B3                  CLR1      [HL].3             ;; 2 cycles
+    143            PM0 |= 0x08U;
+   \   000065 713A20                SET1      0xFFF20.3          ;; 2 cycles
+    144            /* Set TxD1 pin */
+    145            P0 |= 0x04U;
+   \   000068 712200                SET1      S:0xFFF00.2        ;; 2 cycles
+    146            PMC0 &= 0xFBU;
+   \   00006B 366000                MOVW      HL, #0x60          ;; 1 cycle
+   \   00006E 71A3                  CLR1      [HL].2             ;; 2 cycles
+    147            PM0 &= 0xFBU;
+   \   000070 712B20                CLR1      0xFFF20.2          ;; 2 cycles
+    148          }
+   \   000073 D7                    RET                          ;; 6 cycles
+   \   000074                       ; ------------------------------------- Block: 64 cycles
+   \   000074                       ; ------------------------------------- Total: 64 cycles
+   \   000074                       REQUIRE ?CLRL78_V1_0_L00
+   \   000074                       REQUIRE _A_ST0
+   \   000074                       REQUIRE _A_MK1
+   \   000074                       REQUIRE _A_IF1
+   \   000074                       REQUIRE _A_PR11
+   \   000074                       REQUIRE _A_PR01
+   \   000074                       REQUIRE _A_SMR02
+   \   000074                       REQUIRE _A_SCR02
+   \   000074                       REQUIRE _A_SDR02
+   \   000074                       REQUIRE _A_NFEN0
+   \   000074                       REQUIRE _A_SMR03
+   \   000074                       REQUIRE _A_SCR03
+   \   000074                       REQUIRE _A_SDR03
+   \   000074                       REQUIRE _A_SO0
+   \   000074                       REQUIRE _A_SOL0
+   \   000074                       REQUIRE _A_SOE0
+   \   000074                       REQUIRE _A_PMC0
+   \   000074                       REQUIRE _A_PM0
+   \   000074                       REQUIRE _A_P0
+    149          /*
+    150          **-----------------------------------------------------------------------------
+    151          **
+    152          **  Abstract:
+    153          **  This function starts the UART1 module operation.
+    154          **
+    155          **  Parameters:
+    156          **  None
+    157          **
+    158          **  Returns:
+    159          **  None
+    160          **
+    161          **-----------------------------------------------------------------------------
+    162          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    163          void UART1_Start(void)
+   \                     UART1_Start:
+    164          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    165            STIF1 = 0U; /* clear INTST1 interrupt flag */
+   \   000000 710BE2                CLR1      0xFFFE2.0          ;; 2 cycles
+    166            STMK1 = 0U; /* enable INTST1 interrupt */
+   \   000003 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    167            SRIF1 = 0U; /* clear INTSR1 interrupt flag */
+   \   000006 711BE2                CLR1      0xFFFE2.1          ;; 2 cycles
+    168            SRMK1 = 0U; /* enable INTSR1 interrupt */
+   \   000009 711BE6                CLR1      0xFFFE6.1          ;; 2 cycles
+    169            SO0 |= _0004_SAU_CH2_DATA_OUTPUT_1; /* output level normal */
+   \   00000C AF2801                MOVW      AX, 0x128          ;; 1 cycle
+   \   00000F 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   000011 08                    XCH       A, X               ;; 1 cycle
+   \   000012 6C04                  OR        A, #0x4            ;; 1 cycle
+   \   000014 08                    XCH       A, X               ;; 1 cycle
+   \   000015 BF2801                MOVW      0x128, AX          ;; 1 cycle
+    170            SOE0 |= _0004_SAU_CH2_OUTPUT_ENABLE;  /* enable UART1 output */
+   \   000018 362A01                MOVW      HL, #0x12A         ;; 1 cycle
+   \   00001B 71A2                  SET1      [HL].2             ;; 2 cycles
+    171            SS0 |= _0008_SAU_CH3_START_TRG_ON | _0004_SAU_CH2_START_TRG_ON; /* enable UART1 receive and transmit */
+   \   00001D AF2201                MOVW      AX, 0x122          ;; 1 cycle
+   \   000020 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   000022 08                    XCH       A, X               ;; 1 cycle
+   \   000023 6C0C                  OR        A, #0xC            ;; 1 cycle
+   \   000025 08                    XCH       A, X               ;; 1 cycle
+   \   000026 BF2201                MOVW      0x122, AX          ;; 1 cycle
+    172            
+    173            //Reset counters for UART reception
+    174            RXcnt = 0;
+   \   000029 F5....                CLRB      N:RXcnt            ;; 1 cycle
+    175          }
+   \   00002C D7                    RET                          ;; 6 cycles
+   \   00002D                       ; ------------------------------------- Block: 30 cycles
+   \   00002D                       ; ------------------------------------- Total: 30 cycles
+   \   00002D                       REQUIRE ?CLRL78_V1_0_L00
+   \   00002D                       REQUIRE _A_IF1
+   \   00002D                       REQUIRE _A_MK1
+   \   00002D                       REQUIRE _A_SO0
+   \   00002D                       REQUIRE _A_SOE0
+   \   00002D                       REQUIRE _A_SS0
+    176          
+    177          /*
+    178          **-----------------------------------------------------------------------------
+    179          **
+    180          **  Abstract:
+    181          **  This function stops the UART1 module operation.
+    182          **
+    183          **  Parameters:
+    184          **  None
+    185          **
+    186          **  Returns:
+    187          **  None
+    188          **
+    189          **-----------------------------------------------------------------------------
+    190          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    191          void UART1_Stop(void)
+   \                     UART1_Stop:
+    192          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    193            ST0 |= _0008_SAU_CH3_STOP_TRG_ON | _0004_SAU_CH2_STOP_TRG_ON; /* disable UART1 receive and transmit */
+   \   000000 AF2401                MOVW      AX, 0x124          ;; 1 cycle
+   \   000003 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   000005 08                    XCH       A, X               ;; 1 cycle
+   \   000006 6C0C                  OR        A, #0xC            ;; 1 cycle
+   \   000008 08                    XCH       A, X               ;; 1 cycle
+   \   000009 BF2401                MOVW      0x124, AX          ;; 1 cycle
+    194            SOE0 &= ~_0004_SAU_CH2_OUTPUT_ENABLE; /* disable UART1 output */
+   \   00000C 362A01                MOVW      HL, #0x12A         ;; 1 cycle
+   \   00000F 71A3                  CLR1      [HL].2             ;; 2 cycles
+    195            STMK1 = 1U; /* disable INTST1 interrupt */
+   \   000011 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    196            STIF1 = 0U; /* clear INTST1 interrupt flag */
+   \   000014 710BE2                CLR1      0xFFFE2.0          ;; 2 cycles
+    197            SRMK1 = 1U; /* disable INTSR1 interrupt */
+   \   000017 711AE6                SET1      0xFFFE6.1          ;; 2 cycles
+    198            SRIF1 = 0U; /* clear INTSR1 interrupt flag */
+   \   00001A 711BE2                CLR1      0xFFFE2.1          ;; 2 cycles
+    199          }
+   \   00001D D7                    RET                          ;; 6 cycles
+   \   00001E                       ; ------------------------------------- Block: 23 cycles
+   \   00001E                       ; ------------------------------------- Total: 23 cycles
+   \   00001E                       REQUIRE ?CLRL78_V1_0_L00
+   \   00001E                       REQUIRE _A_ST0
+   \   00001E                       REQUIRE _A_SOE0
+   \   00001E                       REQUIRE _A_MK1
+   \   00001E                       REQUIRE _A_IF1
+    200          
+    201          /*
+    202          **-----------------------------------------------------------------------------
+    203          **
+    204          **  Abstract:
+    205          **  This function sends through UART a string.
+    206          **
+    207          **  Parameters:
+    208          **  string: pointer to the string that will be send
+    209          **  
+    210          **
+    211          **  Returns:
+    212          **  True:  Succesful UART transmission
+    213          **  False: Unsuccesful UART transmission
+    214          **
+    215          **-----------------------------------------------------------------------------
+    216          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    217          bool printString(uint8_t * string, uint8_t lineOption)
+   \                     printString:
+    218          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 C3                    PUSH      BC                 ;; 1 cycle
+   \   000004                       ; Auto size: 6
+   \   000004 C1                    PUSH      AX                 ;; 1 cycle
+    219            uint8_t maxSize = 0;
+   \   000005 5400                  MOV       E, #0x0            ;; 1 cycle
+    220            uint8_t sizeString = 0;
+   \   000007 F1                    CLRB      A                  ;; 1 cycle
+   \   000008 9800                  MOV       [SP], A            ;; 1 cycle
+    221            
+    222            if(TXcnt == 0)   //There are no more characters to send. The buffer is empty and ready to receive more data.
+   \   00000A D5....                CMP0      N:TXcnt            ;; 1 cycle
+   \   00000D 61E8                  SKZ                          ;; 4 cycles
+   \   00000F ED....                BR        N:??CSI00_SendReceiveData_0  ;; 4 cycles
+   \   000012                       ; ------------------------------------- Block: 13 cycles
+    223            {
+    224              sizeString = strlen(string);
+   \   000012 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000014 FD....                CALL      strlen             ;; 3 cycles
+   \   000017 60                    MOV       A, X               ;; 1 cycle
+   \   000018 9800                  MOV       [SP], A            ;; 1 cycle
+    225              if(lineOption == NO_LINE){
+   \   00001A 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00001C D1                    CMP0      A                  ;; 1 cycle
+   \   00001D DF2C                  BNZ       ??CSI00_SendReceiveData_1  ;; 4 cycles
+   \   00001F                       ; ------------------------------------- Block: 12 cycles
+    226                if (sizeString > BUFFER_SIZE)
+   \   00001F 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000021 4C81                  CMP       A, #0x81           ;; 1 cycle
+   \   000023 DC11                  BC        ??CSI00_SendReceiveData_2  ;; 4 cycles
+   \   000025                       ; ------------------------------------- Block: 6 cycles
+    227                {
+    228                  memcpy(bufferUARTtx, string, BUFFER_SIZE);
+   \   000025 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000027 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000028 36....                MOVW      HL, #bufferUARTtx  ;; 1 cycle
+   \   00002B 5380                  MOV       B, #0x80           ;; 1 cycle
+   \   00002D FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+    229                  TXcnt = BUFFER_SIZE;
+   \   000030 CF......              MOV       N:TXcnt, #0x80     ;; 1 cycle
+   \   000034 EF59                  BR        S:??CSI00_SendReceiveData_3  ;; 3 cycles
+   \   000036                       ; ------------------------------------- Block: 11 cycles
+    230                }
+    231                else
+    232                {
+    233                  memcpy(bufferUARTtx, string, sizeString);
+   \                     ??CSI00_SendReceiveData_2:
+   \   000036 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000038 72                    MOV       C, A               ;; 1 cycle
+   \   000039 F3                    CLRB      B                  ;; 1 cycle
+   \   00003A A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00003C 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00003D 36....                MOVW      HL, #bufferUARTtx  ;; 1 cycle
+   \   000040 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000041 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    234                  TXcnt = sizeString;
+   \   000044 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000046 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000049 EF44                  BR        S:??CSI00_SendReceiveData_3  ;; 3 cycles
+   \   00004B                       ; ------------------------------------- Block: 15 cycles
+    235                }
+    236                
+    237              }else if(lineOption == WITH_LINE){
+   \                     ??CSI00_SendReceiveData_1:
+   \   00004B 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00004D 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   00004F DF3E                  BNZ       ??CSI00_SendReceiveData_3  ;; 4 cycles
+   \   000051                       ; ------------------------------------- Block: 6 cycles
+    238                if (sizeString > (BUFFER_SIZE - 1))    //127 bytes as still needs to include the '\n' character
+   \   000051 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000053 4C80                  CMP       A, #0x80           ;; 1 cycle
+   \   000055 DC15                  BC        ??CSI00_SendReceiveData_4  ;; 4 cycles
+   \   000057                       ; ------------------------------------- Block: 6 cycles
+    239                {
+    240                  memcpy(bufferUARTtx, string, (BUFFER_SIZE - 1));
+   \   000057 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000059 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00005A 36....                MOVW      HL, #bufferUARTtx  ;; 1 cycle
+   \   00005D 537F                  MOV       B, #0x7F           ;; 1 cycle
+   \   00005F FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+    241                  //Copy the '\n' character to the 128 location. 129 location for '\0'
+    242                  bufferUARTtx[BUFFER_SIZE - 1] = '\n';
+   \   000062 CF......              MOV       N:bufferUARTtx+127, #0xA  ;; 1 cycle
+    243                  TXcnt = BUFFER_SIZE;
+   \   000066 CF......              MOV       N:TXcnt, #0x80     ;; 1 cycle
+   \   00006A EF23                  BR        S:??CSI00_SendReceiveData_3  ;; 3 cycles
+   \   00006C                       ; ------------------------------------- Block: 12 cycles
+    244                }
+    245                else
+    246                {
+    247                  memcpy(bufferUARTtx , string, sizeString);
+   \                     ??CSI00_SendReceiveData_4:
+   \   00006C 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00006E 72                    MOV       C, A               ;; 1 cycle
+   \   00006F F3                    CLRB      B                  ;; 1 cycle
+   \   000070 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000072 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000073 36....                MOVW      HL, #bufferUARTtx  ;; 1 cycle
+   \   000076 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000077 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    248                  //Counter is the pending chars on buffer and the new string
+    249                  TXcnt = sizeString;
+   \   00007A 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00007C 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+    250                  //Add the '\n' char
+    251                  bufferUARTtx[TXcnt++] = '\n';
+   \   00007F 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   000082 70                    MOV       X, A               ;; 1 cycle
+   \   000083 80                    INC       X                  ;; 1 cycle
+   \   000084 08                    XCH       A, X               ;; 1 cycle
+   \   000085 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000088 60                    MOV       A, X               ;; 1 cycle
+   \   000089 73                    MOV       B, A               ;; 1 cycle
+   \   00008A 510A                  MOV       A, #0xA            ;; 1 cycle
+   \   00008C 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   00008F                       ; ------------------------------------- Block: 21 cycles
+    252                }
+    253              }
+    254              
+    255              //Write to the UART register
+    256              STMK1 = 1U; //Disable UART Tx Interrupt
+   \                     ??CSI00_SendReceiveData_3:
+   \   00008F 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    257              addByte = bufferUARTtx;
+   \   000092 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000095 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    258              TXD1 = *addByte;
+   \   000098 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   00009B 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00009C 9E44                  MOV       0xFFF44, A         ;; 1 cycle
+    259              addByte++;
+   \   00009E FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   0000A1 A7                    INCW      HL                 ;; 1 cycle
+   \   0000A2 37                    XCHW      AX, HL             ;; 1 cycle
+   \   0000A3 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+   \   0000A6 37                    XCHW      AX, HL             ;; 1 cycle
+    260              TXcnt--;
+   \   0000A7 B0....                DEC       N:TXcnt            ;; 2 cycles
+    261              STMK1 = 0U; //Enable UART Tx Interrupt
+   \   0000AA 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    262              
+    263              return true;
+   \   0000AD E1                    ONEB      A                  ;; 1 cycle
+   \   0000AE ED....                BR        N:??CSI00_SendReceiveData_5  ;; 3 cycles
+   \   0000B1                       ; ------------------------------------- Block: 20 cycles
+    264            }
+    265            else
+    266            {
+    267              STMK1 = 1U; //Disable UART Tx Interrupt
+   \                     ??CSI00_SendReceiveData_0:
+   \   0000B1 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    268              
+    269              //First move the pending characters to the first position of the UARTbuffer
+    270              memmove(bufferUARTtx, (void *)addByte, TXcnt);
+   \   0000B4 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   0000B7 74                    MOV       E, A               ;; 1 cycle
+   \   0000B8 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   0000BA DB....                MOVW      BC, N:addByte      ;; 1 cycle
+   \   0000BD 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   0000C0 FD....                CALL      memmove            ;; 3 cycles
+    271              //Obtain the maximum free spaces still in the buffer.
+    272              maxSize = BUFFER_SIZE - TXcnt;
+   \   0000C3 5180                  MOV       A, #0x80           ;; 1 cycle
+   \   0000C5 2F....                SUB       A, N:TXcnt         ;; 1 cycle
+   \   0000C8 74                    MOV       E, A               ;; 1 cycle
+    273              sizeString = strlen(string);
+   \   0000C9 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   0000CB FD....                CALL      strlen             ;; 3 cycles
+   \   0000CE 60                    MOV       A, X               ;; 1 cycle
+   \   0000CF 9800                  MOV       [SP], A            ;; 1 cycle
+    274              
+    275              if(lineOption == NO_LINE){
+   \   0000D1 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000D3 D1                    CMP0      A                  ;; 1 cycle
+   \   0000D4 DF3C                  BNZ       ??CSI00_SendReceiveData_6  ;; 4 cycles
+   \   0000D6                       ; ------------------------------------- Block: 25 cycles
+    276                if (sizeString > maxSize)
+   \   0000D6 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   0000D8 6144                  CMP       E, A               ;; 1 cycle
+   \   0000DA DE19                  BNC       ??CSI00_SendReceiveData_7  ;; 4 cycles
+   \   0000DC                       ; ------------------------------------- Block: 6 cycles
+    277                {
+    278                  memcpy((bufferUARTtx + TXcnt), string, maxSize);
+   \   0000DC C5                    PUSH      DE                 ;; 1 cycle
+   \   0000DD C2                    POP       BC                 ;; 1 cycle
+   \   0000DE F3                    CLRB      B                  ;; 1 cycle
+   \   0000DF A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   0000E1 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000E2 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   0000E5 70                    MOV       X, A               ;; 1 cycle
+   \   0000E6 F1                    CLRB      A                  ;; 1 cycle
+   \   0000E7 04....                ADDW      AX, #bufferUARTtx  ;; 1 cycle
+   \   0000EA 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000EB 13                    MOVW      AX, BC             ;; 1 cycle
+   \   0000EC FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    279                  TXcnt = BUFFER_SIZE;
+   \   0000EF CF......              MOV       N:TXcnt, #0x80     ;; 1 cycle
+   \   0000F3 EF76                  BR        S:??CSI00_SendReceiveData_8  ;; 3 cycles
+   \   0000F5                       ; ------------------------------------- Block: 18 cycles
+    280                }
+    281                else
+    282                {
+    283                  memcpy((bufferUARTtx + TXcnt), string, sizeString);
+   \                     ??CSI00_SendReceiveData_7:
+   \   0000F5 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   0000F7 72                    MOV       C, A               ;; 1 cycle
+   \   0000F8 F3                    CLRB      B                  ;; 1 cycle
+   \   0000F9 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   0000FB 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000FC 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   0000FF 70                    MOV       X, A               ;; 1 cycle
+   \   000100 F1                    CLRB      A                  ;; 1 cycle
+   \   000101 04....                ADDW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000104 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000105 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000106 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    284                  TXcnt = TXcnt + sizeString;
+   \   000109 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00010B 36....                MOVW      HL, #TXcnt         ;; 1 cycle
+   \   00010E 0D                    ADD       A, [HL]            ;; 1 cycle
+   \   00010F 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000110 EF59                  BR        S:??CSI00_SendReceiveData_8  ;; 3 cycles
+   \   000112                       ; ------------------------------------- Block: 21 cycles
+    285                }
+    286                
+    287              }else if(lineOption == WITH_LINE){
+   \                     ??CSI00_SendReceiveData_6:
+   \   000112 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000114 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000116 DF53                  BNZ       ??CSI00_SendReceiveData_8  ;; 4 cycles
+   \   000118                       ; ------------------------------------- Block: 6 cycles
+    288                //The string is bigger than the available space
+    289                //maxSize - 1 because we still need to add the '\n' character
+    290                if (sizeString > (maxSize - 1))
+   \   000118 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00011A 72                    MOV       C, A               ;; 1 cycle
+   \   00011B F3                    CLRB      B                  ;; 1 cycle
+   \   00011C 64                    MOV       A, E               ;; 1 cycle
+   \   00011D 70                    MOV       X, A               ;; 1 cycle
+   \   00011E F1                    CLRB      A                  ;; 1 cycle
+   \   00011F B1                    DECW      AX                 ;; 1 cycle
+   \   000120 FD....                CALL      N:?SI_CMP_L02      ;; 3 cycles
+   \   000123 DE1E                  BNC       ??CSI00_SendReceiveData_9  ;; 4 cycles
+   \   000125                       ; ------------------------------------- Block: 14 cycles
+    291                {
+    292                  //Copy the string
+    293                  memcpy((bufferUARTtx + TXcnt), string, (maxSize - 1));
+   \   000125 C5                    PUSH      DE                 ;; 1 cycle
+   \   000126 C2                    POP       BC                 ;; 1 cycle
+   \   000127 F3                    CLRB      B                  ;; 1 cycle
+   \   000128 B3                    DECW      BC                 ;; 1 cycle
+   \   000129 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00012B 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00012C 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   00012F 70                    MOV       X, A               ;; 1 cycle
+   \   000130 F1                    CLRB      A                  ;; 1 cycle
+   \   000131 04....                ADDW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000134 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000135 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000136 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    294                  //Copy the '\n' character to the 128 location. 129 location for '\0'
+    295                  bufferUARTtx[BUFFER_SIZE - 1] = '\n';
+   \   000139 CF......              MOV       N:bufferUARTtx+127, #0xA  ;; 1 cycle
+    296                  TXcnt = BUFFER_SIZE;
+   \   00013D CF......              MOV       N:TXcnt, #0x80     ;; 1 cycle
+   \   000141 EF28                  BR        S:??CSI00_SendReceiveData_8  ;; 3 cycles
+   \   000143                       ; ------------------------------------- Block: 20 cycles
+    297                }
+    298                else
+    299                {
+    300                  memcpy((bufferUARTtx + TXcnt), string, sizeString);
+   \                     ??CSI00_SendReceiveData_9:
+   \   000143 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000145 72                    MOV       C, A               ;; 1 cycle
+   \   000146 F3                    CLRB      B                  ;; 1 cycle
+   \   000147 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000149 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00014A 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   00014D 70                    MOV       X, A               ;; 1 cycle
+   \   00014E F1                    CLRB      A                  ;; 1 cycle
+   \   00014F 04....                ADDW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000152 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000153 13                    MOVW      AX, BC             ;; 1 cycle
+   \   000154 FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    301                  //Counter is the pending chars on buffer and the new string
+    302                  TXcnt = TXcnt + sizeString;
+   \   000157 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000159 36....                MOVW      HL, #TXcnt         ;; 1 cycle
+   \   00015C 0D                    ADD       A, [HL]            ;; 1 cycle
+   \   00015D 9B                    MOV       [HL], A            ;; 1 cycle
+    303                  //Add the '\n' char
+    304                  bufferUARTtx[TXcnt++] = '\n';
+   \   00015E E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000161 63                    MOV       A, B               ;; 1 cycle
+   \   000162 81                    INC       A                  ;; 1 cycle
+   \   000163 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000166 510A                  MOV       A, #0xA            ;; 1 cycle
+   \   000168 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   00016B                       ; ------------------------------------- Block: 24 cycles
+    305                }
+    306              }
+    307              
+    308              //Set the character pointer to location 0 of buffer
+    309              addByte = bufferUARTtx;
+   \                     ??CSI00_SendReceiveData_8:
+   \   00016B 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   00016E BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    310              
+    311              STMK1 = 0U; //Enable UART Tx Interrupt
+   \   000171 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    312              
+    313              //If the buffer is almost full, wait until it gets emptied a little
+    314              if(TXcnt > 64){
+   \   000174 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   000177 4C41                  CMP       A, #0x41           ;; 1 cycle
+   \   000179 DC06                  BC        ??CSI00_SendReceiveData_10  ;; 4 cycles
+   \   00017B                       ; ------------------------------------- Block: 10 cycles
+    315                delay(5);
+   \   00017B 300500                MOVW      AX, #0x5           ;; 1 cycle
+   \   00017E FD....                CALL      delay              ;; 3 cycles
+   \   000181                       ; ------------------------------------- Block: 4 cycles
+    316              }
+    317          
+    318              return false;
+   \                     ??CSI00_SendReceiveData_10:
+   \   000181 F1                    CLRB      A                  ;; 1 cycle
+   \   000182                       ; ------------------------------------- Block: 1 cycles
+   \                     ??CSI00_SendReceiveData_5:
+   \   000182 1006                  ADDW      SP, #0x6           ;; 1 cycle
+   \   000184 C4                    POP       DE                 ;; 1 cycle
+   \   000185 C2                    POP       BC                 ;; 1 cycle
+   \   000186 D7                    RET                          ;; 6 cycles
+   \   000187                       ; ------------------------------------- Block: 9 cycles
+   \   000187                       ; ------------------------------------- Total: 280 cycles
+   \   000187                       REQUIRE ?CLRL78_V1_0_L00
+   \   000187                       REQUIRE _A_MK1
+   \   000187                       REQUIRE _A_SDR02
+    319            }
+    320          }
+    321          /*
+    322          **-----------------------------------------------------------------------------
+    323          **
+    324          **  Abstract:
+    325          **  This function sends a number in hexadecimal format.
+    326          **
+    327          **  Parameters:
+    328          **  hexNumber: number to be converted into ascii in hexadecimal format
+    329          **  
+    330          **
+    331          **  Returns:
+    332          **  True:  Succesful UART transmission
+    333          **  False: Unsuccesful UART transmission
+    334          **
+    335          **-----------------------------------------------------------------------------
+    336          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    337          bool printHex(uint8_t hexNumber, uint8_t lineOption)
+   \                     printHex:
+    338          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 C3                    PUSH      BC                 ;; 1 cycle
+   \   000004                       ; Auto size: 4
+    339            uint8_t residueNumber = 0;
+   \   000004 F3                    CLRB      B                  ;; 1 cycle
+    340          
+    341            if(TXcnt == 0)   //There are no more characters to send. The buffer is empty and ready to receive more data.
+   \   000005 D5....                CMP0      N:TXcnt            ;; 1 cycle
+   \   000008 61E8                  SKZ                          ;; 4 cycles
+   \   00000A ED....                BR        N:??CSI00_SendReceiveData_11  ;; 4 cycles
+   \   00000D                       ; ------------------------------------- Block: 10 cycles
+    342            {
+    343              bufferUARTtx[TXcnt++] = '0';
+   \   00000D 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   000010 70                    MOV       X, A               ;; 1 cycle
+   \   000011 80                    INC       X                  ;; 1 cycle
+   \   000012 08                    XCH       A, X               ;; 1 cycle
+   \   000013 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000016 60                    MOV       A, X               ;; 1 cycle
+   \   000017 73                    MOV       B, A               ;; 1 cycle
+   \   000018 5130                  MOV       A, #0x30           ;; 1 cycle
+   \   00001A 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    344              bufferUARTtx[TXcnt++] = 'x';
+   \   00001D E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000020 63                    MOV       A, B               ;; 1 cycle
+   \   000021 81                    INC       A                  ;; 1 cycle
+   \   000022 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000025 5178                  MOV       A, #0x78           ;; 1 cycle
+   \   000027 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    345              
+    346              if(hexNumber > 0x0F)
+   \   00002A 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00002C 4C10                  CMP       A, #0x10           ;; 1 cycle
+   \   00002E DC2C                  BC        ??CSI00_SendReceiveData_12  ;; 4 cycles
+   \   000030                       ; ------------------------------------- Block: 21 cycles
+    347              {
+    348                residueNumber = hexNumber % 16;
+   \   000030 5010                  MOV       X, #0x10           ;; 1 cycle
+   \   000032 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000034 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   000037 73                    MOV       B, A               ;; 1 cycle
+    349                hexNumber = hexNumber / 16;
+   \   000038 5010                  MOV       X, #0x10           ;; 1 cycle
+   \   00003A 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00003C FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   00003F 72                    MOV       C, A               ;; 1 cycle
+   \   000040 62                    MOV       A, C               ;; 1 cycle
+   \   000041 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   000043 72                    MOV       C, A               ;; 1 cycle
+    350                bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
+   \   000044 D9....                MOV       X, N:TXcnt         ;; 1 cycle
+   \   000047 60                    MOV       A, X               ;; 1 cycle
+   \   000048 81                    INC       A                  ;; 1 cycle
+   \   000049 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   00004C 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00004E 72                    MOV       C, A               ;; 1 cycle
+   \   00004F 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   000052 08                    XCH       A, X               ;; 1 cycle
+   \   000053 72                    MOV       C, A               ;; 1 cycle
+   \   000054 60                    MOV       A, X               ;; 1 cycle
+   \   000055 28....                MOV       (bufferUARTtx & 0xFFFF)[C], A  ;; 1 cycle
+    351                hexNumber = residueNumber;
+   \   000058 63                    MOV       A, B               ;; 1 cycle
+   \   000059 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   00005B 73                    MOV       B, A               ;; 1 cycle
+   \   00005C                       ; ------------------------------------- Block: 29 cycles
+    352              }
+    353              
+    354              bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
+   \                     ??CSI00_SendReceiveData_12:
+   \   00005C E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   00005F 63                    MOV       A, B               ;; 1 cycle
+   \   000060 81                    INC       A                  ;; 1 cycle
+   \   000061 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000064 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000066 72                    MOV       C, A               ;; 1 cycle
+   \   000067 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   00006A 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    355              
+    356              if(lineOption == WITH_LINE){
+   \   00006D 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   00006F 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000071 DF0D                  BNZ       ??CSI00_SendReceiveData_13  ;; 4 cycles
+   \   000073                       ; ------------------------------------- Block: 14 cycles
+    357                bufferUARTtx[TXcnt++] = '\n';
+   \   000073 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000076 63                    MOV       A, B               ;; 1 cycle
+   \   000077 81                    INC       A                  ;; 1 cycle
+   \   000078 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   00007B 510A                  MOV       A, #0xA            ;; 1 cycle
+   \   00007D 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000080                       ; ------------------------------------- Block: 6 cycles
+    358              }
+    359          
+    360              //Write to the UART register
+    361              STMK1 = 1U; //Disable UART Tx Interrupt
+   \                     ??CSI00_SendReceiveData_13:
+   \   000080 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    362              addByte = bufferUARTtx;
+   \   000083 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000086 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    363              TXD1 = *addByte;
+   \   000089 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   00008C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00008D 9E44                  MOV       0xFFF44, A         ;; 1 cycle
+    364              addByte++;
+   \   00008F FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   000092 A7                    INCW      HL                 ;; 1 cycle
+   \   000093 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000094 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+   \   000097 37                    XCHW      AX, HL             ;; 1 cycle
+    365              TXcnt--;
+   \   000098 B0....                DEC       N:TXcnt            ;; 2 cycles
+    366              STMK1 = 0U; //Enable UART Tx Interrupt
+   \   00009B 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    367              
+    368              return true;
+   \   00009E E1                    ONEB      A                  ;; 1 cycle
+   \   00009F ED....                BR        N:??CSI00_SendReceiveData_14  ;; 3 cycles
+   \   0000A2                       ; ------------------------------------- Block: 20 cycles
+    369              
+    370            }
+    371            else
+    372            {
+    373              STMK1 = 1U; //Disable INTST1 interrupt
+   \                     ??CSI00_SendReceiveData_11:
+   \   0000A2 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    374              //First move the pending characters to the first position of the UARTbuffer
+    375              memmove(bufferUARTtx, (void *)addByte, TXcnt);   
+   \   0000A5 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   0000A8 74                    MOV       E, A               ;; 1 cycle
+   \   0000A9 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   0000AB DB....                MOVW      BC, N:addByte      ;; 1 cycle
+   \   0000AE 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   0000B1 FD....                CALL      memmove            ;; 3 cycles
+    376              
+    377              bufferUARTtx[TXcnt++] = '0';
+   \   0000B4 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   0000B7 63                    MOV       A, B               ;; 1 cycle
+   \   0000B8 81                    INC       A                  ;; 1 cycle
+   \   0000B9 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   0000BC 5130                  MOV       A, #0x30           ;; 1 cycle
+   \   0000BE 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    378              bufferUARTtx[TXcnt++] = 'x';
+   \   0000C1 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   0000C4 63                    MOV       A, B               ;; 1 cycle
+   \   0000C5 81                    INC       A                  ;; 1 cycle
+   \   0000C6 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   0000C9 5178                  MOV       A, #0x78           ;; 1 cycle
+   \   0000CB 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    379              
+    380              if(hexNumber > 0x0F)
+   \   0000CE 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000D0 4C10                  CMP       A, #0x10           ;; 1 cycle
+   \   0000D2 DC2C                  BC        ??CSI00_SendReceiveData_15  ;; 4 cycles
+   \   0000D4                       ; ------------------------------------- Block: 28 cycles
+    381              {
+    382                residueNumber = hexNumber % 16;
+   \   0000D4 5010                  MOV       X, #0x10           ;; 1 cycle
+   \   0000D6 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000D8 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   0000DB 73                    MOV       B, A               ;; 1 cycle
+    383                hexNumber = hexNumber / 16;
+   \   0000DC 5010                  MOV       X, #0x10           ;; 1 cycle
+   \   0000DE 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000E0 FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   0000E3 72                    MOV       C, A               ;; 1 cycle
+   \   0000E4 62                    MOV       A, C               ;; 1 cycle
+   \   0000E5 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   0000E7 72                    MOV       C, A               ;; 1 cycle
+    384                bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
+   \   0000E8 D9....                MOV       X, N:TXcnt         ;; 1 cycle
+   \   0000EB 60                    MOV       A, X               ;; 1 cycle
+   \   0000EC 81                    INC       A                  ;; 1 cycle
+   \   0000ED 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   0000F0 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000F2 72                    MOV       C, A               ;; 1 cycle
+   \   0000F3 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   0000F6 08                    XCH       A, X               ;; 1 cycle
+   \   0000F7 72                    MOV       C, A               ;; 1 cycle
+   \   0000F8 60                    MOV       A, X               ;; 1 cycle
+   \   0000F9 28....                MOV       (bufferUARTtx & 0xFFFF)[C], A  ;; 1 cycle
+    385                hexNumber = residueNumber;
+   \   0000FC 63                    MOV       A, B               ;; 1 cycle
+   \   0000FD 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   0000FF 73                    MOV       B, A               ;; 1 cycle
+   \   000100                       ; ------------------------------------- Block: 29 cycles
+    386              }
+    387              
+    388              bufferUARTtx[TXcnt++] = tableAscii[hexNumber];
+   \                     ??CSI00_SendReceiveData_15:
+   \   000100 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000103 63                    MOV       A, B               ;; 1 cycle
+   \   000104 81                    INC       A                  ;; 1 cycle
+   \   000105 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000108 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00010A 72                    MOV       C, A               ;; 1 cycle
+   \   00010B 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   00010E 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    389              
+    390               if(lineOption == WITH_LINE){
+   \   000111 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000113 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000115 DF0D                  BNZ       ??CSI00_SendReceiveData_16  ;; 4 cycles
+   \   000117                       ; ------------------------------------- Block: 14 cycles
+    391                bufferUARTtx[TXcnt++] = '\n';
+   \   000117 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   00011A 63                    MOV       A, B               ;; 1 cycle
+   \   00011B 81                    INC       A                  ;; 1 cycle
+   \   00011C 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   00011F 510A                  MOV       A, #0xA            ;; 1 cycle
+   \   000121 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000124                       ; ------------------------------------- Block: 6 cycles
+    392              }
+    393              
+    394              //Set the character pointer and counter to the new values for continuing UART transmission
+    395              addByte = bufferUARTtx;
+   \                     ??CSI00_SendReceiveData_16:
+   \   000124 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000127 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    396              
+    397              STMK1 = 0U; /* enable INTST1 interrupt */
+   \   00012A 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    398              
+    399              //If the buffer is almost full, wait until it gets emptied a little
+    400              if(TXcnt > 100){
+   \   00012D 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   000130 4C65                  CMP       A, #0x65           ;; 1 cycle
+   \   000132 DC06                  BC        ??CSI00_SendReceiveData_17  ;; 4 cycles
+   \   000134                       ; ------------------------------------- Block: 10 cycles
+    401                delay(5);
+   \   000134 300500                MOVW      AX, #0x5           ;; 1 cycle
+   \   000137 FD....                CALL      delay              ;; 3 cycles
+   \   00013A                       ; ------------------------------------- Block: 4 cycles
+    402              }
+    403          
+    404              return false;
+   \                     ??CSI00_SendReceiveData_17:
+   \   00013A F1                    CLRB      A                  ;; 1 cycle
+   \   00013B                       ; ------------------------------------- Block: 1 cycles
+   \                     ??CSI00_SendReceiveData_14:
+   \   00013B 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00013D C4                    POP       DE                 ;; 1 cycle
+   \   00013E C2                    POP       BC                 ;; 1 cycle
+   \   00013F D7                    RET                          ;; 6 cycles
+   \   000140                       ; ------------------------------------- Block: 9 cycles
+   \   000140                       ; ------------------------------------- Total: 201 cycles
+   \   000140                       REQUIRE ?CLRL78_V1_0_L00
+   \   000140                       REQUIRE _A_MK1
+   \   000140                       REQUIRE _A_SDR02
+    405            }
+    406          }
+    407          /*
+    408          **-----------------------------------------------------------------------------
+    409          **
+    410          **  Abstract:
+    411          **  This function sends a number in decimal format.
+    412          **
+    413          **  Parameters:
+    414          **  decNumber: number to be converted into ascii in decimal format
+    415          **  
+    416          **
+    417          **  Returns:
+    418          **  True:  Succesful UART transmission
+    419          **  False: Unsuccesful UART transmission
+    420          **
+    421          **-----------------------------------------------------------------------------
+    422          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    423          bool printDec(uint8_t decNumber, uint8_t lineOption)
+   \                     printDec:
+    424          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003 C3                    PUSH      BC                 ;; 1 cycle
+   \   000004                       ; Auto size: 4
+    425            uint8_t residueNumber = 0;
+   \   000004 F3                    CLRB      B                  ;; 1 cycle
+    426            
+    427            if(TXcnt == 0)
+   \   000005 D5....                CMP0      N:TXcnt            ;; 1 cycle
+   \   000008 61E8                  SKZ                          ;; 4 cycles
+   \   00000A ED....                BR        N:??CSI00_SendReceiveData_18  ;; 4 cycles
+   \   00000D                       ; ------------------------------------- Block: 10 cycles
+    428            {
+    429              if(decNumber > 99)
+   \   00000D 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00000F 4C64                  CMP       A, #0x64           ;; 1 cycle
+   \   000011 DC2C                  BC        ??CSI00_SendReceiveData_19  ;; 4 cycles
+   \   000013                       ; ------------------------------------- Block: 6 cycles
+    430              {
+    431                residueNumber = decNumber % 100;
+   \   000013 5064                  MOV       X, #0x64           ;; 1 cycle
+   \   000015 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000017 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00001A 73                    MOV       B, A               ;; 1 cycle
+    432                decNumber = decNumber / 100;
+   \   00001B 5064                  MOV       X, #0x64           ;; 1 cycle
+   \   00001D 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00001F FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   000022 72                    MOV       C, A               ;; 1 cycle
+   \   000023 62                    MOV       A, C               ;; 1 cycle
+   \   000024 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   000026 72                    MOV       C, A               ;; 1 cycle
+    433                bufferUARTtx[TXcnt++] = tableAscii[decNumber];
+   \   000027 D9....                MOV       X, N:TXcnt         ;; 1 cycle
+   \   00002A 60                    MOV       A, X               ;; 1 cycle
+   \   00002B 81                    INC       A                  ;; 1 cycle
+   \   00002C 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   00002F 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000031 72                    MOV       C, A               ;; 1 cycle
+   \   000032 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   000035 08                    XCH       A, X               ;; 1 cycle
+   \   000036 72                    MOV       C, A               ;; 1 cycle
+   \   000037 60                    MOV       A, X               ;; 1 cycle
+   \   000038 28....                MOV       (bufferUARTtx & 0xFFFF)[C], A  ;; 1 cycle
+    434                decNumber = residueNumber;
+   \   00003B 63                    MOV       A, B               ;; 1 cycle
+   \   00003C 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   00003E 73                    MOV       B, A               ;; 1 cycle
+   \   00003F                       ; ------------------------------------- Block: 29 cycles
+    435              }
+    436              
+    437              if(decNumber > 9)
+   \                     ??CSI00_SendReceiveData_19:
+   \   00003F 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000041 4C0A                  CMP       A, #0xA            ;; 1 cycle
+   \   000043 DC2C                  BC        ??CSI00_SendReceiveData_20  ;; 4 cycles
+   \   000045                       ; ------------------------------------- Block: 6 cycles
+    438              {
+    439                residueNumber = decNumber % 10;
+   \   000045 500A                  MOV       X, #0xA            ;; 1 cycle
+   \   000047 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000049 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00004C 73                    MOV       B, A               ;; 1 cycle
+    440                decNumber = decNumber / 10;
+   \   00004D 500A                  MOV       X, #0xA            ;; 1 cycle
+   \   00004F 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000051 FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   000054 72                    MOV       C, A               ;; 1 cycle
+   \   000055 62                    MOV       A, C               ;; 1 cycle
+   \   000056 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   000058 72                    MOV       C, A               ;; 1 cycle
+    441                bufferUARTtx[TXcnt++] = tableAscii[decNumber];
+   \   000059 D9....                MOV       X, N:TXcnt         ;; 1 cycle
+   \   00005C 60                    MOV       A, X               ;; 1 cycle
+   \   00005D 81                    INC       A                  ;; 1 cycle
+   \   00005E 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000061 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000063 72                    MOV       C, A               ;; 1 cycle
+   \   000064 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   000067 08                    XCH       A, X               ;; 1 cycle
+   \   000068 72                    MOV       C, A               ;; 1 cycle
+   \   000069 60                    MOV       A, X               ;; 1 cycle
+   \   00006A 28....                MOV       (bufferUARTtx & 0xFFFF)[C], A  ;; 1 cycle
+    442                decNumber = residueNumber;
+   \   00006D 63                    MOV       A, B               ;; 1 cycle
+   \   00006E 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   000070 73                    MOV       B, A               ;; 1 cycle
+   \   000071                       ; ------------------------------------- Block: 29 cycles
+    443              }
+    444              
+    445              bufferUARTtx[TXcnt++] = tableAscii[decNumber];
+   \                     ??CSI00_SendReceiveData_20:
+   \   000071 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000074 63                    MOV       A, B               ;; 1 cycle
+   \   000075 81                    INC       A                  ;; 1 cycle
+   \   000076 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000079 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00007B 72                    MOV       C, A               ;; 1 cycle
+   \   00007C 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   00007F 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    446              
+    447              if(lineOption == WITH_LINE){
+   \   000082 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000084 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000086 DF10                  BNZ       ??CSI00_SendReceiveData_21  ;; 4 cycles
+   \   000088                       ; ------------------------------------- Block: 14 cycles
+    448                bufferUARTtx[TXcnt++] = '\n';
+   \   000088 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   00008B 70                    MOV       X, A               ;; 1 cycle
+   \   00008C 80                    INC       X                  ;; 1 cycle
+   \   00008D 08                    XCH       A, X               ;; 1 cycle
+   \   00008E 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000091 60                    MOV       A, X               ;; 1 cycle
+   \   000092 73                    MOV       B, A               ;; 1 cycle
+   \   000093 510A                  MOV       A, #0xA            ;; 1 cycle
+   \   000095 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000098                       ; ------------------------------------- Block: 9 cycles
+    449              }
+    450              
+    451              //Write to the UART register
+    452              STMK1 = 1U; //Disable UART Tx Interrupt
+   \                     ??CSI00_SendReceiveData_21:
+   \   000098 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    453              addByte = bufferUARTtx;
+   \   00009B 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   00009E BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    454              TXD1 = *addByte;
+   \   0000A1 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   0000A4 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   0000A5 9E44                  MOV       0xFFF44, A         ;; 1 cycle
+    455              addByte++;
+   \   0000A7 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   0000AA A7                    INCW      HL                 ;; 1 cycle
+   \   0000AB 37                    XCHW      AX, HL             ;; 1 cycle
+   \   0000AC BF....                MOVW      N:addByte, AX      ;; 1 cycle
+   \   0000AF 37                    XCHW      AX, HL             ;; 1 cycle
+    456              TXcnt--;
+   \   0000B0 B0....                DEC       N:TXcnt            ;; 2 cycles
+    457              STMK1 = 0U; //Enable UART Tx Interrupt
+   \   0000B3 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    458              
+    459              return true;
+   \   0000B6 E1                    ONEB      A                  ;; 1 cycle
+   \   0000B7 ED....                BR        N:??CSI00_SendReceiveData_22  ;; 3 cycles
+   \   0000BA                       ; ------------------------------------- Block: 20 cycles
+    460              
+    461            }
+    462            else
+    463            {
+    464              STMK1 = 1U; //Disable INTST1 interrupt
+   \                     ??CSI00_SendReceiveData_18:
+   \   0000BA 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    465              //First move the pending characters to the first position of the UARTbuffer
+    466              memmove(bufferUARTtx, (void *)addByte, TXcnt);
+   \   0000BD 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   0000C0 74                    MOV       E, A               ;; 1 cycle
+   \   0000C1 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   0000C3 DB....                MOVW      BC, N:addByte      ;; 1 cycle
+   \   0000C6 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   0000C9 FD....                CALL      memmove            ;; 3 cycles
+    467              
+    468              if(decNumber > 99)
+   \   0000CC 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000CE 4C64                  CMP       A, #0x64           ;; 1 cycle
+   \   0000D0 DC2C                  BC        ??CSI00_SendReceiveData_23  ;; 4 cycles
+   \   0000D2                       ; ------------------------------------- Block: 16 cycles
+    469              {
+    470                residueNumber = decNumber % 100;
+   \   0000D2 5064                  MOV       X, #0x64           ;; 1 cycle
+   \   0000D4 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000D6 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   0000D9 73                    MOV       B, A               ;; 1 cycle
+    471                decNumber = decNumber / 100;
+   \   0000DA 5064                  MOV       X, #0x64           ;; 1 cycle
+   \   0000DC 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000DE FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   0000E1 72                    MOV       C, A               ;; 1 cycle
+   \   0000E2 62                    MOV       A, C               ;; 1 cycle
+   \   0000E3 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   0000E5 72                    MOV       C, A               ;; 1 cycle
+    472                bufferUARTtx[TXcnt++] = tableAscii[decNumber];
+   \   0000E6 D9....                MOV       X, N:TXcnt         ;; 1 cycle
+   \   0000E9 60                    MOV       A, X               ;; 1 cycle
+   \   0000EA 81                    INC       A                  ;; 1 cycle
+   \   0000EB 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   0000EE 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   0000F0 72                    MOV       C, A               ;; 1 cycle
+   \   0000F1 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   0000F4 08                    XCH       A, X               ;; 1 cycle
+   \   0000F5 72                    MOV       C, A               ;; 1 cycle
+   \   0000F6 60                    MOV       A, X               ;; 1 cycle
+   \   0000F7 28....                MOV       (bufferUARTtx & 0xFFFF)[C], A  ;; 1 cycle
+    473                decNumber = residueNumber;
+   \   0000FA 63                    MOV       A, B               ;; 1 cycle
+   \   0000FB 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   0000FD 73                    MOV       B, A               ;; 1 cycle
+   \   0000FE                       ; ------------------------------------- Block: 29 cycles
+    474              }
+    475              
+    476              if(decNumber > 9)
+   \                     ??CSI00_SendReceiveData_23:
+   \   0000FE 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000100 4C0A                  CMP       A, #0xA            ;; 1 cycle
+   \   000102 DC2C                  BC        ??CSI00_SendReceiveData_24  ;; 4 cycles
+   \   000104                       ; ------------------------------------- Block: 6 cycles
+    477              {
+    478                residueNumber = decNumber % 10;
+   \   000104 500A                  MOV       X, #0xA            ;; 1 cycle
+   \   000106 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000108 FD....                CALL      N:?UC_MOD_L01      ;; 3 cycles
+   \   00010B 73                    MOV       B, A               ;; 1 cycle
+    479                decNumber = decNumber / 10;
+   \   00010C 500A                  MOV       X, #0xA            ;; 1 cycle
+   \   00010E 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000110 FD....                CALL      N:?UC_DIV_L01      ;; 3 cycles
+   \   000113 72                    MOV       C, A               ;; 1 cycle
+   \   000114 62                    MOV       A, C               ;; 1 cycle
+   \   000115 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   000117 72                    MOV       C, A               ;; 1 cycle
+    480                bufferUARTtx[TXcnt++] = tableAscii[decNumber];
+   \   000118 D9....                MOV       X, N:TXcnt         ;; 1 cycle
+   \   00011B 60                    MOV       A, X               ;; 1 cycle
+   \   00011C 81                    INC       A                  ;; 1 cycle
+   \   00011D 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000120 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   000122 72                    MOV       C, A               ;; 1 cycle
+   \   000123 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   000126 08                    XCH       A, X               ;; 1 cycle
+   \   000127 72                    MOV       C, A               ;; 1 cycle
+   \   000128 60                    MOV       A, X               ;; 1 cycle
+   \   000129 28....                MOV       (bufferUARTtx & 0xFFFF)[C], A  ;; 1 cycle
+    481                decNumber = residueNumber;
+   \   00012C 63                    MOV       A, B               ;; 1 cycle
+   \   00012D 9803                  MOV       [SP+0x03], A       ;; 1 cycle
+   \   00012F 73                    MOV       B, A               ;; 1 cycle
+   \   000130                       ; ------------------------------------- Block: 29 cycles
+    482              }
+    483              
+    484              bufferUARTtx[TXcnt++] = tableAscii[decNumber];
+   \                     ??CSI00_SendReceiveData_24:
+   \   000130 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000133 63                    MOV       A, B               ;; 1 cycle
+   \   000134 81                    INC       A                  ;; 1 cycle
+   \   000135 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000138 8803                  MOV       A, [SP+0x03]       ;; 1 cycle
+   \   00013A 72                    MOV       C, A               ;; 1 cycle
+   \   00013B 29....                MOV       A, (tableAscii & 0xFFFF)[C]  ;; 1 cycle
+   \   00013E 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+    485              
+    486              if(lineOption == WITH_LINE){
+   \   000141 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   000143 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000145 DF0D                  BNZ       ??CSI00_SendReceiveData_25  ;; 4 cycles
+   \   000147                       ; ------------------------------------- Block: 14 cycles
+    487                bufferUARTtx[TXcnt++] = '\n';
+   \   000147 E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   00014A 63                    MOV       A, B               ;; 1 cycle
+   \   00014B 81                    INC       A                  ;; 1 cycle
+   \   00014C 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   00014F 510A                  MOV       A, #0xA            ;; 1 cycle
+   \   000151 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000154                       ; ------------------------------------- Block: 6 cycles
+    488              }
+    489              
+    490              //Set the character pointer and counter to the new values for continuing UART transmission
+    491              addByte = bufferUARTtx;
+   \                     ??CSI00_SendReceiveData_25:
+   \   000154 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000157 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    492              STMK1 = 0U; /* enable INTST1 interrupt */
+   \   00015A 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+    493          
+    494              //If the buffer is almost full, wait until it gets emptied a little
+    495              if(TXcnt > 100){
+   \   00015D 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   000160 4C65                  CMP       A, #0x65           ;; 1 cycle
+   \   000162 DC06                  BC        ??CSI00_SendReceiveData_26  ;; 4 cycles
+   \   000164                       ; ------------------------------------- Block: 10 cycles
+    496                delay(5);
+   \   000164 300500                MOVW      AX, #0x5           ;; 1 cycle
+   \   000167 FD....                CALL      delay              ;; 3 cycles
+   \   00016A                       ; ------------------------------------- Block: 4 cycles
+    497              }
+    498          
+    499              return false;
+   \                     ??CSI00_SendReceiveData_26:
+   \   00016A F1                    CLRB      A                  ;; 1 cycle
+   \   00016B                       ; ------------------------------------- Block: 1 cycles
+   \                     ??CSI00_SendReceiveData_22:
+   \   00016B 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00016D C4                    POP       DE                 ;; 1 cycle
+   \   00016E C2                    POP       BC                 ;; 1 cycle
+   \   00016F D7                    RET                          ;; 6 cycles
+   \   000170                       ; ------------------------------------- Block: 9 cycles
+   \   000170                       ; ------------------------------------- Total: 247 cycles
+   \   000170                       REQUIRE ?CLRL78_V1_0_L00
+   \   000170                       REQUIRE _A_MK1
+   \   000170                       REQUIRE _A_SDR02
+    500            }
+    501          }
+    502          
+    503          /*
+    504          **-----------------------------------------------------------------------------
+    505          **
+    506          **  Abstract:
+    507          **  This function selects according to which type of element to print
+    508          **  the function to send the data via UART. No new line character added
+    509          **
+    510          **  Parameters:
+    511          **  string: data to be sent via UART
+    512          **  typeString: selects wheter it is string, decimal or hex
+    513          **
+    514          **  Returns:
+    515          **  True:  Successful UART transmission
+    516          **  False: Unsuccessful UART transmission
+    517          **
+    518          **-----------------------------------------------------------------------------
+    519          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    520          bool selectPrint(uint8_t * string, uint8_t typeString)
+   \                     selectPrint:
+    521          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+   \   000000 16                    MOVW      HL, AX             ;; 1 cycle
+    522            bool result = false;
+   \   000001 F0                    CLRB      X                  ;; 1 cycle
+    523            
+    524            switch(typeString){
+   \   000002 63                    MOV       A, B               ;; 1 cycle
+   \   000003 D1                    CMP0      A                  ;; 1 cycle
+   \   000004 DD08                  BZ        ??CSI00_SendReceiveData_27  ;; 4 cycles
+   \   000006                       ; ------------------------------------- Block: 8 cycles
+   \   000006 91                    DEC       A                  ;; 1 cycle
+   \   000007 DD15                  BZ        ??CSI00_SendReceiveData_28  ;; 4 cycles
+   \   000009                       ; ------------------------------------- Block: 5 cycles
+   \   000009 91                    DEC       A                  ;; 1 cycle
+   \   00000A DD0A                  BZ        ??CSI00_SendReceiveData_29  ;; 4 cycles
+   \   00000C                       ; ------------------------------------- Block: 5 cycles
+   \   00000C EF16                  BR        S:??CSI00_SendReceiveData_30  ;; 3 cycles
+   \   00000E                       ; ------------------------------------- Block: 3 cycles
+    525              case TYPE_STRING:
+    526                result = printString(string, NO_LINE);
+   \                     ??CSI00_SendReceiveData_27:
+   \   00000E F3                    CLRB      B                  ;; 1 cycle
+   \   00000F 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000010 FD....                CALL      printString        ;; 3 cycles
+   \   000013 70                    MOV       X, A               ;; 1 cycle
+    527                break;
+   \   000014 EF0E                  BR        S:??CSI00_SendReceiveData_30  ;; 3 cycles
+   \   000016                       ; ------------------------------------- Block: 9 cycles
+    528              case TYPE_HEX:
+    529                result = printHex((uint8_t)string, NO_LINE);
+   \                     ??CSI00_SendReceiveData_29:
+   \   000016 F3                    CLRB      B                  ;; 1 cycle
+   \   000017 66                    MOV       A, L               ;; 1 cycle
+   \   000018 FD....                CALL      printHex           ;; 3 cycles
+   \   00001B 70                    MOV       X, A               ;; 1 cycle
+    530                break;
+   \   00001C EF06                  BR        S:??CSI00_SendReceiveData_30  ;; 3 cycles
+   \   00001E                       ; ------------------------------------- Block: 9 cycles
+    531              case TYPE_DEC:
+    532                result = printDec((uint8_t)string, NO_LINE);
+   \                     ??CSI00_SendReceiveData_28:
+   \   00001E F3                    CLRB      B                  ;; 1 cycle
+   \   00001F 66                    MOV       A, L               ;; 1 cycle
+   \   000020 FD....                CALL      printDec           ;; 3 cycles
+   \   000023 70                    MOV       X, A               ;; 1 cycle
+    533                break;
+   \   000024                       ; ------------------------------------- Block: 6 cycles
+    534              default:
+    535                break;
+    536            }
+    537            
+    538            return result;
+   \                     ??CSI00_SendReceiveData_30:
+   \   000024 60                    MOV       A, X               ;; 1 cycle
+   \   000025 D7                    RET                          ;; 6 cycles
+   \   000026                       ; ------------------------------------- Block: 7 cycles
+   \   000026                       ; ------------------------------------- Total: 52 cycles
+   \   000026                       REQUIRE ?CLRL78_V1_0_L00
+    539          }
+    540          /*
+    541          **-----------------------------------------------------------------------------
+    542          **
+    543          **  Abstract:
+    544          **  This function selects according to which type of element to print
+    545          **  the function to send the data via UART. A new line character is added
+    546          **
+    547          **  Parameters:
+    548          **  string: data to be sent via UART
+    549          **  typeString: selects wheter it is string, decimal or hex
+    550          **
+    551          **  Returns:
+    552          **  True:  Succesful UART transmission
+    553          **  False: Unsuccesful UART transmission
+    554          **
+    555          **-----------------------------------------------------------------------------
+    556          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    557          bool selectPrintln(uint8_t * string, uint8_t typeString)
+   \                     selectPrintln:
+    558          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+   \   000000 16                    MOVW      HL, AX             ;; 1 cycle
+    559            bool result = false;
+   \   000001 F0                    CLRB      X                  ;; 1 cycle
+    560          
+    561            switch(typeString){
+   \   000002 63                    MOV       A, B               ;; 1 cycle
+   \   000003 D1                    CMP0      A                  ;; 1 cycle
+   \   000004 DD08                  BZ        ??CSI00_SendReceiveData_31  ;; 4 cycles
+   \   000006                       ; ------------------------------------- Block: 8 cycles
+   \   000006 91                    DEC       A                  ;; 1 cycle
+   \   000007 DD15                  BZ        ??CSI00_SendReceiveData_32  ;; 4 cycles
+   \   000009                       ; ------------------------------------- Block: 5 cycles
+   \   000009 91                    DEC       A                  ;; 1 cycle
+   \   00000A DD0A                  BZ        ??CSI00_SendReceiveData_33  ;; 4 cycles
+   \   00000C                       ; ------------------------------------- Block: 5 cycles
+   \   00000C EF16                  BR        S:??CSI00_SendReceiveData_34  ;; 3 cycles
+   \   00000E                       ; ------------------------------------- Block: 3 cycles
+    562              case TYPE_STRING:
+    563                result = printString(string, WITH_LINE);
+   \                     ??CSI00_SendReceiveData_31:
+   \   00000E E3                    ONEB      B                  ;; 1 cycle
+   \   00000F 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000010 FD....                CALL      printString        ;; 3 cycles
+   \   000013 70                    MOV       X, A               ;; 1 cycle
+    564                break;
+   \   000014 EF0E                  BR        S:??CSI00_SendReceiveData_34  ;; 3 cycles
+   \   000016                       ; ------------------------------------- Block: 9 cycles
+    565              case TYPE_HEX:
+    566                result = printHex((uint8_t)string, WITH_LINE);
+   \                     ??CSI00_SendReceiveData_33:
+   \   000016 E3                    ONEB      B                  ;; 1 cycle
+   \   000017 66                    MOV       A, L               ;; 1 cycle
+   \   000018 FD....                CALL      printHex           ;; 3 cycles
+   \   00001B 70                    MOV       X, A               ;; 1 cycle
+    567                break;
+   \   00001C EF06                  BR        S:??CSI00_SendReceiveData_34  ;; 3 cycles
+   \   00001E                       ; ------------------------------------- Block: 9 cycles
+    568              case TYPE_DEC:
+    569                result = printDec((uint8_t)string, WITH_LINE);
+   \                     ??CSI00_SendReceiveData_32:
+   \   00001E E3                    ONEB      B                  ;; 1 cycle
+   \   00001F 66                    MOV       A, L               ;; 1 cycle
+   \   000020 FD....                CALL      printDec           ;; 3 cycles
+   \   000023 70                    MOV       X, A               ;; 1 cycle
+    570                break;
+   \   000024                       ; ------------------------------------- Block: 6 cycles
+    571              default:
+    572                break;
+    573            }
+    574            
+    575            return result;
+   \                     ??CSI00_SendReceiveData_34:
+   \   000024 60                    MOV       A, X               ;; 1 cycle
+   \   000025 D7                    RET                          ;; 6 cycles
+   \   000026                       ; ------------------------------------- Block: 7 cycles
+   \   000026                       ; ------------------------------------- Total: 52 cycles
+   \   000026                       REQUIRE ?CLRL78_V1_0_L00
+    576          }
+    577          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    578          bool writeByte(uint8_t value){
+   \                     writeByte:
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+   \   000001 70                    MOV       X, A               ;; 1 cycle
+    579            bool status = false;
+   \   000002 F2                    CLRB      C                  ;; 1 cycle
+    580          
+    581            if(TXcnt == 0){
+   \   000003 D5....                CMP0      N:TXcnt            ;; 1 cycle
+   \   000006 DF32                  BNZ       ??CSI00_SendReceiveData_35  ;; 4 cycles
+   \   000008                       ; ------------------------------------- Block: 8 cycles
+    582              bufferUARTtx[TXcnt++] = value;
+   \   000008 8F....                MOV       A, N:TXcnt         ;; 1 cycle
+   \   00000B 73                    MOV       B, A               ;; 1 cycle
+   \   00000C 83                    INC       B                  ;; 1 cycle
+   \   00000D 618B                  XCH       A, B               ;; 1 cycle
+   \   00000F 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000012 63                    MOV       A, B               ;; 1 cycle
+   \   000013 73                    MOV       B, A               ;; 1 cycle
+   \   000014 60                    MOV       A, X               ;; 1 cycle
+   \   000015 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000018 70                    MOV       X, A               ;; 1 cycle
+    583              status =  true;
+   \   000019 E2                    ONEB      C                  ;; 1 cycle
+    584              
+    585              //Write to the UART register
+    586              STMK1 = 1U; //Disable UART Tx Interrupt
+   \   00001A 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    587              addByte = bufferUARTtx;
+   \   00001D 30....                MOVW      AX, #bufferUARTtx  ;; 1 cycle
+   \   000020 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+    588              TXD1 = *addByte;
+   \   000023 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   000026 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000027 9E44                  MOV       0xFFF44, A         ;; 1 cycle
+    589              addByte++;
+   \   000029 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   00002C A7                    INCW      HL                 ;; 1 cycle
+   \   00002D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00002E BF....                MOVW      N:addByte, AX      ;; 1 cycle
+   \   000031 37                    XCHW      AX, HL             ;; 1 cycle
+    590              TXcnt--;
+   \   000032 B0....                DEC       N:TXcnt            ;; 2 cycles
+    591              STMK1 = 0U; //Enable UART Tx Interrupt     
+   \   000035 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+   \   000038 EF13                  BR        S:??CSI00_SendReceiveData_36  ;; 3 cycles
+   \   00003A                       ; ------------------------------------- Block: 30 cycles
+    592              
+    593            }else{
+    594              STMK1 = 1U; //Disable UART Tx Interrupt
+   \                     ??CSI00_SendReceiveData_35:
+   \   00003A 710AE6                SET1      0xFFFE6.0          ;; 2 cycles
+    595              bufferUARTtx[TXcnt++] = value;
+   \   00003D E9....                MOV       B, N:TXcnt         ;; 1 cycle
+   \   000040 63                    MOV       A, B               ;; 1 cycle
+   \   000041 81                    INC       A                  ;; 1 cycle
+   \   000042 9F....                MOV       N:TXcnt, A         ;; 1 cycle
+   \   000045 60                    MOV       A, X               ;; 1 cycle
+   \   000046 18....                MOV       (bufferUARTtx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000049 70                    MOV       X, A               ;; 1 cycle
+    596              STMK1 = 0U; //Enable UART Tx Interrupt       
+   \   00004A 710BE6                CLR1      0xFFFE6.0          ;; 2 cycles
+   \   00004D                       ; ------------------------------------- Block: 11 cycles
+    597            }
+    598            
+    599            return status; 
+   \                     ??CSI00_SendReceiveData_36:
+   \   00004D 62                    MOV       A, C               ;; 1 cycle
+   \   00004E C2                    POP       BC                 ;; 1 cycle
+   \   00004F D7                    RET                          ;; 6 cycles
+   \   000050                       ; ------------------------------------- Block: 8 cycles
+   \   000050                       ; ------------------------------------- Total: 57 cycles
+   \   000050                       REQUIRE ?CLRL78_V1_0_L00
+   \   000050                       REQUIRE _A_MK1
+   \   000050                       REQUIRE _A_SDR02
+    600          }
+    601          
+    602          /*
+    603          **-----------------------------------------------------------------------------
+    604          **
+    605          **  Abstract:
+    606          **  This function initializes the structure used to convert Arduino code into 
+    607          **  plain C code
+    608          **
+    609          **  Parameters:
+    610          **  * initSerial: Pointer to the Serial structure 
+    611          **  
+    612          **
+    613          **  Returns:
+    614          **  None
+    615          **  
+    616          **-----------------------------------------------------------------------------
+    617          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    618          void initializeSerialMonitor(SerialAdapter * initSerial)
+   \                     initializeSerialMonitor:
+    619          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+   \   000003 C1                    PUSH      AX                 ;; 1 cycle
+    620              initSerial->print = selectPrint;
+   \   000004 30....                MOVW      AX, #selectPrint   ;; 1 cycle
+   \   000007 B800                  MOVW      [SP], AX           ;; 1 cycle
+   \   000009 F6                    CLRW      AX                 ;; 1 cycle
+   \   00000A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00000B                       ; ------------------------------------- Block: 8 cycles
+   \                     ??initializeSerialMonitor_0:
+   \   00000B AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00000D 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   000010 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000011 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000012 89                    MOV       A, [DE]            ;; 1 cycle
+   \   000013 73                    MOV       B, A               ;; 1 cycle
+   \   000014 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000016 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000017 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000018 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000019 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00001A 63                    MOV       A, B               ;; 1 cycle
+   \   00001B 99                    MOV       [DE], A            ;; 1 cycle
+   \   00001C A7                    INCW      HL                 ;; 1 cycle
+   \   00001D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00001E 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000021 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000022 DCE7                  BC        ??initializeSerialMonitor_0  ;; 4 cycles
+   \   000024                       ; ------------------------------------- Block: 21 cycles
+    621              initSerial->println = selectPrintln;
+   \   000024 30....                MOVW      AX, #selectPrintln  ;; 1 cycle
+   \   000027 B800                  MOVW      [SP], AX           ;; 1 cycle
+   \   000029 F6                    CLRW      AX                 ;; 1 cycle
+   \   00002A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00002B                       ; ------------------------------------- Block: 4 cycles
+   \                     ??initializeSerialMonitor_1:
+   \   00002B AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00002D 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   000030 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000031 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000032 89                    MOV       A, [DE]            ;; 1 cycle
+   \   000033 73                    MOV       B, A               ;; 1 cycle
+   \   000034 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000036 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000037 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000038 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000039 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00003A 63                    MOV       A, B               ;; 1 cycle
+   \   00003B 9A02                  MOV       [DE+0x02], A       ;; 1 cycle
+   \   00003D A7                    INCW      HL                 ;; 1 cycle
+   \   00003E 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00003F 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000042 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000043 DCE6                  BC        ??initializeSerialMonitor_1  ;; 4 cycles
+   \   000045                       ; ------------------------------------- Block: 21 cycles
+    622              initSerial->write = writeByte;
+   \   000045 30....                MOVW      AX, #writeByte     ;; 1 cycle
+   \   000048 B800                  MOVW      [SP], AX           ;; 1 cycle
+   \   00004A F6                    CLRW      AX                 ;; 1 cycle
+   \   00004B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00004C                       ; ------------------------------------- Block: 4 cycles
+   \                     ??initializeSerialMonitor_2:
+   \   00004C AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00004E 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   000051 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000052 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000053 89                    MOV       A, [DE]            ;; 1 cycle
+   \   000054 73                    MOV       B, A               ;; 1 cycle
+   \   000055 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000057 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000058 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000059 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00005A 35                    XCHW      AX, DE             ;; 1 cycle
+   \   00005B 63                    MOV       A, B               ;; 1 cycle
+   \   00005C 9A04                  MOV       [DE+0x04], A       ;; 1 cycle
+   \   00005E A7                    INCW      HL                 ;; 1 cycle
+   \   00005F 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000060 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000063 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000064 DCE6                  BC        ??initializeSerialMonitor_2  ;; 4 cycles
+   \   000066                       ; ------------------------------------- Block: 21 cycles
+    623          }
+   \   000066 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000068 C4                    POP       DE                 ;; 1 cycle
+   \   000069 C2                    POP       BC                 ;; 1 cycle
+   \   00006A D7                    RET                          ;; 6 cycles
+   \   00006B                       ; ------------------------------------- Block: 9 cycles
+   \   00006B                       ; ------------------------------------- Total: 88 cycles
+   \   00006B                       REQUIRE ?CLRL78_V1_0_L00
+    624          
+    625          /*
+    626          **-----------------------------------------------------------------------------
+    627          **
+    628          **  Abstract:
+    629          **  This function is INTST1 interrupt service routine.
+    630          **
+    631          **  Parameters:
+    632          **  None
+    633          **
+    634          **  Returns:
+    635          **  None
+    636          **
+    637          **-----------------------------------------------------------------------------
+    638          */
+    639          #pragma vector = INTST1_vect
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    640          __interrupt void UARTtxInterrupt(void)
+   \                     UARTtxInterrupt:
+    641          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C1                    PUSH      AX                 ;; 1 cycle
+   \   000001 C7                    PUSH      HL                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+    642            if (TXcnt > 0U)
+   \   000002 D5....                CMP0      N:TXcnt            ;; 1 cycle
+   \   000005 DD14                  BZ        ??CSI00_SendReceiveData_37  ;; 4 cycles
+   \   000007                       ; ------------------------------------- Block: 7 cycles
+    643            {
+    644              TXD1 = *addByte;
+   \   000007 FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   00000A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00000B 9E44                  MOV       0xFFF44, A         ;; 1 cycle
+    645              addByte++;
+   \   00000D FB....                MOVW      HL, N:addByte      ;; 1 cycle
+   \   000010 A7                    INCW      HL                 ;; 1 cycle
+   \   000011 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000012 BF....                MOVW      N:addByte, AX      ;; 1 cycle
+   \   000015 37                    XCHW      AX, HL             ;; 1 cycle
+    646              TXcnt--;
+   \   000016 B0....                DEC       N:TXcnt            ;; 2 cycles
+   \   000019 EF03                  BR        S:??CSI00_SendReceiveData_38  ;; 3 cycles
+   \   00001B                       ; ------------------------------------- Block: 13 cycles
+    647            }
+    648            else
+    649            {
+    650              TXcnt = 0;         //Be sure to set the counter to 0
+   \                     ??CSI00_SendReceiveData_37:
+   \   00001B F5....                CLRB      N:TXcnt            ;; 1 cycle
+   \   00001E                       ; ------------------------------------- Block: 1 cycles
+    651            }
+    652          }
+   \                     ??CSI00_SendReceiveData_38:
+   \   00001E C6                    POP       HL                 ;; 1 cycle
+   \   00001F C0                    POP       AX                 ;; 1 cycle
+   \   000020 61FC                  RETI                         ;; 6 cycles
+   \   000022                       ; ------------------------------------- Block: 8 cycles
+   \   000022                       ; ------------------------------------- Total: 29 cycles
+   \   000022                       REQUIRE ?CLRL78_V1_0_L00
+   \   000022                       REQUIRE _A_SDR02
+    653          
+    654          /*
+    655          **-----------------------------------------------------------------------------
+    656          **
+    657          **  Abstract:
+    658          **  This function checks if there is a new line character between the first 20 characters of the UART Rx buffer
+    659          **
+    660          **  Parameters:
+    661          **  targetChar: pointer that gets the index of the new line character
+    662          **
+    663          **  Returns:
+    664          **  true
+    665          **  false
+    666          **
+    667          **-----------------------------------------------------------------------------
+    668          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    669          bool existsNewLine(uint8_t * targetChar)
+   \                     existsNewLine:
+    670          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+   \   000001 16                    MOVW      HL, AX             ;; 1 cycle
+    671            uint8_t index = 0;
+   \   000002 F3                    CLRB      B                  ;; 1 cycle
+    672            bool status = false;
+   \   000003 F0                    CLRB      X                  ;; 1 cycle
+    673            
+    674            for(index = 0; index < 20; index++)
+   \   000004 F1                    CLRB      A                  ;; 1 cycle
+   \   000005 73                    MOV       B, A               ;; 1 cycle
+   \   000006 EF01                  BR        S:??CSI00_SendReceiveData_39  ;; 3 cycles
+   \   000008                       ; ------------------------------------- Block: 9 cycles
+   \                     ??existsNewLine_0:
+   \   000008 83                    INC       B                  ;; 1 cycle
+   \   000009                       ; ------------------------------------- Block: 1 cycles
+   \                     ??CSI00_SendReceiveData_39:
+   \   000009 63                    MOV       A, B               ;; 1 cycle
+   \   00000A 4C14                  CMP       A, #0x14           ;; 1 cycle
+   \   00000C DE0A                  BNC       ??CSI00_SendReceiveData_40  ;; 4 cycles
+   \   00000E                       ; ------------------------------------- Block: 6 cycles
+    675            {
+    676              if(bufferUARTrx[index] == '\n'){      
+   \   00000E 09....                MOV       A, (bufferUARTrx & 0xFFFF)[B]  ;; 1 cycle
+   \   000011 4C0A                  CMP       A, #0xA            ;; 1 cycle
+   \   000013 DFF3                  BNZ       ??existsNewLine_0  ;; 4 cycles
+   \   000015                       ; ------------------------------------- Block: 6 cycles
+    677                *targetChar = index;
+   \   000015 63                    MOV       A, B               ;; 1 cycle
+   \   000016 9B                    MOV       [HL], A            ;; 1 cycle
+    678                status = true;
+   \   000017 E0                    ONEB      X                  ;; 1 cycle
+    679                break;
+   \   000018                       ; ------------------------------------- Block: 3 cycles
+    680              }
+    681            }
+    682            
+    683            return status;
+   \                     ??CSI00_SendReceiveData_40:
+   \   000018 60                    MOV       A, X               ;; 1 cycle
+   \   000019 C2                    POP       BC                 ;; 1 cycle
+   \   00001A D7                    RET                          ;; 6 cycles
+   \   00001B                       ; ------------------------------------- Block: 8 cycles
+   \   00001B                       ; ------------------------------------- Total: 33 cycles
+   \   00001B                       REQUIRE ?CLRL78_V1_0_L00
+    684          }
+    685          
+    686          /*
+    687          **-----------------------------------------------------------------------------
+    688          **
+    689          **  Abstract:
+    690          **  This function receives copies data from the UART Rx buffer to another specefic buffer.
+    691          **
+    692          **  Parameters:
+    693          **  uartBuffer: receive buffer pointer where to copy data
+    694          **  uartLenght: number of characters copied
+    695          **
+    696          **  Returns:
+    697          **  true
+    698          **  false
+    699          **
+    700          **-----------------------------------------------------------------------------
+    701          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    702          bool getUART(uint8_t * uartBuffer, uint8_t * uartLenght)
+   \                     getUART:
+    703          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 8
+   \   000003 2004                  SUBW      SP, #0x4           ;; 1 cycle
+    704            uint8_t newLinePosition = 0;
+   \   000005 F1                    CLRB      A                  ;; 1 cycle
+   \   000006 9800                  MOV       [SP], A            ;; 1 cycle
+    705            uint8_t i = 0;
+   \   000008 F1                    CLRB      A                  ;; 1 cycle
+    706            bool status = true;
+   \   000009 E0                    ONEB      X                  ;; 1 cycle
+   \   00000A 60                    MOV       A, X               ;; 1 cycle
+   \   00000B 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   00000D 70                    MOV       X, A               ;; 1 cycle
+    707            
+    708            SRMK1 = 1U; /* disable INTSR1 interrupt */
+   \   00000E 711AE6                SET1      0xFFFE6.1          ;; 2 cycles
+    709            
+    710            if(RXcnt > 0){
+   \   000011 D5....                CMP0      N:RXcnt            ;; 1 cycle
+   \   000014 61F8                  SKNZ                         ;; 4 cycles
+   \   000016 ED....                BR        N:??CSI00_SendReceiveData_41  ;; 4 cycles
+   \   000019                       ; ------------------------------------- Block: 18 cycles
+    711              if(existsNewLine(&newLinePosition))        //Copy data if there is a '\n' character between the first 20 characters
+   \   000019 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00001B FD....                CALL      existsNewLine      ;; 3 cycles
+   \   00001E D1                    CMP0      A                  ;; 1 cycle
+   \   00001F DD74                  BZ        ??CSI00_SendReceiveData_42  ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 9 cycles
+    712              {
+    713                memcpy(uartBuffer, bufferUARTrx, newLinePosition);
+   \   000021 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000023 72                    MOV       C, A               ;; 1 cycle
+   \   000024 F3                    CLRB      B                  ;; 1 cycle
+   \   000025 34....                MOVW      DE, #bufferUARTrx  ;; 1 cycle
+   \   000028 A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   00002A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00002B 13                    MOVW      AX, BC             ;; 1 cycle
+   \   00002C FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+    714                *uartLenght = newLinePosition;
+   \   00002F 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000031 73                    MOV       B, A               ;; 1 cycle
+   \   000032 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000034 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000035 63                    MOV       A, B               ;; 1 cycle
+   \   000036 9B                    MOV       [HL], A            ;; 1 cycle
+    715                
+    716                if(RXcnt == (newLinePosition + 1))   //Check if the '\n' was the last character
+   \   000037 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000039 76                    MOV       L, A               ;; 1 cycle
+   \   00003A 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   00003C A7                    INCW      HL                 ;; 1 cycle
+   \   00003D 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   000040 70                    MOV       X, A               ;; 1 cycle
+   \   000041 F1                    CLRB      A                  ;; 1 cycle
+   \   000042 47                    CMPW      AX, HL             ;; 1 cycle
+   \   000043 DF15                  BNZ       ??CSI00_SendReceiveData_43  ;; 4 cycles
+   \   000045                       ; ------------------------------------- Block: 28 cycles
+    717                {
+    718                  RXcnt = 0;
+   \   000045 F5....                CLRB      N:RXcnt            ;; 1 cycle
+    719                  //Clean the buffer
+    720                  for(i = 0; i < BUFFER_SIZE; i++){
+   \   000048 F1                    CLRB      A                  ;; 1 cycle
+   \   000049                       ; ------------------------------------- Block: 2 cycles
+   \                     ??getUART_0:
+   \   000049 4C80                  CMP       A, #0x80           ;; 1 cycle
+   \   00004B 61C8                  SKC                          ;; 4 cycles
+   \   00004D ED....                BR        N:??CSI00_SendReceiveData_44  ;; 4 cycles
+   \   000050                       ; ------------------------------------- Block: 5 cycles
+    721                    bufferUARTrx[i] = '\0';
+   \   000050 73                    MOV       B, A               ;; 1 cycle
+   \   000051 F0                    CLRB      X                  ;; 1 cycle
+   \   000052 08                    XCH       A, X               ;; 1 cycle
+   \   000053 18....                MOV       (bufferUARTrx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000056 60                    MOV       A, X               ;; 1 cycle
+    722                  }
+   \   000057 81                    INC       A                  ;; 1 cycle
+   \   000058 EFEF                  BR        S:??getUART_0      ;; 3 cycles
+   \   00005A                       ; ------------------------------------- Block: 9 cycles
+    723                }
+    724                else                  //Otherwise move forward the values of the Rx UART buffer, except the '\n'
+    725                {
+    726                  newLinePosition++;
+   \                     ??CSI00_SendReceiveData_43:
+   \   00005A 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00005C 81                    INC       A                  ;; 1 cycle
+   \   00005D 9800                  MOV       [SP], A            ;; 1 cycle
+    727                  memmove(bufferUARTrx, (bufferUARTrx + newLinePosition), RXcnt - newLinePosition);
+   \   00005F 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000061 76                    MOV       L, A               ;; 1 cycle
+   \   000062 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000064 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   000067 70                    MOV       X, A               ;; 1 cycle
+   \   000068 F1                    CLRB      A                  ;; 1 cycle
+   \   000069 27                    SUBW      AX, HL             ;; 1 cycle
+   \   00006A 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00006B 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00006D 70                    MOV       X, A               ;; 1 cycle
+   \   00006E F1                    CLRB      A                  ;; 1 cycle
+   \   00006F 04....                ADDW      AX, #bufferUARTrx  ;; 1 cycle
+   \   000072 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000073 30....                MOVW      AX, #bufferUARTrx  ;; 1 cycle
+   \   000076 FD....                CALL      memmove            ;; 3 cycles
+    728                  RXcnt = RXcnt - newLinePosition;
+   \   000079 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00007B 70                    MOV       X, A               ;; 1 cycle
+   \   00007C 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   00007F 6128                  SUB       A, X               ;; 1 cycle
+   \   000081 9F....                MOV       N:RXcnt, A         ;; 1 cycle
+    729                  //Clear the rest of the buffer
+    730                  for(i = RXcnt; i < BUFFER_SIZE; i++){
+   \   000084 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   000087                       ; ------------------------------------- Block: 26 cycles
+   \                     ??getUART_1:
+   \   000087 4C80                  CMP       A, #0x80           ;; 1 cycle
+   \   000089 DE69                  BNC       ??CSI00_SendReceiveData_44  ;; 4 cycles
+   \   00008B                       ; ------------------------------------- Block: 5 cycles
+    731                    bufferUARTrx[i] = '\0';
+   \   00008B 73                    MOV       B, A               ;; 1 cycle
+   \   00008C F0                    CLRB      X                  ;; 1 cycle
+   \   00008D 08                    XCH       A, X               ;; 1 cycle
+   \   00008E 18....                MOV       (bufferUARTrx & 0xFFFF)[B], A  ;; 1 cycle
+   \   000091 60                    MOV       A, X               ;; 1 cycle
+    732                  }
+   \   000092 81                    INC       A                  ;; 1 cycle
+   \   000093 EFF2                  BR        S:??getUART_1      ;; 3 cycles
+   \   000095                       ; ------------------------------------- Block: 9 cycles
+    733                }
+    734                
+    735              }
+    736              else if(RXcnt > 20)                 //Copy data if there are more than 20 characters
+   \                     ??CSI00_SendReceiveData_42:
+   \   000095 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   000098 4C15                  CMP       A, #0x15           ;; 1 cycle
+   \   00009A DC50                  BC        ??CSI00_SendReceiveData_45  ;; 4 cycles
+   \   00009C                       ; ------------------------------------- Block: 6 cycles
+    737              {
+    738                memcpy(uartBuffer, bufferUARTrx, 20);
+   \   00009C 34....                MOVW      DE, #bufferUARTrx  ;; 1 cycle
+   \   00009F A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   0000A1 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000A2 5314                  MOV       B, #0x14           ;; 1 cycle
+   \   0000A4 FD....                CALL      N:?MEMCPY_SMALL_NEAR  ;; 3 cycles
+    739                *uartLenght = 20;
+   \   0000A7 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   0000A9 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000AA 5114                  MOV       A, #0x14           ;; 1 cycle
+   \   0000AC 9B                    MOV       [HL], A            ;; 1 cycle
+    740                memmove(bufferUARTrx, (bufferUARTrx + 20), RXcnt - 20);
+   \   0000AD 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   0000B0 70                    MOV       X, A               ;; 1 cycle
+   \   0000B1 F1                    CLRB      A                  ;; 1 cycle
+   \   0000B2 04ECFF                ADDW      AX, #0xFFEC        ;; 1 cycle
+   \   0000B5 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000B6 32....                MOVW      BC, #bufferUARTrx+20  ;; 1 cycle
+   \   0000B9 30....                MOVW      AX, #bufferUARTrx  ;; 1 cycle
+   \   0000BC FD....                CALL      memmove            ;; 3 cycles
+    741                RXcnt = RXcnt - 20;
+   \   0000BF 51EC                  MOV       A, #0xEC           ;; 1 cycle
+   \   0000C1 36....                MOVW      HL, #RXcnt         ;; 1 cycle
+   \   0000C4 0D                    ADD       A, [HL]            ;; 1 cycle
+   \   0000C5 9B                    MOV       [HL], A            ;; 1 cycle
+    742                Serial.println("Serial input truncated");
+   \   0000C6 F7                    CLRW      BC                 ;; 1 cycle
+   \   0000C7                       ; ------------------------------------- Block: 26 cycles
+   \                     ??getUART_2:
+   \   0000C7 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0000CA 75                    MOV       D, A               ;; 1 cycle
+   \   0000CB AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000CD 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   0000D0 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0000D1 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000D2 65                    MOV       A, D               ;; 1 cycle
+   \   0000D3 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0000D4 A3                    INCW      BC                 ;; 1 cycle
+   \   0000D5 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000D6 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0000D9 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000DA DCEB                  BC        ??getUART_2        ;; 4 cycles
+   \   0000DC                       ; ------------------------------------- Block: 16 cycles
+   \   0000DC F3                    CLRB      B                  ;; 1 cycle
+   \   0000DD 30....                MOVW      AX, #`?<Constant "Serial input truncated">`  ;; 1 cycle
+   \   0000E0 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000E1 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   0000E3 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000E4 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0000E7 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0000E8 61EA                  CALL      DE                 ;; 3 cycles
+   \   0000EA EF08                  BR        S:??CSI00_SendReceiveData_44  ;; 3 cycles
+   \   0000EC                       ; ------------------------------------- Block: 13 cycles
+    743              }
+    744              else
+    745              {
+    746                status = false;
+   \                     ??CSI00_SendReceiveData_45:
+   \   0000EC F1                    CLRB      A                  ;; 1 cycle
+   \   0000ED 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   0000EF EF03                  BR        S:??CSI00_SendReceiveData_44  ;; 3 cycles
+   \   0000F1                       ; ------------------------------------- Block: 5 cycles
+    747              }
+    748            }
+    749            else
+    750            {
+    751                status = false;
+   \                     ??CSI00_SendReceiveData_41:
+   \   0000F1 F1                    CLRB      A                  ;; 1 cycle
+   \   0000F2 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   0000F4                       ; ------------------------------------- Block: 2 cycles
+    752            }
+    753            
+    754            SRMK1 = 0U; /* enable INTSR1 interrupt */
+   \                     ??CSI00_SendReceiveData_44:
+   \   0000F4 711BE6                CLR1      0xFFFE6.1          ;; 2 cycles
+    755            
+    756            return status;
+   \   0000F7 8801                  MOV       A, [SP+0x01]       ;; 1 cycle
+   \   0000F9 1008                  ADDW      SP, #0x8           ;; 1 cycle
+   \   0000FB C4                    POP       DE                 ;; 1 cycle
+   \   0000FC D7                    RET                          ;; 6 cycles
+   \   0000FD                       ; ------------------------------------- Block: 11 cycles
+   \   0000FD                       ; ------------------------------------- Total: 190 cycles
+   \   0000FD                       REQUIRE ?CLRL78_V1_0_L00
+   \   0000FD                       REQUIRE _A_MK1
+    757          }
+    758          
+    759          /*
+    760          **-----------------------------------------------------------------------------
+    761          **
+    762          **  Abstract:
+    763          **  This function is INTSR1 interrupt service routine.
+    764          **
+    765          **  Parameters:
+    766          **  None
+    767          **
+    768          **  Returns:
+    769          **  None
+    770          **
+    771          **-----------------------------------------------------------------------------
+    772          */
+    773          #pragma vector = INTSR1_vect
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    774          __interrupt void UARTrxInterrupt(void)
+   \                     UARTrxInterrupt:
+    775          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C1                    PUSH      AX                 ;; 1 cycle
+   \   000001 C3                    PUSH      BC                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+    776            uint8_t rx_data;
+    777          
+    778            rx_data = RXD1;
+   \   000002 8E46                  MOV       A, 0xFFF46         ;; 1 cycle
+   \   000004 70                    MOV       X, A               ;; 1 cycle
+    779            
+    780            //While you have space in the buffer just copy the data received via UART
+    781            if (RXcnt < BUFFER_SIZE)
+   \   000005 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   000008 4C80                  CMP       A, #0x80           ;; 1 cycle
+   \   00000A DE11                  BNC       ??CSI00_SendReceiveData_46  ;; 4 cycles
+   \   00000C                       ; ------------------------------------- Block: 10 cycles
+    782            {
+    783              bufferUARTrx[RXcnt++] = rx_data;
+   \   00000C 8F....                MOV       A, N:RXcnt         ;; 1 cycle
+   \   00000F 73                    MOV       B, A               ;; 1 cycle
+   \   000010 83                    INC       B                  ;; 1 cycle
+   \   000011 618B                  XCH       A, B               ;; 1 cycle
+   \   000013 9F....                MOV       N:RXcnt, A         ;; 1 cycle
+   \   000016 63                    MOV       A, B               ;; 1 cycle
+   \   000017 73                    MOV       B, A               ;; 1 cycle
+   \   000018 60                    MOV       A, X               ;; 1 cycle
+   \   000019 18....                MOV       (bufferUARTrx & 0xFFFF)[B], A  ;; 1 cycle
+   \   00001C 70                    MOV       X, A               ;; 1 cycle
+   \   00001D                       ; ------------------------------------- Block: 10 cycles
+    784            }
+    785          }
+   \                     ??CSI00_SendReceiveData_46:
+   \   00001D C2                    POP       BC                 ;; 1 cycle
+   \   00001E C0                    POP       AX                 ;; 1 cycle
+   \   00001F 61FC                  RETI                         ;; 6 cycles
+   \   000021                       ; ------------------------------------- Block: 8 cycles
+   \   000021                       ; ------------------------------------- Total: 28 cycles
+   \   000021                       REQUIRE ?CLRL78_V1_0_L00
+   \   000021                       REQUIRE _A_SDR03
+    786          
+    787          /*
+    788          **-----------------------------------------------------------------------------
+    789          **
+    790          **  Abstract:
+    791          **  This function initializes the CSI00 module.
+    792          **
+    793          **  Parameters:
+    794          **  None
+    795          **
+    796          **  Returns:
+    797          **  None
+    798          **
+    799          **-----------------------------------------------------------------------------
+    800          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    801          void CSI00_Init(void)
+   \                     CSI00_Init:
+    802          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    803            ST0 |= _0001_SAU_CH0_STOP_TRG_ON; /* disable CSI00 */
+   \   000000 362401                MOVW      HL, #0x124         ;; 1 cycle
+   \   000003 7182                  SET1      [HL].0             ;; 2 cycles
+    804            CSIMK00 = 1U; /* disable INTCSI00 interrupt */
+   \   000005 715AE5                SET1      0xFFFE5.5          ;; 2 cycles
+    805            CSIIF00 = 0U; /* clear INTCSI00 interrupt flag */
+   \   000008 715BE1                CLR1      0xFFFE1.5          ;; 2 cycles
+    806            /* Set INTCSI00 low priority */
+    807            CSIPR100 = 1U;
+   \   00000B 715AED                SET1      0xFFFED.5          ;; 2 cycles
+    808            CSIPR000 = 1U;
+   \   00000E 715AE9                SET1      0xFFFE9.5          ;; 2 cycles
+    809            SMR00 = _0020_SAU_SMRMN_INITIALVALUE | _0000_SAU_CLOCK_SELECT_CK00 | _0000_SAU_CLOCK_MODE_CKS | _0000_SAU_TRIGGER_SOFTWARE | _0000_SAU_MODE_CSI | _0000_SAU_TRANSFER_END;
+   \   000011 302000                MOVW      AX, #0x20          ;; 1 cycle
+   \   000014 BF1001                MOVW      0x110, AX          ;; 1 cycle
+    810            SCR00 = _C000_SAU_RECEPTION_TRANSMISSION | _3000_SAU_TIMING_4 | _0080_SAU_LSB | _0007_SAU_LENGTH_8;
+   \   000017 3087F0                MOVW      AX, #0xF087        ;; 1 cycle
+   \   00001A BF1801                MOVW      0x118, AX          ;; 1 cycle
+    811            SDR00 = _0000_CSI00_DIVISOR;
+   \   00001D C9100000              MOVW      S:0xFFF10, #0x0    ;; 1 cycle
+    812            //CK0 is 4Mhz and divisor by default is 2, final freq is 2Mhz
+    813            SO0 |= _0100_SAU_CH0_CLOCK_OUTPUT_1;  /* CSI00 clock initial level */
+   \   000021 AF2801                MOVW      AX, 0x128          ;; 1 cycle
+   \   000024 6C01                  OR        A, #0x1            ;; 1 cycle
+   \   000026 08                    XCH       A, X               ;; 1 cycle
+   \   000027 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   000029 08                    XCH       A, X               ;; 1 cycle
+   \   00002A BF2801                MOVW      0x128, AX          ;; 1 cycle
+    814            SO0 &= ~_0001_SAU_CH0_DATA_OUTPUT_1;  /* CSI00 SO initial level */
+   \   00002D AF2801                MOVW      AX, 0x128          ;; 1 cycle
+   \   000030 5CFF                  AND       A, #0xFF           ;; 1 cycle
+   \   000032 08                    XCH       A, X               ;; 1 cycle
+   \   000033 5CFE                  AND       A, #0xFE           ;; 1 cycle
+   \   000035 08                    XCH       A, X               ;; 1 cycle
+   \   000036 BF2801                MOVW      0x128, AX          ;; 1 cycle
+    815            SOE0 |= _0001_SAU_CH0_OUTPUT_ENABLE;  /* enable CSI00 output */
+   \   000039 362A01                MOVW      HL, #0x12A         ;; 1 cycle
+   \   00003C 7182                  SET1      [HL].0             ;; 2 cycles
+    816            /* Set SI00 pin */
+    817            PM1 |= 0x02U;
+   \   00003E 711A21                SET1      0xFFF21.1          ;; 2 cycles
+    818            /* Set SO00 pin */
+    819            P1 |= 0x04U;
+   \   000041 712201                SET1      S:0xFFF01.2        ;; 2 cycles
+    820            PM1 &= 0xFBU;
+   \   000044 712B21                CLR1      0xFFF21.2          ;; 2 cycles
+    821            /* Set SCK00 pin */
+    822            P1 |= 0x01U;
+   \   000047 710201                SET1      S:0xFFF01.0        ;; 2 cycles
+    823            PM1 &= 0xFEU;
+   \   00004A 710B21                CLR1      0xFFF21.0          ;; 2 cycles
+    824          }
+   \   00004D D7                    RET                          ;; 6 cycles
+   \   00004E                       ; ------------------------------------- Block: 47 cycles
+   \   00004E                       ; ------------------------------------- Total: 47 cycles
+   \   00004E                       REQUIRE ?CLRL78_V1_0_L00
+   \   00004E                       REQUIRE _A_ST0
+   \   00004E                       REQUIRE _A_MK0
+   \   00004E                       REQUIRE _A_IF0
+   \   00004E                       REQUIRE _A_PR10
+   \   00004E                       REQUIRE _A_PR00
+   \   00004E                       REQUIRE _A_SMR00
+   \   00004E                       REQUIRE _A_SCR00
+   \   00004E                       REQUIRE _A_SDR00
+   \   00004E                       REQUIRE _A_SO0
+   \   00004E                       REQUIRE _A_SOE0
+   \   00004E                       REQUIRE _A_PM1
+   \   00004E                       REQUIRE _A_P1
+    825          /*
+    826          **-----------------------------------------------------------------------------
+    827          **
+    828          **  Abstract:
+    829          **  This function starts the CSI00 module operation.
+    830          **
+    831          **  Parameters:
+    832          **  None
+    833          **
+    834          **  Returns:
+    835          **  None
+    836          **
+    837          **-----------------------------------------------------------------------------
+    838          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    839          void CSI00_Start(void)
+   \                     CSI00_Start:
+    840          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    841            CSIIF00 = 0U; /* clear INTCSI00 interrupt flag */
+   \   000000 715BE1                CLR1      0xFFFE1.5          ;; 2 cycles
+    842            #if defined (SPI_INTERRUPT)
+    843            CSIMK00 = 0U; /* enable INTCSI00 */
+    844            #endif
+    845            SO0 |= _0100_SAU_CH0_CLOCK_OUTPUT_1;  /* CSI00 clock initial level */
+   \   000003 AF2801                MOVW      AX, 0x128          ;; 1 cycle
+   \   000006 6C01                  OR        A, #0x1            ;; 1 cycle
+   \   000008 08                    XCH       A, X               ;; 1 cycle
+   \   000009 6C00                  OR        A, #0x0            ;; 1 cycle
+   \   00000B 08                    XCH       A, X               ;; 1 cycle
+   \   00000C BF2801                MOVW      0x128, AX          ;; 1 cycle
+    846            SO0 &= ~_0001_SAU_CH0_DATA_OUTPUT_1;  /* CSI00 SO initial level */
+   \   00000F AF2801                MOVW      AX, 0x128          ;; 1 cycle
+   \   000012 5CFF                  AND       A, #0xFF           ;; 1 cycle
+   \   000014 08                    XCH       A, X               ;; 1 cycle
+   \   000015 5CFE                  AND       A, #0xFE           ;; 1 cycle
+   \   000017 08                    XCH       A, X               ;; 1 cycle
+   \   000018 BF2801                MOVW      0x128, AX          ;; 1 cycle
+    847            SOE0 |= _0001_SAU_CH0_OUTPUT_ENABLE;  /* enable CSI00 output */
+   \   00001B 362A01                MOVW      HL, #0x12A         ;; 1 cycle
+   \   00001E 7182                  SET1      [HL].0             ;; 2 cycles
+    848            SS0 |= _0001_SAU_CH0_START_TRG_ON;  /* enable CSI00 */
+   \   000020 362201                MOVW      HL, #0x122         ;; 1 cycle
+   \   000023 7182                  SET1      [HL].0             ;; 2 cycles
+    849          }
+   \   000025 D7                    RET                          ;; 6 cycles
+   \   000026                       ; ------------------------------------- Block: 26 cycles
+   \   000026                       ; ------------------------------------- Total: 26 cycles
+   \   000026                       REQUIRE ?CLRL78_V1_0_L00
+   \   000026                       REQUIRE _A_IF0
+   \   000026                       REQUIRE _A_SO0
+   \   000026                       REQUIRE _A_SOE0
+   \   000026                       REQUIRE _A_SS0
+    850          /*
+    851          **-----------------------------------------------------------------------------
+    852          **
+    853          **  Abstract:
+    854          **  This function stops the CSI00 module operation.
+    855          **
+    856          **  Parameters:
+    857          **  None
+    858          **
+    859          **  Returns:
+    860          **  None
+    861          **
+    862          **-----------------------------------------------------------------------------
+    863          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    864          void CSI00_Stop(void)
+   \                     CSI00_Stop:
+    865          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    866            ST0 |= _0001_SAU_CH0_STOP_TRG_ON; /* disable CSI00 */
+   \   000000 362401                MOVW      HL, #0x124         ;; 1 cycle
+   \   000003 7182                  SET1      [HL].0             ;; 2 cycles
+    867            SOE0 &= ~_0001_SAU_CH0_OUTPUT_ENABLE; /* disable CSI00 output */
+   \   000005 362A01                MOVW      HL, #0x12A         ;; 1 cycle
+   \   000008 7183                  CLR1      [HL].0             ;; 2 cycles
+    868            CSIMK00 = 1U; /* disable INTCSI00 interrupt */
+   \   00000A 715AE5                SET1      0xFFFE5.5          ;; 2 cycles
+    869            CSIIF00 = 0U; /* clear INTCSI00 interrupt flag */
+   \   00000D 715BE1                CLR1      0xFFFE1.5          ;; 2 cycles
+    870          }
+   \   000010 D7                    RET                          ;; 6 cycles
+   \   000011                       ; ------------------------------------- Block: 16 cycles
+   \   000011                       ; ------------------------------------- Total: 16 cycles
+   \   000011                       REQUIRE ?CLRL78_V1_0_L00
+   \   000011                       REQUIRE _A_ST0
+   \   000011                       REQUIRE _A_SOE0
+   \   000011                       REQUIRE _A_MK0
+   \   000011                       REQUIRE _A_IF0
+    871          /*
+    872          **-----------------------------------------------------------------------------
+    873          **
+    874          **  Abstract:
+    875          **  This function sends and receives CSI00 data.
+    876          **
+    877          **  Parameters:
+    878          **  txbuf: transfer buffer pointer
+    879          **  txnum: buffer size
+    880          **  rxbuf: receive buffer pointer
+    881          **
+    882          **  Returns:
+    883          **  MD_OK
+    884          **  MD_ARGERROR
+    885          **
+    886          **-----------------------------------------------------------------------------
+    887          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    888          uint8_t CSI00_SendReceiveData(UCHAR txByte)
+   \                     CSI00_SendReceiveData:
+    889          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    890            
+    891            #if defined (SPI_NO_INTERRUPT)
+    892              //SPI With no interruption
+    893              CSIIF00 = 0;     //Clear flag of SPI transmission/reception end (interruption flag)
+   \   000000 715BE1                CLR1      0xFFFE1.5          ;; 2 cycles
+    894              SIO00 = txByte;  //Started by writing data to SDR[7:0]
+   \   000003 9D10                  MOV       S:0xFFF10, A       ;; 1 cycle
+   \   000005                       ; ------------------------------------- Block: 3 cycles
+    895          
+    896              while(CSIIF00 == 0);
+   \                     ??CSI00_SendReceiveData_47:
+   \   000005 36E1FF                MOVW      HL, #0xFFFE1       ;; 1 cycle
+   \   000008 31D5FA                BF        [HL].5, ??CSI00_SendReceiveData_47  ;; 5 cycles
+   \   00000B                       ; ------------------------------------- Block: 6 cycles
+    897              RxSPIByte = SIO00;
+   \   00000B 8D10                  MOV       A, S:0xFFF10       ;; 1 cycle
+   \   00000D 9F....                MOV       N:RxSPIByte, A     ;; 1 cycle
+    898              
+    899            #elif defined (SPI_INTERRUPT)
+    900              //SPI with interruption
+    901              
+    902              flagSPIdone = false;
+    903              uint8_t dummy = 0;
+    904              
+    905              CSIMK00 = 1U;    // disable INTCSI00 interrupt
+    906              SIO00 = txByte;  // started by writing data to SDR[7:0]
+    907              CSIMK00 = 0U;    // enable INTCSI00 interrupt
+    908          
+    909              while(flagSPIdone);
+    910              
+    911              //Small delay for the interrupt to work properly.
+    912              //Refer to RL78 web forum for more details
+    913              for(dummy = 0 ; dummy < 10; dummy++);
+    914            #endif
+    915            
+    916            return RxSPIByte;
+   \   000010 8F....                MOV       A, N:RxSPIByte     ;; 1 cycle
+   \   000013 D7                    RET                          ;; 6 cycles
+   \   000014                       ; ------------------------------------- Block: 9 cycles
+   \   000014                       ; ------------------------------------- Total: 18 cycles
+   \   000014                       REQUIRE ?CLRL78_V1_0_L00
+   \   000014                       REQUIRE _A_IF0
+   \   000014                       REQUIRE _A_SDR00
+    917          }
+
+   \                                 In  segment INTVEC, offset 0x24, root
+   \                     `??UARTtxInterrupt??INTVEC 36`:
+   \   000024 ....                  DW UARTtxInterrupt
+
+   \                                 In  segment INTVEC, offset 0x26, root
+   \                     `??UARTrxInterrupt??INTVEC 38`:
+   \   000026 ....                  DW UARTrxInterrupt
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Serial input truncated">`:
+   \   000000 53657269616C          DB "Serial input truncated"
+   \   000017 00                    DB 0
+    918          
+    919          /*
+    920          **-----------------------------------------------------------------------------
+    921          **
+    922          **  Abstract:
+    923          **  This function is INTCSI00 interrupt service routine.
+    924          **
+    925          **  Parameters:
+    926          **  None
+    927          **
+    928          **  Returns:
+    929          **  None
+    930          **
+    931          **-----------------------------------------------------------------------------
+    932          */
+    933          
+    934          #if defined (SPI_INTERRUPT)
+    935          
+    936          #pragma vector = INTCSI00_vect
+    937          __interrupt void MD_INTCSI00(void)
+    938          {
+    939             
+    940            RxSPIByte = SIO00;
+    941            flagSPIdone = true;
+    942            
+    943          }
+    944          
+    945          #endif
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      0   CSI00_Init
+      0   CSI00_SendReceiveData
+      0   CSI00_Start
+      0   CSI00_Stop
+      0   SAU0_Init
+        0   -> CSI00_Init
+        0   -> CSI00_Start
+        0   -> UART1_Init
+        0   -> UART1_Start
+      0   UART1_Init
+      0   UART1_Start
+      0   UART1_Stop
+      4   UARTrxInterrupt
+      4   UARTtxInterrupt
+      2   existsNewLine
+     10   getUART
+       10   -- Indirect call
+       10   -> existsNewLine
+       10   -> memmove
+      8   initializeSerialMonitor
+      8   printDec
+        8   -> delay
+        8   -> memmove
+      8   printHex
+        8   -> delay
+        8   -> memmove
+     10   printString
+       10   -> delay
+       10   -> memmove
+       10   -> strlen
+      0   selectPrint
+        0   -> printDec
+        0   -> printHex
+        0   -> printString
+      0   selectPrintln
+        0   -> printDec
+        0   -> printHex
+        0   -> printString
+      2   writeByte
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      24  ?<Constant "Serial input truncated">
+       2  ??UARTrxInterrupt??INTVEC 38
+       2  ??UARTtxInterrupt??INTVEC 36
+      78  CSI00_Init
+      20  CSI00_SendReceiveData
+      38  CSI00_Start
+      17  CSI00_Stop
+       1  RXcnt
+       1  RxSPIByte
+      28  SAU0_Init
+       6  Serial
+       1  TXcnt
+     116  UART1_Init
+      45  UART1_Start
+      30  UART1_Stop
+      33  UARTrxInterrupt
+      34  UARTtxInterrupt
+       2  _A_IF0
+       2  _A_IF1
+       2  _A_MK0
+       2  _A_MK1
+       1  _A_NFEN0
+       1  _A_P0
+       1  _A_P1
+       1  _A_PER0
+       1  _A_PM0
+       1  _A_PM1
+       1  _A_PMC0
+       2  _A_PR00
+       2  _A_PR01
+       2  _A_PR10
+       2  _A_PR11
+       2  _A_SCR00
+       2  _A_SCR02
+       2  _A_SCR03
+       2  _A_SDR00
+       2  _A_SDR02
+       2  _A_SDR03
+       2  _A_SMR00
+       2  _A_SMR02
+       2  _A_SMR03
+       2  _A_SO0
+       2  _A_SOE0
+       2  _A_SOL0
+       2  _A_SPS0
+       2  _A_SS0
+       2  _A_ST0
+       2  addByte
+     128  bufferUARTrx
+     128  bufferUARTtx
+      27  existsNewLine
+     253  getUART
+     107  initializeSerialMonitor
+     368  printDec
+     320  printHex
+     391  printString
+      38  selectPrint
+      38  selectPrintln
+      16  tableAscii
+      80  writeByte
+
+ 
+ 2 061 bytes in segment CODE
+     4 bytes in segment INTVEC
+    49 bytes in segment NEAR_A
+    40 bytes in segment NEAR_CONST
+   267 bytes in segment NEAR_Z
+     4 bytes in segment SADDR_A
+ 
+ 2 061 bytes of CODE  memory (+  4 bytes shared)
+    40 bytes of CONST memory
+   267 bytes of DATA  memory (+ 53 bytes shared)
+
+Errors: none
+Warnings: 6

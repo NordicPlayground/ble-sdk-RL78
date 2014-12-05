@@ -1,0 +1,1135 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 05/Dec/2014  14:43:21
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\main.c
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\main.c"
+#        --core rl78_1 --code_model near --data_model near
+#        --near_const_location rom0 -o "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\main.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\main.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\main.c
+      1          /* Copyright (c) 2014, Nordic Semiconductor ASA
+      2           *
+      3           * Permission is hereby granted, free of charge, to any person obtaining a copy
+      4           * of this software and associated documentation files (the "Software"), to deal
+      5           * in the Software without restriction, including without limitation the rights
+      6           * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      7           * copies of the Software, and to permit persons to whom the Software is
+      8           * furnished to do so, subject to the following conditions:
+      9           *
+     10           * The above copyright notice and this permission notice shall be included in all
+     11           * copies or substantial portions of the Software.
+     12           *
+     13           * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     14           * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     15           * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     16           * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     17           * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     18           * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+     19           * SOFTWARE.
+     20           */
+     21          
+     22          /**
+     23           * echo project to verify the SPI/ACI connectivity
+     24           */
+     25          
+     26          /** @defgroup my_project my_project
+     27          @{
+     28          @ingroup projects
+     29          @brief Echo project to loop data from the mcu to the nRF800 and back
+     30          
+     31          @details
+     32          This project is a test project to verify the SPI/ACI.
+     33          The data in the ACI echo command send and the data
+     34          received in the ACI echo event should be the same.
+     35          
+     36          
+     37           */
+     38          
+     39           /*
+     40          *******************************************************************************
+     41          **  HEADERS
+     42          *******************************************************************************
+     43          */
+     44          #define DEBUG_ENABLE CODED_TRACES
+     45          #include <lib_aci.h>
+     46          
+     47          /*
+     48          *******************************************************************************
+     49          **  OPTION BYTES CONFIGURATION
+     50          *******************************************************************************
+     51          */
+     52          /* Set option bytes */
+     53          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     54          __root const UCHAR opbyte0 = 0xEFU;
+   \                     opbyte0:
+   \   000000 EF                    DB 239
+     55          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     56          __root const UCHAR opbyte1 = 0x73U;
+   \                     opbyte1:
+   \   000000 73                    DB 115
+     57          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     58          __root const UCHAR opbyte2 = 0xE8U;
+   \                     opbyte2:
+   \   000000 E8                    DB 232
+     59          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     60          __root const UCHAR opbyte3 = 0x85U;
+   \                     opbyte3:
+   \   000000 85                    DB 133
+     61          
+     62          /* Set security ID */
+     63          #pragma location = "SECUID"
+
+   \                                 In  segment SECUID, align 2, root
+     64          __root const UCHAR secuid[10] = 
+   \                     secuid:
+   \   000000 FFFFFFFFFFFF          DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+     65            {0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU};
+     66          
+     67          // aci_struct that will contain
+     68          // total initial credits
+     69          // current credit
+     70          // current state of the aci (setup/standby/active/sleep)
+     71          // open remote pipe pending
+     72          // close remote pipe pending
+     73          // Current pipe available bitmap
+     74          // Current pipe closed bitmap
+     75          // Current connection interval, slave latency and link supervision timeout
+     76          // Current State of the the GATT client (Service Discovery)
+     77          // Status of the bond (R) Peer address
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     78          static struct aci_state_t aci_state;
+   \                     aci_state:
+   \   000000                       DS 45
+   \   00002D                       REQUIRE __INIT_NEAR_Z
+     79          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     80          static hal_aci_evt_t aci_data;
+   \                     aci_data:
+   \   000000                       DS 34
+   \   000022                       REQUIRE __INIT_NEAR_Z
+     81          
+
+   \                                 In  segment NEAR_CONST, align 2
+     82          const uint8_t echo_data[] = { 0x00, 0xaa, 0x55, 0xff, 0x77, 0x55, 0x33, 0x22, 0x11, 0x44, 0x66, 0x88, 0x99, 0xbb, 0xdd, 0xcc, 0x00, 0xaa, 0x55, 0xff };
+   \                     echo_data:
+   \   000000 00AA55FF7755          DB 0, 170, 85, 255, 119, 85, 51, 34, 17, 68, 102, 136, 153, 187, 221
+   \   00000F CC00AA55FF            DB 204, 0, 170, 85, 255
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     83          static uint8_t aci_echo_cmd = 0;
+   \                     aci_echo_cmd:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+     84          
+     85          #define NUM_ECHO_CMDS    3
+     86          
+     87          /* Define how assert should function in the BLE library */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     88          void __ble_assert(const char *file, uint16_t line)
+   \                     __ble_assert:
+     89          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 14
+   \   000003 200A                  SUBW      SP, #0xA           ;; 1 cycle
+     90            Serial.print("ERROR ");
+   \   000005 F7                    CLRW      BC                 ;; 1 cycle
+   \   000006                       ; ------------------------------------- Block: 5 cycles
+   \                     ??__ble_assert_0:
+   \   000006 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000009 75                    MOV       D, A               ;; 1 cycle
+   \   00000A AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00000C 040800                ADDW      AX, #0x8           ;; 1 cycle
+   \   00000F 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000010 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000011 65                    MOV       A, D               ;; 1 cycle
+   \   000012 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000013 A3                    INCW      BC                 ;; 1 cycle
+   \   000014 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000015 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000018 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000019 DCEB                  BC        ??__ble_assert_0   ;; 4 cycles
+   \   00001B                       ; ------------------------------------- Block: 16 cycles
+   \   00001B F3                    CLRB      B                  ;; 1 cycle
+   \   00001C 30....                MOVW      AX, #`?<Constant "ERROR ">`  ;; 1 cycle
+   \   00001F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000020 A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   000022 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000023 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000026 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000027 61EA                  CALL      DE                 ;; 3 cycles
+     91            Serial.print(file);
+   \   000029 F7                    CLRW      BC                 ;; 1 cycle
+   \   00002A                       ; ------------------------------------- Block: 11 cycles
+   \                     ??__ble_assert_1:
+   \   00002A 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   00002D 75                    MOV       D, A               ;; 1 cycle
+   \   00002E AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000030 040600                ADDW      AX, #0x6           ;; 1 cycle
+   \   000033 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000034 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000035 65                    MOV       A, D               ;; 1 cycle
+   \   000036 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000037 A3                    INCW      BC                 ;; 1 cycle
+   \   000038 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000039 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00003C 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00003D DCEB                  BC        ??__ble_assert_1   ;; 4 cycles
+   \   00003F                       ; ------------------------------------- Block: 16 cycles
+   \   00003F F3                    CLRB      B                  ;; 1 cycle
+   \   000040 A80C                  MOVW      AX, [SP+0x0C]      ;; 1 cycle
+   \   000042 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000043 A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   000045 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000046 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000049 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00004A 61EA                  CALL      DE                 ;; 3 cycles
+     92            Serial.print(": ");
+   \   00004C F7                    CLRW      BC                 ;; 1 cycle
+   \   00004D                       ; ------------------------------------- Block: 11 cycles
+   \                     ??__ble_assert_2:
+   \   00004D 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000050 75                    MOV       D, A               ;; 1 cycle
+   \   000051 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000053 040400                ADDW      AX, #0x4           ;; 1 cycle
+   \   000056 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000057 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000058 65                    MOV       A, D               ;; 1 cycle
+   \   000059 9B                    MOV       [HL], A            ;; 1 cycle
+   \   00005A A3                    INCW      BC                 ;; 1 cycle
+   \   00005B 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00005C 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00005F 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000060 DCEB                  BC        ??__ble_assert_2   ;; 4 cycles
+   \   000062                       ; ------------------------------------- Block: 16 cycles
+   \   000062 F3                    CLRB      B                  ;; 1 cycle
+   \   000063 30....                MOVW      AX, #`?<Constant ": ">`  ;; 1 cycle
+   \   000066 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000067 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000069 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00006A CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   00006D 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00006E 61EA                  CALL      DE                 ;; 3 cycles
+     93            Serial.print(line);
+   \   000070 F7                    CLRW      BC                 ;; 1 cycle
+   \   000071                       ; ------------------------------------- Block: 11 cycles
+   \                     ??__ble_assert_3:
+   \   000071 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000074 75                    MOV       D, A               ;; 1 cycle
+   \   000075 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000077 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   00007A 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00007B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007C 65                    MOV       A, D               ;; 1 cycle
+   \   00007D 9B                    MOV       [HL], A            ;; 1 cycle
+   \   00007E A3                    INCW      BC                 ;; 1 cycle
+   \   00007F 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000080 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000083 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000084 DCEB                  BC        ??__ble_assert_3   ;; 4 cycles
+   \   000086                       ; ------------------------------------- Block: 16 cycles
+   \   000086 F3                    CLRB      B                  ;; 1 cycle
+   \   000087 A80A                  MOVW      AX, [SP+0x0A]      ;; 1 cycle
+   \   000089 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00008A A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00008C 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00008D CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000090 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000091 61EA                  CALL      DE                 ;; 3 cycles
+     94            Serial.print("\n");
+   \   000093 F7                    CLRW      BC                 ;; 1 cycle
+   \   000094                       ; ------------------------------------- Block: 11 cycles
+   \                     ??__ble_assert_4:
+   \   000094 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000097 75                    MOV       D, A               ;; 1 cycle
+   \   000098 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00009A 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   00009D 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00009E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00009F 65                    MOV       A, D               ;; 1 cycle
+   \   0000A0 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0000A1 A3                    INCW      BC                 ;; 1 cycle
+   \   0000A2 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000A3 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0000A6 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000A7 DCEB                  BC        ??__ble_assert_4   ;; 4 cycles
+   \   0000A9                       ; ------------------------------------- Block: 16 cycles
+   \   0000A9 F3                    CLRB      B                  ;; 1 cycle
+   \   0000AA 30....                MOVW      AX, #`?<Constant "\\n">`  ;; 1 cycle
+   \   0000AD 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000AE A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0000B0 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000B1 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0000B4 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0000B5 61EA                  CALL      DE                 ;; 3 cycles
+   \   0000B7                       ; ------------------------------------- Block: 10 cycles
+     95            while(1);
+   \                     ??__ble_assert_5:
+   \   0000B7 EFFE                  BR        S:??__ble_assert_5  ;; 3 cycles
+   \   0000B9                       ; ------------------------------------- Block: 3 cycles
+   \   0000B9                       ; ------------------------------------- Total: 142 cycles
+   \   0000B9                       REQUIRE ?CLRL78_V1_0_L00
+     96          }
+     97          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     98          void setup(void)
+   \                     setup:
+     99          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 4
+   \   000002 2004                  SUBW      SP, #0x4           ;; 1 cycle
+    100            #if defined(__ICCRL78__)
+    101              //The Serial monitor is configured as 9600, 8 data bit, 1 stop bit, no parity
+    102              //and is configured on the systeminit() at CG_systeminit.c
+    103              //This call just initializes the structure needed for sending data using 
+    104              //the same functions name as in Arduino
+    105              initializeSerialMonitor(&Serial);
+   \   000004 30....                MOVW      AX, #Serial        ;; 1 cycle
+   \   000007 FD....                CALL      initializeSerialMonitor  ;; 3 cycles
+    106            #else
+    107              Serial.begin(115200);
+    108              //Wait until the serial port is available (useful only for the Leonardo)
+    109              //As the Leonardo board is not reseted every time you open the Serial Monitor
+    110              #if defined (__AVR_ATmega32U4__)
+    111                while(!Serial)
+    112                {}
+    113                delay(5000);  //5 seconds delay for enabling to see the start up comments on the serial board
+    114              #elif defined(__PIC32MX__)
+    115                delay(1000);
+    116              #endif
+    117            #endif
+    118            
+    119            Serial.println(F("Arduino setup"));
+   \   00000A F7                    CLRW      BC                 ;; 1 cycle
+   \   00000B                       ; ------------------------------------- Block: 8 cycles
+   \                     ??setup_0:
+   \   00000B 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   00000E 75                    MOV       D, A               ;; 1 cycle
+   \   00000F AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000011 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   000014 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000015 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000016 65                    MOV       A, D               ;; 1 cycle
+   \   000017 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000018 A3                    INCW      BC                 ;; 1 cycle
+   \   000019 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00001A 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00001D 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00001E DCEB                  BC        ??setup_0          ;; 4 cycles
+   \   000020                       ; ------------------------------------- Block: 16 cycles
+   \   000020 F3                    CLRB      B                  ;; 1 cycle
+   \   000021 30....                MOVW      AX, #`?<Constant "Arduino setup">`  ;; 1 cycle
+   \   000024 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000025 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000027 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000028 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   00002B 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00002C 61EA                  CALL      DE                 ;; 3 cycles
+    120          
+    121            /*
+    122            Tell the ACI library, the MCU to nRF8001 pin connections.
+    123            The Active pin is optional and can be marked UNUSED
+    124            */
+    125            aci_state.aci_pins.board_name = BOARD_DEFAULT; //See board.h for details REDBEARLAB_SHIELD_V1_1 or BOARD_DEFAULT
+   \   00002E F5....                CLRB      N:aci_state        ;; 1 cycle
+    126            aci_state.aci_pins.reqn_pin   = ACI_REQN; 
+   \   000031 CF......              MOV       N:aci_state+1, #0x3  ;; 1 cycle
+    127            aci_state.aci_pins.rdyn_pin   = ACI_RDYN; 
+   \   000035 CF......              MOV       N:aci_state+2, #0x4  ;; 1 cycle
+    128            aci_state.aci_pins.mosi_pin   = ACI_MOSI;
+   \   000039 F5....                CLRB      N:aci_state+3      ;; 1 cycle
+    129            aci_state.aci_pins.miso_pin   = ACI_MISO;
+   \   00003C E5....                ONEB      N:aci_state+4      ;; 1 cycle
+    130            aci_state.aci_pins.sck_pin    = ACI_SCLK;
+   \   00003F CF......              MOV       N:aci_state+5, #0x2  ;; 1 cycle
+    131          
+    132            aci_state.aci_pins.spi_clock_divider      = SPI_CLOCK_DIV8;//SPI_CLOCK_DIV8  = 2MHz SPI speed
+   \   000043 F5....                CLRB      N:aci_state+6      ;; 1 cycle
+    133                                                                       //SPI_CLOCK_DIV16 = 1MHz SPI speed
+    134          
+    135            aci_state.aci_pins.reset_pin              = ACI_RESET;
+   \   000046 CF......              MOV       N:aci_state+7, #0x5  ;; 1 cycle
+    136            aci_state.aci_pins.active_pin             = UNUSED;
+   \   00004A CF......              MOV       N:aci_state+8, #0xFF  ;; 1 cycle
+    137            aci_state.aci_pins.optional_chip_sel_pin  = UNUSED;
+   \   00004E CF......              MOV       N:aci_state+9, #0xFF  ;; 1 cycle
+    138          
+    139            aci_state.aci_pins.interface_is_interrupt = false;
+   \   000052 F5....                CLRB      N:aci_state+10     ;; 1 cycle
+    140            aci_state.aci_pins.interrupt_number       = 1;
+   \   000055 E5....                ONEB      N:aci_state+11     ;; 1 cycle
+    141          
+    142            //The second parameter is for turning debug printing on for the ACI Commands and Events so they be printed on the Serial
+    143            hal_aci_tl_init(&(aci_state.aci_pins),true);
+   \   000058 E3                    ONEB      B                  ;; 1 cycle
+   \   000059 30....                MOVW      AX, #aci_state     ;; 1 cycle
+   \   00005C FD....                CALL      hal_aci_tl_init    ;; 3 cycles
+    144            Serial.println(F("nRF8001 Reset done"));
+   \   00005F F7                    CLRW      BC                 ;; 1 cycle
+   \   000060                       ; ------------------------------------- Block: 28 cycles
+   \                     ??setup_1:
+   \   000060 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   000063 75                    MOV       D, A               ;; 1 cycle
+   \   000064 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000066 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   000069 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00006A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00006B 65                    MOV       A, D               ;; 1 cycle
+   \   00006C 9B                    MOV       [HL], A            ;; 1 cycle
+   \   00006D A3                    INCW      BC                 ;; 1 cycle
+   \   00006E 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00006F 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000072 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000073 DCEB                  BC        ??setup_1          ;; 4 cycles
+   \   000075                       ; ------------------------------------- Block: 16 cycles
+   \   000075 F3                    CLRB      B                  ;; 1 cycle
+   \   000076 30....                MOVW      AX, #`?<Constant "nRF8001 Reset done">`  ;; 1 cycle
+   \   000079 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007A A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00007C 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00007D CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000080 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000081 61EA                  CALL      DE                 ;; 3 cycles
+    145          }
+   \   000083 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   000085 C4                    POP       DE                 ;; 1 cycle
+   \   000086 C2                    POP       BC                 ;; 1 cycle
+   \   000087 D7                    RET                          ;; 6 cycles
+   \   000088                       ; ------------------------------------- Block: 19 cycles
+   \   000088                       ; ------------------------------------- Total: 87 cycles
+   \   000088                       REQUIRE ?CLRL78_V1_0_L00
+    146          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    147          void loop()
+   \                     loop:
+    148          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 24
+   \   000002 2018                  SUBW      SP, #0x18          ;; 1 cycle
+    149            // We enter the if statement only when there is a ACI event available to be processed
+    150            if (lib_aci_event_get(&aci_state, &aci_data))
+   \   000004 32....                MOVW      BC, #aci_data      ;; 1 cycle
+   \   000007 30....                MOVW      AX, #aci_state     ;; 1 cycle
+   \   00000A FD....                CALL      lib_aci_event_get  ;; 3 cycles
+   \   00000D D1                    CMP0      A                  ;; 1 cycle
+   \   00000E 61F8                  SKNZ                         ;; 4 cycles
+   \   000010 ED....                BR        N:??main_0         ;; 4 cycles
+   \   000013                       ; ------------------------------------- Block: 13 cycles
+    151            {
+    152              aci_evt_t * aci_evt;
+    153              aci_evt = &aci_data.evt;
+   \   000013 30....                MOVW      AX, #aci_data+1    ;; 1 cycle
+   \   000016 B800                  MOVW      [SP], AX           ;; 1 cycle
+    154              switch(aci_evt->evt_opcode)
+   \   000018 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00001A A1                    INCW      AX                 ;; 1 cycle
+   \   00001B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001D 2C81                  SUB       A, #0x81           ;; 1 cycle
+   \   00001F DD10                  BZ        ??main_1           ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 11 cycles
+   \   000021 91                    DEC       A                  ;; 1 cycle
+   \   000022 61F8                  SKNZ                         ;; 4 cycles
+   \   000024 ED....                BR        N:??main_2         ;; 4 cycles
+   \   000027                       ; ------------------------------------- Block: 5 cycles
+   \   000027 2C02                  SUB       A, #0x2            ;; 1 cycle
+   \   000029 61F8                  SKNZ                         ;; 4 cycles
+   \   00002B ED....                BR        N:??main_3         ;; 4 cycles
+   \   00002E                       ; ------------------------------------- Block: 5 cycles
+   \   00002E ED....                BR        N:??main_0         ;; 3 cycles
+   \   000031                       ; ------------------------------------- Block: 3 cycles
+    155              {
+    156                /**
+    157                As soon as you reset the nRF8001 you will get an ACI Device Started Event
+    158                */
+    159                case ACI_EVT_DEVICE_STARTED:
+    160                {
+    161                  aci_state.data_credit_available = aci_evt->params.device_started.credit_available;
+   \                     ??main_1:
+   \   000031 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000033 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000034 8C04                  MOV       A, [HL+0x04]       ;; 1 cycle
+   \   000036 9F....                MOV       N:aci_state+21, A  ;; 1 cycle
+    162                  switch(aci_evt->params.device_started.device_mode)
+   \   000039 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00003B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003C 8C02                  MOV       A, [HL+0x02]       ;; 1 cycle
+   \   00003E 91                    DEC       A                  ;; 1 cycle
+   \   00003F DD5B                  BZ        ??main_4           ;; 4 cycles
+   \   000041                       ; ------------------------------------- Block: 12 cycles
+   \   000041 91                    DEC       A                  ;; 1 cycle
+   \   000042 DD06                  BZ        ??main_5           ;; 4 cycles
+   \   000044                       ; ------------------------------------- Block: 5 cycles
+   \   000044 91                    DEC       A                  ;; 1 cycle
+   \   000045 DD2E                  BZ        ??main_6           ;; 4 cycles
+   \   000047                       ; ------------------------------------- Block: 5 cycles
+   \   000047 ED....                BR        N:??main_0         ;; 3 cycles
+   \   00004A                       ; ------------------------------------- Block: 3 cycles
+    163                  {
+    164                    case ACI_DEVICE_SETUP:
+    165                      Serial.println(F("Evt Device Started: Setup"));
+   \                     ??main_5:
+   \   00004A F7                    CLRW      BC                 ;; 1 cycle
+   \   00004B                       ; ------------------------------------- Block: 1 cycles
+   \                     ??loop_0:
+   \   00004B 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   00004E 75                    MOV       D, A               ;; 1 cycle
+   \   00004F AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000051 041600                ADDW      AX, #0x16          ;; 1 cycle
+   \   000054 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000055 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000056 65                    MOV       A, D               ;; 1 cycle
+   \   000057 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000058 A3                    INCW      BC                 ;; 1 cycle
+   \   000059 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00005A 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00005D 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00005E DCEB                  BC        ??loop_0           ;; 4 cycles
+   \   000060                       ; ------------------------------------- Block: 16 cycles
+   \   000060 F3                    CLRB      B                  ;; 1 cycle
+   \   000061 30....                MOVW      AX, #`?<Constant "Evt Device Started: S...">`  ;; 1 cycle
+   \   000064 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000065 A816                  MOVW      AX, [SP+0x16]      ;; 1 cycle
+   \   000067 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000068 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   00006B 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00006C 61EA                  CALL      DE                 ;; 3 cycles
+    166                      lib_aci_test(ACI_TEST_MODE_DTM_UART);
+   \   00006E E1                    ONEB      A                  ;; 1 cycle
+   \   00006F FD....                CALL      lib_aci_test       ;; 3 cycles
+    167                      break;
+   \   000072 ED....                BR        N:??main_0         ;; 3 cycles
+   \   000075                       ; ------------------------------------- Block: 17 cycles
+    168                    case ACI_DEVICE_STANDBY:
+    169                      Serial.println(F("Evt Device Started: Standby"));
+   \                     ??main_6:
+   \   000075 F7                    CLRW      BC                 ;; 1 cycle
+   \   000076                       ; ------------------------------------- Block: 1 cycles
+   \                     ??loop_1:
+   \   000076 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   000079 75                    MOV       D, A               ;; 1 cycle
+   \   00007A AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00007C 041400                ADDW      AX, #0x14          ;; 1 cycle
+   \   00007F 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000080 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000081 65                    MOV       A, D               ;; 1 cycle
+   \   000082 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000083 A3                    INCW      BC                 ;; 1 cycle
+   \   000084 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000085 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000088 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000089 DCEB                  BC        ??loop_1           ;; 4 cycles
+   \   00008B                       ; ------------------------------------- Block: 16 cycles
+   \   00008B F3                    CLRB      B                  ;; 1 cycle
+   \   00008C 30....                MOVW      AX, #`?<Constant "Evt Device Started: S...">_1`  ;; 1 cycle
+   \   00008F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000090 A814                  MOVW      AX, [SP+0x14]      ;; 1 cycle
+   \   000092 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000093 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000096 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000097 61EA                  CALL      DE                 ;; 3 cycles
+    170                      break;
+   \   000099 ED....                BR        N:??main_0         ;; 3 cycles
+   \   00009C                       ; ------------------------------------- Block: 13 cycles
+    171                    case ACI_DEVICE_TEST:
+    172                    {
+    173                      uint8_t i = 0;
+   \                     ??main_4:
+   \   00009C 5500                  MOV       D, #0x0            ;; 1 cycle
+    174                      Serial.println(F("Evt Device Started: Test"));
+   \   00009E F7                    CLRW      BC                 ;; 1 cycle
+   \   00009F                       ; ------------------------------------- Block: 2 cycles
+   \                     ??loop_2:
+   \   00009F 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0000A2 75                    MOV       D, A               ;; 1 cycle
+   \   0000A3 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000A5 041200                ADDW      AX, #0x12          ;; 1 cycle
+   \   0000A8 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0000A9 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000AA 65                    MOV       A, D               ;; 1 cycle
+   \   0000AB 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0000AC A3                    INCW      BC                 ;; 1 cycle
+   \   0000AD 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000AE 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0000B1 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000B2 DCEB                  BC        ??loop_2           ;; 4 cycles
+   \   0000B4                       ; ------------------------------------- Block: 16 cycles
+   \   0000B4 F3                    CLRB      B                  ;; 1 cycle
+   \   0000B5 30....                MOVW      AX, #`?<Constant "Evt Device Started: Test">`  ;; 1 cycle
+   \   0000B8 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000B9 A812                  MOVW      AX, [SP+0x12]      ;; 1 cycle
+   \   0000BB 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000BC CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0000BF 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0000C0 61EA                  CALL      DE                 ;; 3 cycles
+    175                      Serial.println(F("Started infinite Echo test"));
+   \   0000C2 F7                    CLRW      BC                 ;; 1 cycle
+   \   0000C3                       ; ------------------------------------- Block: 11 cycles
+   \                     ??loop_3:
+   \   0000C3 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0000C6 75                    MOV       D, A               ;; 1 cycle
+   \   0000C7 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000C9 041000                ADDW      AX, #0x10          ;; 1 cycle
+   \   0000CC 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0000CD 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000CE 65                    MOV       A, D               ;; 1 cycle
+   \   0000CF 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0000D0 A3                    INCW      BC                 ;; 1 cycle
+   \   0000D1 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000D2 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0000D5 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000D6 DCEB                  BC        ??loop_3           ;; 4 cycles
+   \   0000D8                       ; ------------------------------------- Block: 16 cycles
+   \   0000D8 F3                    CLRB      B                  ;; 1 cycle
+   \   0000D9 30....                MOVW      AX, #`?<Constant "Started infinite Echo...">`  ;; 1 cycle
+   \   0000DC 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000DD A810                  MOVW      AX, [SP+0x10]      ;; 1 cycle
+   \   0000DF 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000E0 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0000E3 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0000E4 61EA                  CALL      DE                 ;; 3 cycles
+    176                      Serial.println(F("Repeat the test with all bytes in echo_data inverted."));
+   \   0000E6 F7                    CLRW      BC                 ;; 1 cycle
+   \   0000E7                       ; ------------------------------------- Block: 11 cycles
+   \                     ??loop_4:
+   \   0000E7 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0000EA 75                    MOV       D, A               ;; 1 cycle
+   \   0000EB AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000ED 040E00                ADDW      AX, #0xE           ;; 1 cycle
+   \   0000F0 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0000F1 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000F2 65                    MOV       A, D               ;; 1 cycle
+   \   0000F3 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0000F4 A3                    INCW      BC                 ;; 1 cycle
+   \   0000F5 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000F6 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0000F9 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000FA DCEB                  BC        ??loop_4           ;; 4 cycles
+   \   0000FC                       ; ------------------------------------- Block: 16 cycles
+   \   0000FC F3                    CLRB      B                  ;; 1 cycle
+   \   0000FD 30....                MOVW      AX, #`?<Constant "Repeat the test with ...">`  ;; 1 cycle
+   \   000100 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000101 A80E                  MOVW      AX, [SP+0x0E]      ;; 1 cycle
+   \   000103 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000104 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000107 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000108 61EA                  CALL      DE                 ;; 3 cycles
+    177                      Serial.println(F("Waiting 4 seconds before the test starts...."));
+   \   00010A F7                    CLRW      BC                 ;; 1 cycle
+   \   00010B                       ; ------------------------------------- Block: 11 cycles
+   \                     ??loop_5:
+   \   00010B 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   00010E 75                    MOV       D, A               ;; 1 cycle
+   \   00010F AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000111 040C00                ADDW      AX, #0xC           ;; 1 cycle
+   \   000114 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000115 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000116 65                    MOV       A, D               ;; 1 cycle
+   \   000117 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000118 A3                    INCW      BC                 ;; 1 cycle
+   \   000119 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00011A 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00011D 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00011E DCEB                  BC        ??loop_5           ;; 4 cycles
+   \   000120                       ; ------------------------------------- Block: 16 cycles
+   \   000120 F3                    CLRB      B                  ;; 1 cycle
+   \   000121 30....                MOVW      AX, #`?<Constant "Waiting 4 seconds bef...">`  ;; 1 cycle
+   \   000124 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000125 A80C                  MOVW      AX, [SP+0x0C]      ;; 1 cycle
+   \   000127 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000128 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   00012B 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00012C 61EA                  CALL      DE                 ;; 3 cycles
+    178                      delay(4000);
+   \   00012E 30A00F                MOVW      AX, #0xFA0         ;; 1 cycle
+   \   000131 FD....                CALL      delay              ;; 3 cycles
+    179                      for(i=0; i<NUM_ECHO_CMDS; i++)
+   \   000134 5500                  MOV       D, #0x0            ;; 1 cycle
+   \   000136 EF0C                  BR        S:??main_7         ;; 3 cycles
+   \   000138                       ; ------------------------------------- Block: 18 cycles
+    180                      {
+    181                        lib_aci_echo_msg(sizeof(echo_data), (uint8_t *)&echo_data[0]);
+   \                     ??loop_6:
+   \   000138 32....                MOVW      BC, #echo_data     ;; 1 cycle
+   \   00013B 5114                  MOV       A, #0x14           ;; 1 cycle
+   \   00013D FD....                CALL      lib_aci_echo_msg   ;; 3 cycles
+    182                        aci_echo_cmd++;
+   \   000140 A0....                INC       N:aci_echo_cmd     ;; 2 cycles
+    183                      }
+   \   000143 85                    INC       D                  ;; 1 cycle
+   \   000144                       ; ------------------------------------- Block: 8 cycles
+   \                     ??main_7:
+   \   000144 65                    MOV       A, D               ;; 1 cycle
+   \   000145 4C03                  CMP       A, #0x3            ;; 1 cycle
+   \   000147 DCEF                  BC        ??loop_6           ;; 4 cycles
+   \   000149                       ; ------------------------------------- Block: 6 cycles
+    184                    }
+    185                      break;
+    186                  }
+    187                }
+    188                  break; //ACI Device Started Event
+   \   000149 ED....                BR        N:??main_0         ;; 3 cycles
+   \   00014C                       ; ------------------------------------- Block: 3 cycles
+    189                case ACI_EVT_CMD_RSP:
+    190                  //If an ACI command response event comes with an error -> stop
+    191                  if (ACI_STATUS_SUCCESS != aci_evt->params.cmd_rsp.cmd_status)
+   \                     ??main_3:
+   \   00014C A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00014E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00014F 8C03                  MOV       A, [HL+0x03]       ;; 1 cycle
+   \   000151 D1                    CMP0      A                  ;; 1 cycle
+   \   000152 DD73                  BZ        ??main_8           ;; 4 cycles
+   \   000154                       ; ------------------------------------- Block: 8 cycles
+    192                  {
+    193                    //ACI ReadDynamicData and ACI WriteDynamicData will have status codes of
+    194                    //TRANSACTION_CONTINUE and TRANSACTION_COMPLETE
+    195                    //all other ACI commands will have status code of ACI_STATUS_SCUCCESS for a successful command
+    196                    Serial.print(F("ACI Command 0x"));
+   \   000154 F7                    CLRW      BC                 ;; 1 cycle
+   \   000155                       ; ------------------------------------- Block: 1 cycles
+   \                     ??loop_7:
+   \   000155 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000158 75                    MOV       D, A               ;; 1 cycle
+   \   000159 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00015B 040A00                ADDW      AX, #0xA           ;; 1 cycle
+   \   00015E 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00015F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000160 65                    MOV       A, D               ;; 1 cycle
+   \   000161 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000162 A3                    INCW      BC                 ;; 1 cycle
+   \   000163 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000164 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000167 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000168 DCEB                  BC        ??loop_7           ;; 4 cycles
+   \   00016A                       ; ------------------------------------- Block: 16 cycles
+   \   00016A F3                    CLRB      B                  ;; 1 cycle
+   \   00016B 30....                MOVW      AX, #`?<Constant "ACI Command 0x">`  ;; 1 cycle
+   \   00016E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00016F A80A                  MOVW      AX, [SP+0x0A]      ;; 1 cycle
+   \   000171 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000172 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000175 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000176 61EA                  CALL      DE                 ;; 3 cycles
+    197                    Serial.println(aci_evt->params.cmd_rsp.cmd_opcode, HEX);
+   \   000178 F7                    CLRW      BC                 ;; 1 cycle
+   \   000179                       ; ------------------------------------- Block: 11 cycles
+   \                     ??loop_8:
+   \   000179 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   00017C 75                    MOV       D, A               ;; 1 cycle
+   \   00017D AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00017F 040800                ADDW      AX, #0x8           ;; 1 cycle
+   \   000182 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000183 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000184 65                    MOV       A, D               ;; 1 cycle
+   \   000185 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000186 A3                    INCW      BC                 ;; 1 cycle
+   \   000187 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000188 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00018B 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00018C DCEB                  BC        ??loop_8           ;; 4 cycles
+   \   00018E                       ; ------------------------------------- Block: 16 cycles
+   \   00018E 5302                  MOV       B, #0x2            ;; 1 cycle
+   \   000190 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000192 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000193 8C02                  MOV       A, [HL+0x02]       ;; 1 cycle
+   \   000195 70                    MOV       X, A               ;; 1 cycle
+   \   000196 F1                    CLRB      A                  ;; 1 cycle
+   \   000197 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000198 A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   00019A 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00019B CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   00019E 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00019F 61EA                  CALL      DE                 ;; 3 cycles
+    198                    Serial.println(F("Evt Cmd respone: Error. Arduino is in an while(1); loop"));
+   \   0001A1 F7                    CLRW      BC                 ;; 1 cycle
+   \   0001A2                       ; ------------------------------------- Block: 15 cycles
+   \                     ??loop_9:
+   \   0001A2 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0001A5 75                    MOV       D, A               ;; 1 cycle
+   \   0001A6 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0001A8 040600                ADDW      AX, #0x6           ;; 1 cycle
+   \   0001AB 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0001AC 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0001AD 65                    MOV       A, D               ;; 1 cycle
+   \   0001AE 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0001AF A3                    INCW      BC                 ;; 1 cycle
+   \   0001B0 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0001B1 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0001B4 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0001B5 DCEB                  BC        ??loop_9           ;; 4 cycles
+   \   0001B7                       ; ------------------------------------- Block: 16 cycles
+   \   0001B7 F3                    CLRB      B                  ;; 1 cycle
+   \   0001B8 30....                MOVW      AX, #`?<Constant "Evt Cmd respone: Erro...">`  ;; 1 cycle
+   \   0001BB 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0001BC A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   0001BE 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0001BF CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0001C2 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0001C3 61EA                  CALL      DE                 ;; 3 cycles
+   \   0001C5                       ; ------------------------------------- Block: 10 cycles
+    199                    while (1);
+   \                     ??loop_10:
+   \   0001C5 EFFE                  BR        S:??loop_10        ;; 3 cycles
+   \   0001C7                       ; ------------------------------------- Block: 3 cycles
+    200                  }
+    201                  break;
+   \                     ??main_8:
+   \   0001C7 EF7D                  BR        S:??main_0         ;; 3 cycles
+   \   0001C9                       ; ------------------------------------- Block: 3 cycles
+    202                case ACI_EVT_ECHO:
+    203                  if (0 != memcmp(&echo_data[0], &(aci_evt->params.echo.echo_data[0]), sizeof(echo_data)))
+   \                     ??main_2:
+   \   0001C9 341400                MOVW      DE, #0x14          ;; 1 cycle
+   \   0001CC A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   0001CE 12                    MOVW      BC, AX             ;; 1 cycle
+   \   0001CF A3                    INCW      BC                 ;; 1 cycle
+   \   0001D0 A3                    INCW      BC                 ;; 1 cycle
+   \   0001D1 30....                MOVW      AX, #echo_data     ;; 1 cycle
+   \   0001D4 FD....                CALL      memcmp             ;; 3 cycles
+   \   0001D7 440000                CMPW      AX, #0x0           ;; 1 cycle
+   \   0001DA DD26                  BZ        ??main_9           ;; 4 cycles
+   \   0001DC                       ; ------------------------------------- Block: 14 cycles
+    204                  {
+    205                    Serial.println(F("Error: Echo loop test failed. Verify the SPI connectivity on the PCB."));
+   \   0001DC F7                    CLRW      BC                 ;; 1 cycle
+   \   0001DD                       ; ------------------------------------- Block: 1 cycles
+   \                     ??loop_11:
+   \   0001DD 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0001E0 75                    MOV       D, A               ;; 1 cycle
+   \   0001E1 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0001E3 040400                ADDW      AX, #0x4           ;; 1 cycle
+   \   0001E6 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0001E7 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0001E8 65                    MOV       A, D               ;; 1 cycle
+   \   0001E9 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0001EA A3                    INCW      BC                 ;; 1 cycle
+   \   0001EB 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0001EC 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0001EF 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0001F0 DCEB                  BC        ??loop_11          ;; 4 cycles
+   \   0001F2                       ; ------------------------------------- Block: 16 cycles
+   \   0001F2 F3                    CLRB      B                  ;; 1 cycle
+   \   0001F3 30....                MOVW      AX, #`?<Constant "Error: Echo loop test...">`  ;; 1 cycle
+   \   0001F6 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0001F7 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   0001F9 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0001FA CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0001FD 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0001FE 61EA                  CALL      DE                 ;; 3 cycles
+   \   000200 EF24                  BR        S:??main_10        ;; 3 cycles
+   \   000202                       ; ------------------------------------- Block: 13 cycles
+    206                  }
+    207                  else
+    208                  {
+    209                    Serial.println(F("Echo OK"));
+   \                     ??main_9:
+   \   000202 F7                    CLRW      BC                 ;; 1 cycle
+   \   000203                       ; ------------------------------------- Block: 1 cycles
+   \                     ??loop_12:
+   \   000203 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   000206 75                    MOV       D, A               ;; 1 cycle
+   \   000207 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000209 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   00020C 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00020D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00020E 65                    MOV       A, D               ;; 1 cycle
+   \   00020F 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000210 A3                    INCW      BC                 ;; 1 cycle
+   \   000211 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000212 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000215 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000216 DCEB                  BC        ??loop_12          ;; 4 cycles
+   \   000218                       ; ------------------------------------- Block: 16 cycles
+   \   000218 F3                    CLRB      B                  ;; 1 cycle
+   \   000219 30....                MOVW      AX, #`?<Constant "Echo OK">`  ;; 1 cycle
+   \   00021C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00021D A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00021F 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000220 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000223 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000224 61EA                  CALL      DE                 ;; 3 cycles
+   \   000226                       ; ------------------------------------- Block: 10 cycles
+    210                  }
+    211                  if (NUM_ECHO_CMDS == aci_echo_cmd)
+   \                     ??main_10:
+   \   000226 40......              CMP       N:aci_echo_cmd, #0x3  ;; 1 cycle
+   \   00022A DF1A                  BNZ       ??main_0           ;; 4 cycles
+   \   00022C                       ; ------------------------------------- Block: 5 cycles
+    212                  {
+    213                    uint8_t i = 0;
+   \   00022C 5500                  MOV       D, #0x0            ;; 1 cycle
+    214                    aci_echo_cmd = 0;
+   \   00022E F5....                CLRB      N:aci_echo_cmd     ;; 1 cycle
+    215                    for(i=0; i<NUM_ECHO_CMDS; i++)
+   \   000231 F1                    CLRB      A                  ;; 1 cycle
+   \   000232 75                    MOV       D, A               ;; 1 cycle
+   \   000233 EF0C                  BR        S:??main_11        ;; 3 cycles
+   \   000235                       ; ------------------------------------- Block: 7 cycles
+    216                    {
+    217                      lib_aci_echo_msg(sizeof(echo_data), (uint8_t *)&echo_data[0]);
+   \                     ??loop_13:
+   \   000235 32....                MOVW      BC, #echo_data     ;; 1 cycle
+   \   000238 5114                  MOV       A, #0x14           ;; 1 cycle
+   \   00023A FD....                CALL      lib_aci_echo_msg   ;; 3 cycles
+    218                      aci_echo_cmd++;
+   \   00023D A0....                INC       N:aci_echo_cmd     ;; 2 cycles
+    219                    }
+   \   000240 85                    INC       D                  ;; 1 cycle
+   \   000241                       ; ------------------------------------- Block: 8 cycles
+   \                     ??main_11:
+   \   000241 65                    MOV       A, D               ;; 1 cycle
+   \   000242 4C03                  CMP       A, #0x3            ;; 1 cycle
+   \   000244 DCEF                  BC        ??loop_13          ;; 4 cycles
+   \   000246                       ; ------------------------------------- Block: 6 cycles
+    220                  }
+    221                  break;
+    222              }
+    223            }
+    224            else
+    225            {
+    226              // No event in the ACI Event queue
+    227              // Arduino can go to sleep now
+    228              // Wakeup from sleep from the RDYN line
+    229            }
+    230          }
+   \                     ??main_0:
+   \   000246 1018                  ADDW      SP, #0x18          ;; 1 cycle
+   \   000248 C4                    POP       DE                 ;; 1 cycle
+   \   000249 C2                    POP       BC                 ;; 1 cycle
+   \   00024A D7                    RET                          ;; 6 cycles
+   \   00024B                       ; ------------------------------------- Block: 9 cycles
+   \   00024B                       ; ------------------------------------- Total: 465 cycles
+   \   00024B                       REQUIRE ?CLRL78_V1_0_L00
+    231          
+    232          
+    233          
+    234          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    235          void main(void) 
+   \                     main:
+    236          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    237            setup(); 
+   \   000000 FD....                CALL      setup              ;; 3 cycles
+   \   000003                       ; ------------------------------------- Block: 3 cycles
+    238            while(1)
+    239            {
+    240              loop();
+   \                     ??main_12:
+   \   000003 FD....                CALL      loop               ;; 3 cycles
+   \   000006 EFFB                  BR        S:??main_12        ;; 3 cycles
+   \   000008                       ; ------------------------------------- Block: 6 cycles
+   \   000008                       ; ------------------------------------- Total: 9 cycles
+   \   000008                       REQUIRE ?CLRL78_V1_0_L00
+    241            }
+    242          }
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "ERROR ">`:
+   \   000000 4552524F5220          DB "ERROR "
+   \   000007 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant ": ">`:
+   \   000000 3A2000                DB ": "
+   \   000003 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "\\n">`:
+   \   000000 0A00                  DB "\012"
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Arduino setup">`:
+   \   000000 41726475696E          DB "Arduino setup"
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "nRF8001 Reset done">`:
+   \   000000 6E5246383030          DB "nRF8001 Reset done"
+   \   000013 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Evt Device Started: S...">`:
+   \   000000 457674204465          DB "Evt Device Started: Setup"
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Evt Device Started: S...">_1`:
+   \   000000 457674204465          DB "Evt Device Started: Standby"
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Evt Device Started: Test">`:
+   \   000000 457674204465          DB "Evt Device Started: Test"
+   \   000019 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Started infinite Echo...">`:
+   \   000000 537461727465          DB "Started infinite Echo test"
+   \   00001B 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Repeat the test with ...">`:
+   \   000000 526570656174          DB 52H, 65H, 70H, 65H, 61H, 74H, 20H, 74H
+   \   000008 686520746573          DB 68H, 65H, 20H, 74H, 65H, 73H, 74H, 20H
+   \   000010 776974682061          DB 77H, 69H, 74H, 68H, 20H, 61H, 6CH, 6CH
+   \   000018 206279746573          DB 20H, 62H, 79H, 74H, 65H, 73H, 20H, 69H
+   \   000020 6E206563686F          DB 6EH, 20H, 65H, 63H, 68H, 6FH, 5FH, 64H
+   \   000028 61746120696E          DB 61H, 74H, 61H, 20H, 69H, 6EH, 76H, 65H
+   \   000030 727465642E00          DB 72H, 74H, 65H, 64H, 2EH, 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Waiting 4 seconds bef...">`:
+   \   000000 57616974696E          DB "Waiting 4 seconds before the test starts...."
+   \   00002D 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "ACI Command 0x">`:
+   \   000000 41434920436F          DB "ACI Command 0x"
+   \   00000F 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Evt Cmd respone: Erro...">`:
+   \   000000 45767420436D          DB 45H, 76H, 74H, 20H, 43H, 6DH, 64H, 20H
+   \   000008 726573706F6E          DB 72H, 65H, 73H, 70H, 6FH, 6EH, 65H, 3AH
+   \   000010 204572726F72          DB 20H, 45H, 72H, 72H, 6FH, 72H, 2EH, 20H
+   \   000018 41726475696E          DB 41H, 72H, 64H, 75H, 69H, 6EH, 6FH, 20H
+   \   000020 697320696E20          DB 69H, 73H, 20H, 69H, 6EH, 20H, 61H, 6EH
+   \   000028 207768696C65          DB 20H, 77H, 68H, 69H, 6CH, 65H, 28H, 31H
+   \   000030 293B206C6F6F          DB 29H, 3BH, 20H, 6CH, 6FH, 6FH, 70H, 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Error: Echo loop test...">`:
+   \   000000 4572726F723A          DB 45H, 72H, 72H, 6FH, 72H, 3AH, 20H, 45H
+   \   000008 63686F206C6F          DB 63H, 68H, 6FH, 20H, 6CH, 6FH, 6FH, 70H
+   \   000010 207465737420          DB 20H, 74H, 65H, 73H, 74H, 20H, 66H, 61H
+   \   000018 696C65642E20          DB 69H, 6CH, 65H, 64H, 2EH, 20H, 56H, 65H
+   \   000020 726966792074          DB 72H, 69H, 66H, 79H, 20H, 74H, 68H, 65H
+   \   000028 205350492063          DB 20H, 53H, 50H, 49H, 20H, 63H, 6FH, 6EH
+   \   000030 6E6563746976          DB 6EH, 65H, 63H, 74H, 69H, 76H, 69H, 74H
+   \   000038 79206F6E2074          DB 79H, 20H, 6FH, 6EH, 20H, 74H, 68H, 65H
+   \   000040 205043422E00          DB 20H, 50H, 43H, 42H, 2EH, 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Echo OK">`:
+   \   000000 4563686F204F          DB "Echo OK"
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+     16   __ble_assert
+       16   -- Indirect call
+     28   loop
+       28   -- Indirect call
+       28   -> delay
+       28   -> lib_aci_echo_msg
+       28   -> lib_aci_event_get
+       28   -> lib_aci_test
+       28   -> memcmp
+      0   main
+        0   -> loop
+        0   -> setup
+      8   setup
+        8   -- Indirect call
+        8   -> hal_aci_tl_init
+        8   -> initializeSerialMonitor
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ?<Constant ": ">
+      16  ?<Constant "ACI Command 0x">
+      14  ?<Constant "Arduino setup">
+       8  ?<Constant "ERROR ">
+       8  ?<Constant "Echo OK">
+      70  ?<Constant "Error: Echo loop test...">
+      56  ?<Constant "Evt Cmd respone: Erro...">
+      26  ?<Constant "Evt Device Started: S...">
+      28  ?<Constant "Evt Device Started: S...">_1
+      26  ?<Constant "Evt Device Started: Test">
+      54  ?<Constant "Repeat the test with ...">
+      28  ?<Constant "Started infinite Echo...">
+      46  ?<Constant "Waiting 4 seconds bef...">
+       2  ?<Constant "\n">
+      20  ?<Constant "nRF8001 Reset done">
+     185  __ble_assert
+      34  aci_data
+       1  aci_echo_cmd
+      45  aci_state
+      20  echo_data
+     587  loop
+       8  main
+       1  opbyte0
+       1  opbyte1
+       1  opbyte2
+       1  opbyte3
+      10  secuid
+     136  setup
+
+ 
+ 916 bytes in segment CODE
+ 426 bytes in segment NEAR_CONST
+  80 bytes in segment NEAR_Z
+   4 bytes in segment OPTBYTE
+  10 bytes in segment SECUID
+ 
+ 916 bytes of CODE  memory
+ 440 bytes of CONST memory
+  80 bytes of DATA  memory
+
+Errors: none
+Warnings: none

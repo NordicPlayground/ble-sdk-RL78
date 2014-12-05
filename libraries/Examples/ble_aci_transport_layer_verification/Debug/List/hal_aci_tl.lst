@@ -1,0 +1,1631 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:42
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\hal_aci_tl.cpp
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\hal_aci_tl.cpp" --core
+#        rl78_1 --code_model near --data_model near --near_const_location rom0
+#        -o "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\hal_aci_tl.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\hal_aci_tl.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\BLE\hal_aci_tl.cpp
+      1          /* Copyright (c) 2014, Nordic Semiconductor ASA
+      2           *
+      3           * Permission is hereby granted, free of charge, to any person obtaining a copy
+      4           * of this software and associated documentation files (the "Software"), to deal
+      5           * in the Software without restriction, including without limitation the rights
+      6           * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      7           * copies of the Software, and to permit persons to whom the Software is
+      8           * furnished to do so, subject to the following conditions:
+      9           *
+     10           * The above copyright notice and this permission notice shall be included in all
+     11           * copies or substantial portions of the Software.
+     12           *
+     13           * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     14           * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     15           * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     16           * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     17           * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     18           * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+     19           * SOFTWARE.
+     20           */
+     21          
+     22          /** @file
+     23          @brief Implementation of the ACI transport layer module
+     24          */
+     25          
+     26          
+     27          #include "hal_platform.h"
+     28          #include "hal_aci_tl.h"
+     29          #include "aci_queue.h"
+     30          #if ( !defined(__SAM3X8E__) && !defined(__PIC32MX__) && !defined(__ICCRL78__))
+     31          #include <avr/sleep.h>
+     32          #endif
+     33          /*
+     34          PIC32 supports only MSbit transfer on SPI and the nRF8001 uses LSBit
+     35          Use the REVERSE_BITS macro to convert from MSBit to LSBit
+     36          The outgoing command and the incoming event needs to be converted
+     37          */
+     38          //Board dependent defines
+     39          #if defined (__AVR__)
+     40               #include <SPI.h>
+     41              //For Arduino add nothing
+     42          #elif defined(__PIC32MX__)
+     43              //For ChipKit as the transmission has to be reversed, the next definitions have to be added
+     44              #define REVERSE_BITS(byte) (((reverse_lookup[(byte & 0x0F)]) << 4) + reverse_lookup[((byte & 0xF0) >> 4)])
+     45              static const uint8_t reverse_lookup[] = { 0, 8,  4, 12, 2, 10, 6, 14,1, 9, 5, 13,3, 11, 7, 15 };
+     46          #endif
+     47          
+     48          static void m_aci_data_print(hal_aci_data_t *p_data);
+     49          static void m_aci_event_check(void);
+     50          static void m_aci_isr(void);
+     51          static void m_aci_pins_set(aci_pins_t *a_pins_ptr);
+     52          static inline void m_aci_reqn_disable (void);
+     53          static inline void m_aci_reqn_enable (void);
+     54          static void m_aci_q_flush(void);
+     55          static bool m_aci_spi_transfer(hal_aci_data_t * data_to_send, hal_aci_data_t * received_data);
+     56          
+     57          static uint8_t        spi_readwrite(uint8_t aci_byte);
+     58          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     59          static bool           aci_debug_print = false;
+   \                     aci_debug_print:
+   \   000000                       DS 1
+   \   000001                       REQUIRE __INIT_NEAR_Z
+     60          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     61          aci_queue_t    aci_tx_q;
+   \                     aci_tx_q:
+   \   000000                       DS 134
+   \   000086                       REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     62          aci_queue_t    aci_rx_q;
+   \                     aci_rx_q:
+   \   000000                       DS 134
+   \   000086                       REQUIRE __INIT_NEAR_Z
+     63          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     64          static aci_pins_t  *a_pins_local_ptr;
+   \                     a_pins_local_ptr:
+   \   000000                       DS 2
+   \   000002                       REQUIRE __INIT_NEAR_Z
+     65          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     66          void m_aci_data_print(hal_aci_data_t *p_data)
+   \                     m_aci_data_print:
+     67          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 14
+   \   000003 200C                  SUBW      SP, #0xC           ;; 1 cycle
+     68            const uint8_t length = p_data->buffer[0];
+   \   000005 A80C                  MOVW      AX, [SP+0x0C]      ;; 1 cycle
+   \   000007 A1                    INCW      AX                 ;; 1 cycle
+   \   000008 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000009 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00000A 9800                  MOV       [SP], A            ;; 1 cycle
+     69            uint8_t i;
+     70            Serial.print(length, DEC);
+   \   00000C F7                    CLRW      BC                 ;; 1 cycle
+   \   00000D                       ; ------------------------------------- Block: 10 cycles
+   \                     ??m_aci_data_print_0:
+   \   00000D 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000010 75                    MOV       D, A               ;; 1 cycle
+   \   000011 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000013 040A00                ADDW      AX, #0xA           ;; 1 cycle
+   \   000016 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000017 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000018 65                    MOV       A, D               ;; 1 cycle
+   \   000019 9B                    MOV       [HL], A            ;; 1 cycle
+   \   00001A A3                    INCW      BC                 ;; 1 cycle
+   \   00001B 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00001C 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00001F 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000020 DCEB                  BC        ??m_aci_data_print_0  ;; 4 cycles
+   \   000022                       ; ------------------------------------- Block: 16 cycles
+   \   000022 E3                    ONEB      B                  ;; 1 cycle
+   \   000023 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000025 70                    MOV       X, A               ;; 1 cycle
+   \   000026 F1                    CLRB      A                  ;; 1 cycle
+   \   000027 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000028 A80A                  MOVW      AX, [SP+0x0A]      ;; 1 cycle
+   \   00002A 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00002B CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   00002E 17                    MOVW      AX, HL             ;; 1 cycle
+   \   00002F 61EA                  CALL      DE                 ;; 3 cycles
+     71            Serial.print(" :");
+   \   000031 F7                    CLRW      BC                 ;; 1 cycle
+   \   000032                       ; ------------------------------------- Block: 13 cycles
+   \                     ??m_aci_data_print_1:
+   \   000032 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000035 75                    MOV       D, A               ;; 1 cycle
+   \   000036 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000038 040800                ADDW      AX, #0x8           ;; 1 cycle
+   \   00003B 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00003C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003D 65                    MOV       A, D               ;; 1 cycle
+   \   00003E 9B                    MOV       [HL], A            ;; 1 cycle
+   \   00003F A3                    INCW      BC                 ;; 1 cycle
+   \   000040 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000041 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000044 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000045 DCEB                  BC        ??m_aci_data_print_1  ;; 4 cycles
+   \   000047                       ; ------------------------------------- Block: 16 cycles
+   \   000047 F3                    CLRB      B                  ;; 1 cycle
+   \   000048 30....                MOVW      AX, #`?<Constant " :">`  ;; 1 cycle
+   \   00004B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00004C A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   00004E 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00004F CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000052 17                    MOVW      AX, HL             ;; 1 cycle
+   \   000053 61EA                  CALL      DE                 ;; 3 cycles
+     72            for (i=0; i<=length; i++)
+   \   000055 5400                  MOV       E, #0x0            ;; 1 cycle
+   \   000057 EF51                  BR        S:??hal_aci_tl_q_flush_0  ;; 3 cycles
+   \   000059                       ; ------------------------------------- Block: 14 cycles
+     73            {
+     74              Serial.print(p_data->buffer[i], HEX);
+   \                     ??m_aci_data_print_2:
+   \   000059 F7                    CLRW      BC                 ;; 1 cycle
+   \   00005A                       ; ------------------------------------- Block: 1 cycles
+   \                     ??m_aci_data_print_3:
+   \   00005A 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   00005D 75                    MOV       D, A               ;; 1 cycle
+   \   00005E AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000060 040600                ADDW      AX, #0x6           ;; 1 cycle
+   \   000063 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000064 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000065 65                    MOV       A, D               ;; 1 cycle
+   \   000066 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000067 A3                    INCW      BC                 ;; 1 cycle
+   \   000068 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000069 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00006C 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00006D DCEB                  BC        ??m_aci_data_print_3  ;; 4 cycles
+   \   00006F                       ; ------------------------------------- Block: 16 cycles
+   \   00006F 5302                  MOV       B, #0x2            ;; 1 cycle
+   \   000071 C5                    PUSH      DE                 ;; 1 cycle
+   \   000072 C6                    POP       HL                 ;; 1 cycle
+   \   000073 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000075 A80C                  MOVW      AX, [SP+0x0C]      ;; 1 cycle
+   \   000077 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000078 A1                    INCW      AX                 ;; 1 cycle
+   \   000079 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00007A 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00007B 70                    MOV       X, A               ;; 1 cycle
+   \   00007C F1                    CLRB      A                  ;; 1 cycle
+   \   00007D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00007E A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   000080 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000081 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000084 61FA                  CALL      HL                 ;; 3 cycles
+     75              Serial.print(F(", "));
+   \   000086 F7                    CLRW      BC                 ;; 1 cycle
+   \   000087                       ; ------------------------------------- Block: 19 cycles
+   \                     ??m_aci_data_print_4:
+   \   000087 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   00008A 75                    MOV       D, A               ;; 1 cycle
+   \   00008B AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00008D 040400                ADDW      AX, #0x4           ;; 1 cycle
+   \   000090 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000091 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000092 65                    MOV       A, D               ;; 1 cycle
+   \   000093 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000094 A3                    INCW      BC                 ;; 1 cycle
+   \   000095 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000096 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000099 33                    XCHW      AX, BC             ;; 1 cycle
+   \   00009A DCEB                  BC        ??m_aci_data_print_4  ;; 4 cycles
+   \   00009C                       ; ------------------------------------- Block: 16 cycles
+   \   00009C F3                    CLRB      B                  ;; 1 cycle
+   \   00009D 30....                MOVW      AX, #`?<Constant ", ">`  ;; 1 cycle
+   \   0000A0 37                    XCHW      AX, HL             ;; 1 cycle
+   \   0000A1 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   0000A3 37                    XCHW      AX, HL             ;; 1 cycle
+   \   0000A4 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0000A7 61FA                  CALL      HL                 ;; 3 cycles
+     76            }
+   \   0000A9 84                    INC       E                  ;; 1 cycle
+   \   0000AA                       ; ------------------------------------- Block: 10 cycles
+   \                     ??hal_aci_tl_q_flush_0:
+   \   0000AA 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   0000AC 614C                  CMP       A, E               ;; 1 cycle
+   \   0000AE DEA9                  BNC       ??m_aci_data_print_2  ;; 4 cycles
+   \   0000B0                       ; ------------------------------------- Block: 6 cycles
+     77            Serial.println(F(""));
+   \   0000B0 F7                    CLRW      BC                 ;; 1 cycle
+   \   0000B1                       ; ------------------------------------- Block: 1 cycles
+   \                     ??m_aci_data_print_5:
+   \   0000B1 49....                MOV       A, (Serial+2 & 0xFFFF)[BC]  ;; 1 cycle
+   \   0000B4 75                    MOV       D, A               ;; 1 cycle
+   \   0000B5 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000B7 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   0000BA 03                    ADDW      AX, BC             ;; 1 cycle
+   \   0000BB 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000BC 65                    MOV       A, D               ;; 1 cycle
+   \   0000BD 9B                    MOV       [HL], A            ;; 1 cycle
+   \   0000BE A3                    INCW      BC                 ;; 1 cycle
+   \   0000BF 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000C0 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   0000C3 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000C4 DCEB                  BC        ??m_aci_data_print_5  ;; 4 cycles
+   \   0000C6                       ; ------------------------------------- Block: 16 cycles
+   \   0000C6 F3                    CLRB      B                  ;; 1 cycle
+   \   0000C7 30....                MOVW      AX, #`?<Constant "">`  ;; 1 cycle
+   \   0000CA 16                    MOVW      HL, AX             ;; 1 cycle
+   \   0000CB A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   0000CD 14                    MOVW      DE, AX             ;; 1 cycle
+   \   0000CE CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   0000D1 17                    MOVW      AX, HL             ;; 1 cycle
+   \   0000D2 61EA                  CALL      DE                 ;; 3 cycles
+     78          }
+   \   0000D4 100E                  ADDW      SP, #0xE           ;; 1 cycle
+   \   0000D6 C4                    POP       DE                 ;; 1 cycle
+   \   0000D7 C2                    POP       BC                 ;; 1 cycle
+   \   0000D8 D7                    RET                          ;; 6 cycles
+   \   0000D9                       ; ------------------------------------- Block: 19 cycles
+   \   0000D9                       ; ------------------------------------- Total: 173 cycles
+   \   0000D9                       REQUIRE ?CLRL78_V1_0_L00
+     79          
+     80          /*
+     81            Interrupt service routine called when the RDYN line goes low. Runs the SPI transfer.
+     82          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     83          static void m_aci_isr(void)
+   \                     m_aci_isr:
+     84          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 66
+   \   000001 2042                  SUBW      SP, #0x42          ;; 1 cycle
+     85            hal_aci_data_t data_to_send;
+     86            hal_aci_data_t received_data;
+     87          
+     88            // Receive from queue
+     89            if (!aci_queue_dequeue_from_isr(&aci_tx_q, &data_to_send))
+   \   000003 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000005 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000006 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   000009 FD....                CALL      aci_queue_dequeue_from_isr  ;; 3 cycles
+   \   00000C D1                    CMP0      A                  ;; 1 cycle
+   \   00000D DF06                  BNZ       ??hal_aci_tl_q_flush_1  ;; 4 cycles
+   \   00000F                       ; ------------------------------------- Block: 13 cycles
+     90            {
+     91              /* queue was empty, nothing to send */
+     92              data_to_send.status_byte = 0;
+   \   00000F F1                    CLRB      A                  ;; 1 cycle
+   \   000010 9800                  MOV       [SP], A            ;; 1 cycle
+     93              data_to_send.buffer[0] = 0;
+   \   000012 F1                    CLRB      A                  ;; 1 cycle
+   \   000013 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   000015                       ; ------------------------------------- Block: 4 cycles
+     94            }
+     95          
+     96            // Receive and/or transmit data
+     97            m_aci_spi_transfer(&data_to_send, &received_data);
+   \                     ??hal_aci_tl_q_flush_1:
+   \   000015 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000017 042100                ADDW      AX, #0x21          ;; 1 cycle
+   \   00001A 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00001B AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00001D FD....                CALL      m_aci_spi_transfer  ;; 3 cycles
+     98          
+     99            if (!aci_queue_is_full_from_isr(&aci_rx_q) && !aci_queue_is_empty_from_isr(&aci_tx_q))
+   \   000020 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000023 FD....                CALL      aci_queue_is_full_from_isr  ;; 3 cycles
+   \   000026 D1                    CMP0      A                  ;; 1 cycle
+   \   000027 DF0C                  BNZ       ??hal_aci_tl_q_flush_2  ;; 4 cycles
+   \   000029                       ; ------------------------------------- Block: 16 cycles
+   \   000029 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   00002C FD....                CALL      aci_queue_is_empty_from_isr  ;; 3 cycles
+   \   00002F D1                    CMP0      A                  ;; 1 cycle
+   \   000030 61F8                  SKNZ                         ;; 4 cycles
+   \   000032                       ; ------------------------------------- Block: 9 cycles
+    100            {
+    101              m_aci_reqn_enable();
+   \   000032 FD....                CALL      m_aci_reqn_enable  ;; 3 cycles
+   \   000035                       ; ------------------------------------- Block: 3 cycles
+    102            }
+    103          
+    104            // Check if we received data
+    105            if (received_data.buffer[0] > 0)
+   \                     ??hal_aci_tl_q_flush_2:
+   \   000035 8822                  MOV       A, [SP+0x22]       ;; 1 cycle
+   \   000037 D1                    CMP0      A                  ;; 1 cycle
+   \   000038 DD22                  BZ        ??hal_aci_tl_q_flush_3  ;; 4 cycles
+   \   00003A                       ; ------------------------------------- Block: 6 cycles
+    106            {
+    107              if (!aci_queue_enqueue_from_isr(&aci_rx_q, &received_data))
+   \   00003A AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00003C 042100                ADDW      AX, #0x21          ;; 1 cycle
+   \   00003F 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000040 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000043 FD....                CALL      aci_queue_enqueue_from_isr  ;; 3 cycles
+   \   000046 D1                    CMP0      A                  ;; 1 cycle
+   \   000047 61F8                  SKNZ                         ;; 4 cycles
+   \   000049                       ; ------------------------------------- Block: 12 cycles
+    108              {
+    109                /* Receive Buffer full.
+    110                   Should never happen.
+    111                   Spin in a while loop.
+    112                */
+    113                while(1);
+   \                     ??m_aci_isr_0:
+   \   000049 EFFE                  BR        S:??m_aci_isr_0    ;; 3 cycles
+   \   00004B                       ; ------------------------------------- Block: 3 cycles
+    114              }
+    115          
+    116              // Disable ready line interrupt until we have room to store incoming messages
+    117              if (aci_queue_is_full_from_isr(&aci_rx_q))
+   \                     ??m_aci_isr_1:
+   \   00004B 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   00004E FD....                CALL      aci_queue_is_full_from_isr  ;; 3 cycles
+   \   000051 D1                    CMP0      A                  ;; 1 cycle
+   \   000052 DD08                  BZ        ??hal_aci_tl_q_flush_3  ;; 4 cycles
+   \   000054                       ; ------------------------------------- Block: 9 cycles
+    118              {
+    119                detachInterrupt(a_pins_local_ptr->interrupt_number);
+   \   000054 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000057 8C0B                  MOV       A, [HL+0x0B]       ;; 1 cycle
+   \   000059 FD....                CALL      detachInterrupt    ;; 3 cycles
+   \   00005C                       ; ------------------------------------- Block: 5 cycles
+    120              }
+    121            }
+    122          
+    123            return;
+   \                     ??hal_aci_tl_q_flush_3:
+   \   00005C 1042                  ADDW      SP, #0x42          ;; 1 cycle
+   \   00005E C2                    POP       BC                 ;; 1 cycle
+   \   00005F D7                    RET                          ;; 6 cycles
+   \   000060                       ; ------------------------------------- Block: 8 cycles
+   \   000060                       ; ------------------------------------- Total: 88 cycles
+   \   000060                       REQUIRE ?CLRL78_V1_0_L00
+    124          }
+    125          
+    126          /*
+    127            Checks the RDYN line and runs the SPI transfer if required.
+    128          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    129          static void m_aci_event_check(void)
+   \                     m_aci_event_check:
+    130          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 66
+   \   000001 2042                  SUBW      SP, #0x42          ;; 1 cycle
+    131            hal_aci_data_t data_to_send;
+    132            hal_aci_data_t received_data;
+    133          
+    134            // No room to store incoming messages
+    135            if (aci_queue_is_full(&aci_rx_q))
+   \   000003 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000006 FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000009 D1                    CMP0      A                  ;; 1 cycle
+   \   00000A DF62                  BNZ       ??hal_aci_tl_q_flush_4  ;; 4 cycles
+   \   00000C                       ; ------------------------------------- Block: 11 cycles
+    136            {
+    137              return;
+    138            }
+    139          
+    140            // If the ready line is disabled and we have pending messages outgoing we enable the request line
+    141            if (HIGH == digitalRead(a_pins_local_ptr->rdyn_pin))
+   \   00000C FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   00000F 8C02                  MOV       A, [HL+0x02]       ;; 1 cycle
+   \   000011 FD....                CALL      digitalRead        ;; 3 cycles
+   \   000014 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000016 DF0E                  BNZ       ??hal_aci_tl_q_flush_5  ;; 4 cycles
+   \   000018                       ; ------------------------------------- Block: 10 cycles
+    142            {
+    143              if (!aci_queue_is_empty(&aci_tx_q))
+   \   000018 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   00001B FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   00001E D1                    CMP0      A                  ;; 1 cycle
+   \   00001F DF4D                  BNZ       ??hal_aci_tl_q_flush_4  ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 9 cycles
+    144              {
+    145                m_aci_reqn_enable();
+   \   000021 FD....                CALL      m_aci_reqn_enable  ;; 3 cycles
+    146              }
+    147          
+    148              return;
+   \   000024 EF48                  BR        S:??hal_aci_tl_q_flush_4  ;; 3 cycles
+   \   000026                       ; ------------------------------------- Block: 6 cycles
+    149            }
+    150          
+    151            // Receive from queue
+    152            if (!aci_queue_dequeue(&aci_tx_q, &data_to_send))
+   \                     ??hal_aci_tl_q_flush_5:
+   \   000026 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000028 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000029 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   00002C FD....                CALL      aci_queue_dequeue  ;; 3 cycles
+   \   00002F D1                    CMP0      A                  ;; 1 cycle
+   \   000030 DF06                  BNZ       ??hal_aci_tl_q_flush_6  ;; 4 cycles
+   \   000032                       ; ------------------------------------- Block: 11 cycles
+    153            {
+    154              /* queue was empty, nothing to send */
+    155              data_to_send.status_byte = 0;
+   \   000032 F1                    CLRB      A                  ;; 1 cycle
+   \   000033 9800                  MOV       [SP], A            ;; 1 cycle
+    156              data_to_send.buffer[0] = 0;
+   \   000035 F1                    CLRB      A                  ;; 1 cycle
+   \   000036 9801                  MOV       [SP+0x01], A       ;; 1 cycle
+   \   000038                       ; ------------------------------------- Block: 4 cycles
+    157            }
+    158          
+    159            // Receive and/or transmit data
+    160            m_aci_spi_transfer(&data_to_send, &received_data);
+   \                     ??hal_aci_tl_q_flush_6:
+   \   000038 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00003A 042100                ADDW      AX, #0x21          ;; 1 cycle
+   \   00003D 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00003E AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000040 FD....                CALL      m_aci_spi_transfer  ;; 3 cycles
+    161          
+    162            /* If there are messages to transmit, and we can store the reply, we request a new transfer */
+    163            if (!aci_queue_is_full(&aci_rx_q) && !aci_queue_is_empty(&aci_tx_q))
+   \   000043 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000046 FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000049 D1                    CMP0      A                  ;; 1 cycle
+   \   00004A DF0C                  BNZ       ??hal_aci_tl_q_flush_7  ;; 4 cycles
+   \   00004C                       ; ------------------------------------- Block: 16 cycles
+   \   00004C 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   00004F FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   000052 D1                    CMP0      A                  ;; 1 cycle
+   \   000053 61F8                  SKNZ                         ;; 4 cycles
+   \   000055                       ; ------------------------------------- Block: 9 cycles
+    164            {
+    165              m_aci_reqn_enable();
+   \   000055 FD....                CALL      m_aci_reqn_enable  ;; 3 cycles
+   \   000058                       ; ------------------------------------- Block: 3 cycles
+    166            }
+    167          
+    168            // Check if we received data
+    169            if (received_data.buffer[0] > 0)
+   \                     ??hal_aci_tl_q_flush_7:
+   \   000058 8822                  MOV       A, [SP+0x22]       ;; 1 cycle
+   \   00005A D1                    CMP0      A                  ;; 1 cycle
+   \   00005B DD11                  BZ        ??hal_aci_tl_q_flush_4  ;; 4 cycles
+   \   00005D                       ; ------------------------------------- Block: 6 cycles
+    170            {
+    171              if (!aci_queue_enqueue(&aci_rx_q, &received_data))
+   \   00005D AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00005F 042100                ADDW      AX, #0x21          ;; 1 cycle
+   \   000062 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000063 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000066 FD....                CALL      aci_queue_enqueue  ;; 3 cycles
+   \   000069 D1                    CMP0      A                  ;; 1 cycle
+   \   00006A 61F8                  SKNZ                         ;; 4 cycles
+   \   00006C                       ; ------------------------------------- Block: 12 cycles
+    172              {
+    173                /* Receive Buffer full.
+    174                   Should never happen.
+    175                   Spin in a while loop.
+    176                */
+    177                while(1);
+   \                     ??m_aci_event_check_0:
+   \   00006C EFFE                  BR        S:??m_aci_event_check_0  ;; 3 cycles
+   \   00006E                       ; ------------------------------------- Block: 3 cycles
+    178              }
+    179            }
+    180          
+    181            return;
+   \                     ??hal_aci_tl_q_flush_4:
+   \   00006E 1042                  ADDW      SP, #0x42          ;; 1 cycle
+   \   000070 C2                    POP       BC                 ;; 1 cycle
+   \   000071 D7                    RET                          ;; 6 cycles
+   \   000072                       ; ------------------------------------- Block: 8 cycles
+   \   000072                       ; ------------------------------------- Total: 108 cycles
+   \   000072                       REQUIRE ?CLRL78_V1_0_L00
+    182          }
+    183          
+    184          /** @brief Point the low level library at the ACI pins specified
+    185           *  @details
+    186           *  The ACI pins are specified in the application and a pointer is made available for
+    187           *  the low level library to use
+    188           */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    189          static void m_aci_pins_set(aci_pins_t *a_pins_ptr)
+   \                     m_aci_pins_set:
+    190          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+   \   000000 16                    MOVW      HL, AX             ;; 1 cycle
+    191            a_pins_local_ptr = a_pins_ptr;
+   \   000001 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000002 BF....                MOVW      N:a_pins_local_ptr, AX  ;; 1 cycle
+   \   000005 37                    XCHW      AX, HL             ;; 1 cycle
+    192          }
+   \   000006 D7                    RET                          ;; 6 cycles
+   \   000007                       ; ------------------------------------- Block: 10 cycles
+   \   000007                       ; ------------------------------------- Total: 10 cycles
+   \   000007                       REQUIRE ?CLRL78_V1_0_L00
+    193          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    194          static inline void m_aci_reqn_disable (void)
+   \                     m_aci_reqn_disable:
+    195          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+    196            digitalWrite(a_pins_local_ptr->reqn_pin, 1);
+   \   000001 E3                    ONEB      B                  ;; 1 cycle
+   \   000002 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000005 8C01                  MOV       A, [HL+0x01]       ;; 1 cycle
+   \   000007 FD....                CALL      digitalWrite       ;; 3 cycles
+    197          }
+   \   00000A C2                    POP       BC                 ;; 1 cycle
+   \   00000B D7                    RET                          ;; 6 cycles
+   \   00000C                       ; ------------------------------------- Block: 14 cycles
+   \   00000C                       ; ------------------------------------- Total: 14 cycles
+   \   00000C                       REQUIRE ?CLRL78_V1_0_L00
+    198          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    199          static inline void m_aci_reqn_enable (void)
+   \                     m_aci_reqn_enable:
+    200          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+    201            digitalWrite(a_pins_local_ptr->reqn_pin, 0);
+   \   000001 F3                    CLRB      B                  ;; 1 cycle
+   \   000002 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000005 8C01                  MOV       A, [HL+0x01]       ;; 1 cycle
+   \   000007 FD....                CALL      digitalWrite       ;; 3 cycles
+    202          }
+   \   00000A C2                    POP       BC                 ;; 1 cycle
+   \   00000B D7                    RET                          ;; 6 cycles
+   \   00000C                       ; ------------------------------------- Block: 14 cycles
+   \   00000C                       ; ------------------------------------- Total: 14 cycles
+   \   00000C                       REQUIRE ?CLRL78_V1_0_L00
+    203          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    204          static void m_aci_q_flush(void)
+   \                     m_aci_q_flush:
+    205          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    206            noInterrupts();
+   \   000000 FD....                CALL      noInterrupts       ;; 3 cycles
+    207            /* re-initialize aci cmd queue and aci event queue to flush them*/
+    208            aci_queue_init(&aci_tx_q);
+   \   000003 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   000006 FD....                CALL      aci_queue_init     ;; 3 cycles
+    209            aci_queue_init(&aci_rx_q);
+   \   000009 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   00000C FD....                CALL      aci_queue_init     ;; 3 cycles
+    210            interrupts();
+   \   00000F FD....                CALL      interrupts         ;; 3 cycles
+    211          }
+   \   000012 D7                    RET                          ;; 6 cycles
+   \   000013                       ; ------------------------------------- Block: 20 cycles
+   \   000013                       ; ------------------------------------- Total: 20 cycles
+   \   000013                       REQUIRE ?CLRL78_V1_0_L00
+    212          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    213          static bool m_aci_spi_transfer(hal_aci_data_t * data_to_send, hal_aci_data_t * received_data)
+   \                     m_aci_spi_transfer:
+    214          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+    215            uint8_t byte_cnt;
+    216            uint8_t byte_sent_cnt;
+    217            uint8_t max_bytes;
+    218          
+    219            m_aci_reqn_enable();
+   \   000003 FD....                CALL      m_aci_reqn_enable  ;; 3 cycles
+    220          
+    221            // Send length, receive header
+    222            byte_sent_cnt = 0;
+   \   000006 5400                  MOV       E, #0x0            ;; 1 cycle
+    223            received_data->status_byte = spi_readwrite(data_to_send->buffer[byte_sent_cnt++]);
+   \   000008 C5                    PUSH      DE                 ;; 1 cycle
+   \   000009 C2                    POP       BC                 ;; 1 cycle
+   \   00000A F3                    CLRB      B                  ;; 1 cycle
+   \   00000B A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00000D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00000E 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00000F 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000010 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000011 A7                    INCW      HL                 ;; 1 cycle
+   \   000012 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000013 FD....                CALL      spi_readwrite      ;; 3 cycles
+   \   000016 73                    MOV       B, A               ;; 1 cycle
+   \   000017 84                    INC       E                  ;; 1 cycle
+   \   000018 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00001A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001B 63                    MOV       A, B               ;; 1 cycle
+   \   00001C 9B                    MOV       [HL], A            ;; 1 cycle
+    224            // Send first byte, receive length from slave
+    225            received_data->buffer[0] = spi_readwrite(data_to_send->buffer[byte_sent_cnt++]);
+   \   00001D C5                    PUSH      DE                 ;; 1 cycle
+   \   00001E C2                    POP       BC                 ;; 1 cycle
+   \   00001F F3                    CLRB      B                  ;; 1 cycle
+   \   000020 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000022 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000023 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000024 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000025 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000026 A7                    INCW      HL                 ;; 1 cycle
+   \   000027 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000028 FD....                CALL      spi_readwrite      ;; 3 cycles
+   \   00002B 73                    MOV       B, A               ;; 1 cycle
+   \   00002C 84                    INC       E                  ;; 1 cycle
+   \   00002D A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00002F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000030 A7                    INCW      HL                 ;; 1 cycle
+   \   000031 63                    MOV       A, B               ;; 1 cycle
+   \   000032 9B                    MOV       [HL], A            ;; 1 cycle
+    226            if (0 == data_to_send->buffer[0])
+   \   000033 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000035 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000036 A7                    INCW      HL                 ;; 1 cycle
+   \   000037 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000038 D1                    CMP0      A                  ;; 1 cycle
+   \   000039 DF08                  BNZ       ??hal_aci_tl_q_flush_8  ;; 4 cycles
+   \   00003B                       ; ------------------------------------- Block: 55 cycles
+    227            {
+    228              max_bytes = received_data->buffer[0];
+   \   00003B A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00003D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003E A7                    INCW      HL                 ;; 1 cycle
+   \   00003F 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000040 75                    MOV       D, A               ;; 1 cycle
+   \   000041 EF22                  BR        S:??hal_aci_tl_q_flush_9  ;; 3 cycles
+   \   000043                       ; ------------------------------------- Block: 8 cycles
+    229            }
+    230            else
+    231            {
+    232              // Set the maximum to the biggest size. One command byte is already sent
+    233              max_bytes = (received_data->buffer[0] > (data_to_send->buffer[0] - 1))
+    234                                                    ? received_data->buffer[0]
+    235                                                    : (data_to_send->buffer[0] - 1);
+   \                     ??hal_aci_tl_q_flush_8:
+   \   000043 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000045 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000046 A7                    INCW      HL                 ;; 1 cycle
+   \   000047 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000048 72                    MOV       C, A               ;; 1 cycle
+   \   000049 F3                    CLRB      B                  ;; 1 cycle
+   \   00004A A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00004C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00004D A7                    INCW      HL                 ;; 1 cycle
+   \   00004E 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00004F 70                    MOV       X, A               ;; 1 cycle
+   \   000050 F1                    CLRB      A                  ;; 1 cycle
+   \   000051 B1                    DECW      AX                 ;; 1 cycle
+   \   000052 FD....                CALL      N:?SI_CMP_L02      ;; 3 cycles
+   \   000055 DE07                  BNC       ??hal_aci_tl_q_flush_10  ;; 4 cycles
+   \   000057                       ; ------------------------------------- Block: 20 cycles
+   \   000057 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000059 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00005A A7                    INCW      HL                 ;; 1 cycle
+   \   00005B 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00005C EF06                  BR        S:??hal_aci_tl_q_flush_11  ;; 3 cycles
+   \   00005E                       ; ------------------------------------- Block: 7 cycles
+   \                     ??hal_aci_tl_q_flush_10:
+   \   00005E A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000060 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000061 A7                    INCW      HL                 ;; 1 cycle
+   \   000062 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000063 91                    DEC       A                  ;; 1 cycle
+   \   000064                       ; ------------------------------------- Block: 5 cycles
+   \                     ??hal_aci_tl_q_flush_11:
+   \   000064 75                    MOV       D, A               ;; 1 cycle
+   \   000065                       ; ------------------------------------- Block: 1 cycles
+    236            }
+    237          
+    238            if (max_bytes > HAL_ACI_MAX_LENGTH)
+   \                     ??hal_aci_tl_q_flush_9:
+   \   000065 65                    MOV       A, D               ;; 1 cycle
+   \   000066 4C20                  CMP       A, #0x20           ;; 1 cycle
+   \   000068 61C8                  SKC                          ;; 4 cycles
+   \   00006A                       ; ------------------------------------- Block: 6 cycles
+    239            {
+    240              max_bytes = HAL_ACI_MAX_LENGTH;
+   \   00006A 551F                  MOV       D, #0x1F           ;; 1 cycle
+   \   00006C                       ; ------------------------------------- Block: 1 cycles
+    241            }
+    242          
+    243            // Transmit/receive the rest of the packet
+    244            for (byte_cnt = 0; byte_cnt < max_bytes; byte_cnt++)
+   \                     ??m_aci_spi_transfer_0:
+   \   00006C F2                    CLRB      C                  ;; 1 cycle
+   \   00006D EF1B                  BR        S:??hal_aci_tl_q_flush_12  ;; 3 cycles
+   \   00006F                       ; ------------------------------------- Block: 4 cycles
+    245            {
+    246              received_data->buffer[byte_cnt+1] =  spi_readwrite(data_to_send->buffer[byte_sent_cnt++]);
+   \                     ??m_aci_spi_transfer_1:
+   \   00006F C5                    PUSH      DE                 ;; 1 cycle
+   \   000070 C6                    POP       HL                 ;; 1 cycle
+   \   000071 5700                  MOV       H, #0x0            ;; 1 cycle
+   \   000073 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000075 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000076 A1                    INCW      AX                 ;; 1 cycle
+   \   000077 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000078 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000079 FD....                CALL      spi_readwrite      ;; 3 cycles
+   \   00007C 73                    MOV       B, A               ;; 1 cycle
+   \   00007D 84                    INC       E                  ;; 1 cycle
+   \   00007E 62                    MOV       A, C               ;; 1 cycle
+   \   00007F 70                    MOV       X, A               ;; 1 cycle
+   \   000080 F1                    CLRB      A                  ;; 1 cycle
+   \   000081 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000082 A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   000084 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000085 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000086 63                    MOV       A, B               ;; 1 cycle
+   \   000087 9C02                  MOV       [HL+0x02], A       ;; 1 cycle
+    247            }
+   \   000089 82                    INC       C                  ;; 1 cycle
+   \   00008A                       ; ------------------------------------- Block: 23 cycles
+   \                     ??hal_aci_tl_q_flush_12:
+   \   00008A 62                    MOV       A, C               ;; 1 cycle
+   \   00008B 614D                  CMP       A, D               ;; 1 cycle
+   \   00008D 72                    MOV       C, A               ;; 1 cycle
+   \   00008E DCDF                  BC        ??m_aci_spi_transfer_1  ;; 4 cycles
+   \   000090                       ; ------------------------------------- Block: 7 cycles
+    248          
+    249            // RDYN should follow the REQN line in approx 100ns
+    250            m_aci_reqn_disable();
+   \   000090 FD....                CALL      m_aci_reqn_disable  ;; 3 cycles
+    251          
+    252            return (max_bytes > 0);
+   \   000093 65                    MOV       A, D               ;; 1 cycle
+   \   000094 D1                    CMP0      A                  ;; 1 cycle
+   \   000095 75                    MOV       D, A               ;; 1 cycle
+   \   000096 E1                    ONEB      A                  ;; 1 cycle
+   \   000097 61F8                  SKNZ                         ;; 4 cycles
+   \   000099                       ; ------------------------------------- Block: 11 cycles
+   \   000099 F1                    CLRB      A                  ;; 1 cycle
+   \   00009A                       ; ------------------------------------- Block: 1 cycles
+   \                     ??m_aci_spi_transfer_2:
+   \   00009A 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00009C C4                    POP       DE                 ;; 1 cycle
+   \   00009D D7                    RET                          ;; 6 cycles
+   \   00009E                       ; ------------------------------------- Block: 8 cycles
+   \   00009E                       ; ------------------------------------- Total: 157 cycles
+   \   00009E                       REQUIRE ?CLRL78_V1_0_L00
+    253          }
+    254          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    255          void hal_aci_tl_debug_print(bool enable)
+   \                     hal_aci_tl_debug_print:
+    256          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    257            aci_debug_print = enable;
+   \   000000 9F....                MOV       N:aci_debug_print, A  ;; 1 cycle
+    258          }
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 7 cycles
+   \   000004                       ; ------------------------------------- Total: 7 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    259          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    260          void hal_aci_tl_pin_reset(void)
+   \                     hal_aci_tl_pin_reset:
+    261          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 0
+    262              if (UNUSED != a_pins_local_ptr->reset_pin)
+   \   000001 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000004 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   000006 81                    INC       A                  ;; 1 cycle
+   \   000007 DD4E                  BZ        ??hal_aci_tl_q_flush_13  ;; 4 cycles
+   \   000009                       ; ------------------------------------- Block: 8 cycles
+    263              {
+    264                  pinMode(a_pins_local_ptr->reset_pin, OUTPUT);
+   \   000009 F3                    CLRB      B                  ;; 1 cycle
+   \   00000A FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   00000D 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   00000F FD....                CALL      pinMode            ;; 3 cycles
+    265          
+    266                  if ((REDBEARLAB_SHIELD_V1_1     == a_pins_local_ptr->board_name) ||
+    267                      (REDBEARLAB_SHIELD_V2012_07 == a_pins_local_ptr->board_name))
+   \   000012 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000015 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000016 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000018 DD08                  BZ        ??hal_aci_tl_q_flush_14  ;; 4 cycles
+   \   00001A                       ; ------------------------------------- Block: 13 cycles
+   \   00001A FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   00001D 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00001E 4C01                  CMP       A, #0x1            ;; 1 cycle
+   \   000020 DF1A                  BNZ       ??hal_aci_tl_q_flush_15  ;; 4 cycles
+   \   000022                       ; ------------------------------------- Block: 7 cycles
+    268                  {
+    269                      //The reset for the Redbearlab v1.1 and v2012.07 boards are inverted and has a Power On Reset
+    270                      //circuit that takes about 100ms to trigger the reset
+    271                      digitalWrite(a_pins_local_ptr->reset_pin, 1);
+   \                     ??hal_aci_tl_q_flush_14:
+   \   000022 E3                    ONEB      B                  ;; 1 cycle
+   \   000023 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000026 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   000028 FD....                CALL      digitalWrite       ;; 3 cycles
+    272                      delay(100);
+   \   00002B 306400                MOVW      AX, #0x64          ;; 1 cycle
+   \   00002E FD....                CALL      delay              ;; 3 cycles
+    273                      digitalWrite(a_pins_local_ptr->reset_pin, 0);
+   \   000031 F3                    CLRB      B                  ;; 1 cycle
+   \   000032 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000035 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   000037 FD....                CALL      digitalWrite       ;; 3 cycles
+   \   00003A EF1B                  BR        S:??hal_aci_tl_q_flush_13  ;; 3 cycles
+   \   00003C                       ; ------------------------------------- Block: 19 cycles
+    274                  }
+    275                  else
+    276                  {
+    277                      digitalWrite(a_pins_local_ptr->reset_pin, 1);
+   \                     ??hal_aci_tl_q_flush_15:
+   \   00003C E3                    ONEB      B                  ;; 1 cycle
+   \   00003D FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000040 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   000042 FD....                CALL      digitalWrite       ;; 3 cycles
+    278                      digitalWrite(a_pins_local_ptr->reset_pin, 0);
+   \   000045 F3                    CLRB      B                  ;; 1 cycle
+   \   000046 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000049 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   00004B FD....                CALL      digitalWrite       ;; 3 cycles
+    279                      digitalWrite(a_pins_local_ptr->reset_pin, 1);
+   \   00004E E3                    ONEB      B                  ;; 1 cycle
+   \   00004F FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000052 8C07                  MOV       A, [HL+0x07]       ;; 1 cycle
+   \   000054 FD....                CALL      digitalWrite       ;; 3 cycles
+   \   000057                       ; ------------------------------------- Block: 18 cycles
+    280                  }
+    281              }
+    282          }
+   \                     ??hal_aci_tl_q_flush_13:
+   \   000057 C2                    POP       BC                 ;; 1 cycle
+   \   000058 D7                    RET                          ;; 6 cycles
+   \   000059                       ; ------------------------------------- Block: 7 cycles
+   \   000059                       ; ------------------------------------- Total: 72 cycles
+   \   000059                       REQUIRE ?CLRL78_V1_0_L00
+    283          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    284          bool hal_aci_tl_event_peek(hal_aci_data_t *p_aci_data)
+   \                     hal_aci_tl_event_peek:
+    285          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    286            if (!a_pins_local_ptr->interface_is_interrupt)
+   \   000003 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000006 8C0A                  MOV       A, [HL+0x0A]       ;; 1 cycle
+   \   000008 D1                    CMP0      A                  ;; 1 cycle
+   \   000009 61F8                  SKNZ                         ;; 4 cycles
+   \   00000B                       ; ------------------------------------- Block: 10 cycles
+    287            {
+    288              m_aci_event_check();
+   \   00000B FD....                CALL      m_aci_event_check  ;; 3 cycles
+   \   00000E                       ; ------------------------------------- Block: 3 cycles
+    289            }
+    290          
+    291            if (aci_queue_peek(&aci_rx_q, p_aci_data))
+   \                     ??hal_aci_tl_event_peek_0:
+   \   00000E C5                    PUSH      DE                 ;; 1 cycle
+   \   00000F C2                    POP       BC                 ;; 1 cycle
+   \   000010 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000013 FD....                CALL      aci_queue_peek     ;; 3 cycles
+   \   000016 D1                    CMP0      A                  ;; 1 cycle
+   \   000017 DD03                  BZ        ??hal_aci_tl_q_flush_16  ;; 4 cycles
+   \   000019                       ; ------------------------------------- Block: 11 cycles
+    292            {
+    293              return true;
+   \   000019 E1                    ONEB      A                  ;; 1 cycle
+   \   00001A EF01                  BR        S:??hal_aci_tl_q_flush_17  ;; 3 cycles
+   \   00001C                       ; ------------------------------------- Block: 4 cycles
+    294            }
+    295          
+    296            return false;
+   \                     ??hal_aci_tl_q_flush_16:
+   \   00001C F1                    CLRB      A                  ;; 1 cycle
+   \   00001D                       ; ------------------------------------- Block: 1 cycles
+   \                     ??hal_aci_tl_q_flush_17:
+   \   00001D C4                    POP       DE                 ;; 1 cycle
+   \   00001E C2                    POP       BC                 ;; 1 cycle
+   \   00001F D7                    RET                          ;; 6 cycles
+   \   000020                       ; ------------------------------------- Block: 8 cycles
+   \   000020                       ; ------------------------------------- Total: 37 cycles
+   \   000020                       REQUIRE ?CLRL78_V1_0_L00
+    297          }
+    298          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    299          bool hal_aci_tl_event_get(hal_aci_data_t *p_aci_data)
+   \                     hal_aci_tl_event_get:
+    300          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+   \   000003 C1                    PUSH      AX                 ;; 1 cycle
+    301            bool was_full;
+    302          
+    303            if (!a_pins_local_ptr->interface_is_interrupt && !aci_queue_is_full(&aci_rx_q))
+   \   000004 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000007 8C0A                  MOV       A, [HL+0x0A]       ;; 1 cycle
+   \   000009 D1                    CMP0      A                  ;; 1 cycle
+   \   00000A DF0C                  BNZ       ??hal_aci_tl_q_flush_18  ;; 4 cycles
+   \   00000C                       ; ------------------------------------- Block: 11 cycles
+   \   00000C 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   00000F FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000012 D1                    CMP0      A                  ;; 1 cycle
+   \   000013 61F8                  SKNZ                         ;; 4 cycles
+   \   000015                       ; ------------------------------------- Block: 9 cycles
+    304            {
+    305              m_aci_event_check();
+   \   000015 FD....                CALL      m_aci_event_check  ;; 3 cycles
+   \   000018                       ; ------------------------------------- Block: 3 cycles
+    306            }
+    307          
+    308            was_full = aci_queue_is_full(&aci_rx_q);
+   \                     ??hal_aci_tl_q_flush_18:
+   \   000018 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   00001B FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   00001E 75                    MOV       D, A               ;; 1 cycle
+    309          
+    310            if (aci_queue_dequeue(&aci_rx_q, p_aci_data))
+   \   00001F A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000021 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000022 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000025 FD....                CALL      aci_queue_dequeue  ;; 3 cycles
+   \   000028 D1                    CMP0      A                  ;; 1 cycle
+   \   000029 DD5E                  BZ        ??hal_aci_tl_q_flush_19  ;; 4 cycles
+   \   00002B                       ; ------------------------------------- Block: 16 cycles
+    311            {
+    312              if (aci_debug_print)
+   \   00002B D5....                CMP0      N:aci_debug_print  ;; 1 cycle
+   \   00002E DD28                  BZ        ??hal_aci_tl_q_flush_20  ;; 4 cycles
+   \   000030                       ; ------------------------------------- Block: 5 cycles
+    313              {
+    314                Serial.print(" E");
+   \   000030 F7                    CLRW      BC                 ;; 1 cycle
+   \   000031                       ; ------------------------------------- Block: 1 cycles
+   \                     ??hal_aci_tl_event_get_0:
+   \   000031 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000034 74                    MOV       E, A               ;; 1 cycle
+   \   000035 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000037 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   00003A 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00003B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003C 64                    MOV       A, E               ;; 1 cycle
+   \   00003D 9B                    MOV       [HL], A            ;; 1 cycle
+   \   00003E A3                    INCW      BC                 ;; 1 cycle
+   \   00003F 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000040 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000043 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000044 DCEB                  BC        ??hal_aci_tl_event_get_0  ;; 4 cycles
+   \   000046                       ; ------------------------------------- Block: 16 cycles
+   \   000046 F3                    CLRB      B                  ;; 1 cycle
+   \   000047 30....                MOVW      AX, #`?<Constant " E">`  ;; 1 cycle
+   \   00004A 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00004B A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00004D 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00004E CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000051 61FA                  CALL      HL                 ;; 3 cycles
+    315                m_aci_data_print(p_aci_data);
+   \   000053 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000055 FD....                CALL      m_aci_data_print   ;; 3 cycles
+   \   000058                       ; ------------------------------------- Block: 13 cycles
+    316              }
+    317          
+    318              if (was_full && a_pins_local_ptr->interface_is_interrupt)
+   \                     ??hal_aci_tl_q_flush_20:
+   \   000058 65                    MOV       A, D               ;; 1 cycle
+   \   000059 D1                    CMP0      A                  ;; 1 cycle
+   \   00005A 75                    MOV       D, A               ;; 1 cycle
+   \   00005B DD14                  BZ        ??hal_aci_tl_q_flush_21  ;; 4 cycles
+   \   00005D                       ; ------------------------------------- Block: 7 cycles
+   \   00005D FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   000060 8C0A                  MOV       A, [HL+0x0A]       ;; 1 cycle
+   \   000062 D1                    CMP0      A                  ;; 1 cycle
+   \   000063 DD0C                  BZ        ??hal_aci_tl_q_flush_21  ;; 4 cycles
+   \   000065                       ; ------------------------------------- Block: 7 cycles
+    319              {
+    320                /* Enable RDY line interrupt again */
+    321                attachInterrupt(a_pins_local_ptr->interrupt_number, m_aci_isr, LOW);
+   \   000065 F0                    CLRB      X                  ;; 1 cycle
+   \   000066 32....                MOVW      BC, #m_aci_isr     ;; 1 cycle
+   \   000069 FB....                MOVW      HL, N:a_pins_local_ptr  ;; 1 cycle
+   \   00006C 8C0B                  MOV       A, [HL+0x0B]       ;; 1 cycle
+   \   00006E FD....                CALL      attachInterrupt    ;; 3 cycles
+   \   000071                       ; ------------------------------------- Block: 7 cycles
+    322              }
+    323          
+    324              /* Attempt to pull REQN LOW since we've made room for new messages */
+    325              if (!aci_queue_is_full(&aci_rx_q) && !aci_queue_is_empty(&aci_tx_q))
+   \                     ??hal_aci_tl_q_flush_21:
+   \   000071 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000074 FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000077 D1                    CMP0      A                  ;; 1 cycle
+   \   000078 DF0C                  BNZ       ??hal_aci_tl_q_flush_22  ;; 4 cycles
+   \   00007A                       ; ------------------------------------- Block: 9 cycles
+   \   00007A 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   00007D FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   000080 D1                    CMP0      A                  ;; 1 cycle
+   \   000081 61F8                  SKNZ                         ;; 4 cycles
+   \   000083                       ; ------------------------------------- Block: 9 cycles
+    326              {
+    327                m_aci_reqn_enable();
+   \   000083 FD....                CALL      m_aci_reqn_enable  ;; 3 cycles
+   \   000086                       ; ------------------------------------- Block: 3 cycles
+    328              }
+    329          
+    330              return true;
+   \                     ??hal_aci_tl_q_flush_22:
+   \   000086 E1                    ONEB      A                  ;; 1 cycle
+   \   000087 EF01                  BR        S:??hal_aci_tl_q_flush_23  ;; 3 cycles
+   \   000089                       ; ------------------------------------- Block: 4 cycles
+    331            }
+    332          
+    333            return false;
+   \                     ??hal_aci_tl_q_flush_19:
+   \   000089 F1                    CLRB      A                  ;; 1 cycle
+   \   00008A                       ; ------------------------------------- Block: 1 cycles
+   \                     ??hal_aci_tl_q_flush_23:
+   \   00008A 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00008C C4                    POP       DE                 ;; 1 cycle
+   \   00008D C2                    POP       BC                 ;; 1 cycle
+   \   00008E D7                    RET                          ;; 6 cycles
+   \   00008F                       ; ------------------------------------- Block: 9 cycles
+   \   00008F                       ; ------------------------------------- Total: 130 cycles
+   \   00008F                       REQUIRE ?CLRL78_V1_0_L00
+    334          }
+    335          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    336          void hal_aci_tl_init(aci_pins_t *a_pins, bool debug)
+   \                     hal_aci_tl_init:
+    337          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002                       ; Auto size: 0
+   \   000002 14                    MOVW      DE, AX             ;; 1 cycle
+    338            aci_debug_print = debug;
+   \   000003 63                    MOV       A, B               ;; 1 cycle
+   \   000004 9F....                MOV       N:aci_debug_print, A  ;; 1 cycle
+   \   000007 73                    MOV       B, A               ;; 1 cycle
+    339          
+    340            /* Needs to be called as the first thing for proper intialization*/
+    341            m_aci_pins_set(a_pins);
+   \   000008 15                    MOVW      AX, DE             ;; 1 cycle
+   \   000009 FD....                CALL      m_aci_pins_set     ;; 3 cycles
+    342          
+    343            #if defined (__AVR__ ) || (__PIC32MX__)
+    344              /*
+    345              The SPI lines used are mapped directly to the hardware SPI
+    346              MISO MOSI and SCK
+    347              Change here if the pins are mapped differently
+    348          
+    349              The SPI library assumes that the hardware pins are used
+    350              */
+    351              SPI.begin();
+    352              //Board dependent defines
+    353              #if defined (__AVR__)
+    354                //For Arduino use the LSB first
+    355                SPI.setBitOrder(LSBFIRST);
+    356              #elif defined(__PIC32MX__)
+    357                //For ChipKit use MSBFIRST and REVERSE the bits on the SPI as LSBFIRST is not supported
+    358                SPI.setBitOrder(MSBFIRST);
+    359              #endif
+    360              SPI.setClockDivider(a_pins->spi_clock_divider);
+    361              SPI.setDataMode(SPI_MODE0);
+    362            #endif
+    363            
+    364            #if defined(__ICCRL78__)
+    365              CSI00_SendReceiveData(0x00);  //Send dummy on SPI so the lines get to the values the have to be.
+   \   00000C F1                    CLRB      A                  ;; 1 cycle
+   \   00000D FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+    366            #endif
+    367            
+    368            /* Initialize the ACI Command queue. This must be called after the delay above. */
+    369            aci_queue_init(&aci_tx_q);
+   \   000010 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   000013 FD....                CALL      aci_queue_init     ;; 3 cycles
+    370            aci_queue_init(&aci_rx_q);
+   \   000016 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000019 FD....                CALL      aci_queue_init     ;; 3 cycles
+    371          
+    372            //Configure the IO lines
+    373            pinMode(a_pins->rdyn_pin,   INPUT_PULLUP);
+   \   00001C F3                    CLRB      B                  ;; 1 cycle
+   \   00001D 8A02                  MOV       A, [DE+0x02]       ;; 1 cycle
+   \   00001F FD....                CALL      pinMode            ;; 3 cycles
+    374            pinMode(a_pins->reqn_pin,   OUTPUT);
+   \   000022 F3                    CLRB      B                  ;; 1 cycle
+   \   000023 8A01                  MOV       A, [DE+0x01]       ;; 1 cycle
+   \   000025 FD....                CALL      pinMode            ;; 3 cycles
+    375          
+    376            if (UNUSED != a_pins->active_pin)
+   \   000028 8A08                  MOV       A, [DE+0x08]       ;; 1 cycle
+   \   00002A 81                    INC       A                  ;; 1 cycle
+   \   00002B DD06                  BZ        ??hal_aci_tl_q_flush_24  ;; 4 cycles
+   \   00002D                       ; ------------------------------------- Block: 38 cycles
+    377            {
+    378              pinMode(a_pins->active_pin, INPUT);
+   \   00002D F3                    CLRB      B                  ;; 1 cycle
+   \   00002E 8A08                  MOV       A, [DE+0x08]       ;; 1 cycle
+   \   000030 FD....                CALL      pinMode            ;; 3 cycles
+   \   000033                       ; ------------------------------------- Block: 5 cycles
+    379            }
+    380            /* Pin reset the nRF8001, required when the nRF8001 setup is being changed */
+    381            hal_aci_tl_pin_reset();
+   \                     ??hal_aci_tl_q_flush_24:
+   \   000033 FD....                CALL      hal_aci_tl_pin_reset  ;; 3 cycles
+    382          
+    383            /* Set the nRF8001 to a known state as required by the datasheet*/
+    384            //digitalWrite(a_pins->miso_pin, 0);
+    385            //digitalWrite(a_pins->mosi_pin, 0);
+    386            digitalWrite(a_pins->reqn_pin, 1);
+   \   000036 E3                    ONEB      B                  ;; 1 cycle
+   \   000037 8A01                  MOV       A, [DE+0x01]       ;; 1 cycle
+   \   000039 FD....                CALL      digitalWrite       ;; 3 cycles
+    387            //digitalWrite(a_pins->sck_pin,  0);
+    388          
+    389            //EAGM Delay had to be bigger
+    390            delay(30); //Wait for the nRF8001 to get hold of its lines - the lines float for a few ms after the reset
+   \   00003C 301E00                MOVW      AX, #0x1E          ;; 1 cycle
+   \   00003F FD....                CALL      delay              ;; 3 cycles
+    391          
+    392            /* Attach the interrupt to the RDYN line as requested by the caller */
+    393            if (a_pins->interface_is_interrupt)
+   \   000042 8A0A                  MOV       A, [DE+0x0A]       ;; 1 cycle
+   \   000044 D1                    CMP0      A                  ;; 1 cycle
+   \   000045 DD09                  BZ        ??hal_aci_tl_q_flush_25  ;; 4 cycles
+   \   000047                       ; ------------------------------------- Block: 18 cycles
+    394            {
+    395              // We use the LOW level of the RDYN line as the atmega328 can wakeup from sleep only on LOW
+    396              attachInterrupt(a_pins->interrupt_number, m_aci_isr, LOW);
+   \   000047 F0                    CLRB      X                  ;; 1 cycle
+   \   000048 32....                MOVW      BC, #m_aci_isr     ;; 1 cycle
+   \   00004B 8A0B                  MOV       A, [DE+0x0B]       ;; 1 cycle
+   \   00004D FD....                CALL      attachInterrupt    ;; 3 cycles
+   \   000050                       ; ------------------------------------- Block: 6 cycles
+    397            }
+    398            
+    399          }
+   \                     ??hal_aci_tl_q_flush_25:
+   \   000050 C4                    POP       DE                 ;; 1 cycle
+   \   000051 C2                    POP       BC                 ;; 1 cycle
+   \   000052 D7                    RET                          ;; 6 cycles
+   \   000053                       ; ------------------------------------- Block: 8 cycles
+   \   000053                       ; ------------------------------------- Total: 75 cycles
+   \   000053                       REQUIRE ?CLRL78_V1_0_L00
+    400          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    401          bool hal_aci_tl_send(hal_aci_data_t *p_aci_cmd)
+   \                     hal_aci_tl_send:
+    402          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 4
+   \   000003 C1                    PUSH      AX                 ;; 1 cycle
+    403            const uint8_t length = p_aci_cmd->buffer[0];
+   \   000004 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000006 A1                    INCW      AX                 ;; 1 cycle
+   \   000007 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000008 8B                    MOV       A, [HL]            ;; 1 cycle
+    404            bool ret_val = false;
+   \   000009 5500                  MOV       D, #0x0            ;; 1 cycle
+    405          
+    406            if (length > HAL_ACI_MAX_LENGTH)
+   \   00000B 4C20                  CMP       A, #0x20           ;; 1 cycle
+   \   00000D DC03                  BC        ??hal_aci_tl_q_flush_26  ;; 4 cycles
+   \   00000F                       ; ------------------------------------- Block: 14 cycles
+    407            {
+    408              return false;
+   \   00000F F1                    CLRB      A                  ;; 1 cycle
+   \   000010 EF49                  BR        S:??hal_aci_tl_q_flush_27  ;; 3 cycles
+   \   000012                       ; ------------------------------------- Block: 4 cycles
+    409            }
+    410          
+    411            ret_val = aci_queue_enqueue(&aci_tx_q, p_aci_cmd);
+   \                     ??hal_aci_tl_q_flush_26:
+   \   000012 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000014 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000015 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   000018 FD....                CALL      aci_queue_enqueue  ;; 3 cycles
+   \   00001B 75                    MOV       D, A               ;; 1 cycle
+    412            if (ret_val)
+   \   00001C 65                    MOV       A, D               ;; 1 cycle
+   \   00001D D1                    CMP0      A                  ;; 1 cycle
+   \   00001E 75                    MOV       D, A               ;; 1 cycle
+   \   00001F DD39                  BZ        ??hal_aci_tl_q_flush_28  ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 14 cycles
+    413            {
+    414              if(!aci_queue_is_full(&aci_rx_q))
+   \   000021 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000024 FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000027 D1                    CMP0      A                  ;; 1 cycle
+   \   000028 61F8                  SKNZ                         ;; 4 cycles
+   \   00002A                       ; ------------------------------------- Block: 9 cycles
+    415              {
+    416                // Lower the REQN only when successfully enqueued
+    417                m_aci_reqn_enable();
+   \   00002A FD....                CALL      m_aci_reqn_enable  ;; 3 cycles
+   \   00002D                       ; ------------------------------------- Block: 3 cycles
+    418              }
+    419          
+    420              if (aci_debug_print)
+   \                     ??hal_aci_tl_send_0:
+   \   00002D D5....                CMP0      N:aci_debug_print  ;; 1 cycle
+   \   000030 DD28                  BZ        ??hal_aci_tl_q_flush_28  ;; 4 cycles
+   \   000032                       ; ------------------------------------- Block: 5 cycles
+    421              {
+    422                Serial.print("C"); //ACI Command
+   \   000032 F7                    CLRW      BC                 ;; 1 cycle
+   \   000033                       ; ------------------------------------- Block: 1 cycles
+   \                     ??hal_aci_tl_send_1:
+   \   000033 49....                MOV       A, (Serial & 0xFFFF)[BC]  ;; 1 cycle
+   \   000036 74                    MOV       E, A               ;; 1 cycle
+   \   000037 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000039 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   00003C 03                    ADDW      AX, BC             ;; 1 cycle
+   \   00003D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003E 64                    MOV       A, E               ;; 1 cycle
+   \   00003F 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000040 A3                    INCW      BC                 ;; 1 cycle
+   \   000041 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000042 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000045 33                    XCHW      AX, BC             ;; 1 cycle
+   \   000046 DCEB                  BC        ??hal_aci_tl_send_1  ;; 4 cycles
+   \   000048                       ; ------------------------------------- Block: 16 cycles
+   \   000048 F3                    CLRB      B                  ;; 1 cycle
+   \   000049 30....                MOVW      AX, #`?<Constant "C">`  ;; 1 cycle
+   \   00004C 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00004D A800                  MOVW      AX, [SP]           ;; 1 cycle
+   \   00004F 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000050 CEFC00                MOV       CS, #0x0           ;; 1 cycle
+   \   000053 61FA                  CALL      HL                 ;; 3 cycles
+    423                m_aci_data_print(p_aci_cmd);
+   \   000055 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000057 FD....                CALL      m_aci_data_print   ;; 3 cycles
+   \   00005A                       ; ------------------------------------- Block: 13 cycles
+    424              }
+    425            }
+    426          
+    427            return ret_val;
+   \                     ??hal_aci_tl_q_flush_28:
+   \   00005A 65                    MOV       A, D               ;; 1 cycle
+   \   00005B                       ; ------------------------------------- Block: 1 cycles
+   \                     ??hal_aci_tl_q_flush_27:
+   \   00005B 1004                  ADDW      SP, #0x4           ;; 1 cycle
+   \   00005D C4                    POP       DE                 ;; 1 cycle
+   \   00005E C2                    POP       BC                 ;; 1 cycle
+   \   00005F D7                    RET                          ;; 6 cycles
+   \   000060                       ; ------------------------------------- Block: 9 cycles
+   \   000060                       ; ------------------------------------- Total: 89 cycles
+   \   000060                       REQUIRE ?CLRL78_V1_0_L00
+    428          }
+    429          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    430          static uint8_t spi_readwrite(const uint8_t aci_byte)
+   \                     spi_readwrite:
+    431          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    432            //Board dependent defines
+    433          #if defined (__AVR__)
+    434            //For Arduino the transmission does not have to be reversed
+    435            return SPI.transfer(aci_byte);
+    436          #elif defined(__PIC32MX__)
+    437            //For ChipKit the transmission has to be reversed
+    438            uint8_t tmp_bits;
+    439            tmp_bits = SPI.transfer(REVERSE_BITS(aci_byte));
+    440            return REVERSE_BITS(tmp_bits);
+    441          #elif defined (__ICCRL78__)
+    442            return CSI00_SendReceiveData(aci_byte);  
+   \   000000 FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+    443          #endif
+    444          }
+    445          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    446          bool hal_aci_tl_rx_q_empty (void)
+   \                     hal_aci_tl_rx_q_empty:
+    447          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    448            return aci_queue_is_empty(&aci_rx_q);
+   \   000000 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000003 FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   000006 D7                    RET                          ;; 6 cycles
+   \   000007                       ; ------------------------------------- Block: 10 cycles
+   \   000007                       ; ------------------------------------- Total: 10 cycles
+   \   000007                       REQUIRE ?CLRL78_V1_0_L00
+    449          }
+    450          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    451          bool hal_aci_tl_rx_q_full (void)
+   \                     hal_aci_tl_rx_q_full:
+    452          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    453            return aci_queue_is_full(&aci_rx_q);
+   \   000000 30....                MOVW      AX, #aci_rx_q      ;; 1 cycle
+   \   000003 FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000006 D7                    RET                          ;; 6 cycles
+   \   000007                       ; ------------------------------------- Block: 10 cycles
+   \   000007                       ; ------------------------------------- Total: 10 cycles
+   \   000007                       REQUIRE ?CLRL78_V1_0_L00
+    454          }
+    455          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    456          bool hal_aci_tl_tx_q_empty (void)
+   \                     hal_aci_tl_tx_q_empty:
+    457          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    458            return aci_queue_is_empty(&aci_tx_q);
+   \   000000 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   000003 FD....                CALL      aci_queue_is_empty  ;; 3 cycles
+   \   000006 D7                    RET                          ;; 6 cycles
+   \   000007                       ; ------------------------------------- Block: 10 cycles
+   \   000007                       ; ------------------------------------- Total: 10 cycles
+   \   000007                       REQUIRE ?CLRL78_V1_0_L00
+    459          }
+    460          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    461          bool hal_aci_tl_tx_q_full (void)
+   \                     hal_aci_tl_tx_q_full:
+    462          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    463            return aci_queue_is_full(&aci_tx_q);
+   \   000000 30....                MOVW      AX, #aci_tx_q      ;; 1 cycle
+   \   000003 FD....                CALL      aci_queue_is_full  ;; 3 cycles
+   \   000006 D7                    RET                          ;; 6 cycles
+   \   000007                       ; ------------------------------------- Block: 10 cycles
+   \   000007                       ; ------------------------------------- Total: 10 cycles
+   \   000007                       REQUIRE ?CLRL78_V1_0_L00
+    464          }
+    465          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    466          void hal_aci_tl_q_flush (void)
+   \                     hal_aci_tl_q_flush:
+    467          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+    468            m_aci_q_flush();
+   \   000000 FD....                CALL      m_aci_q_flush      ;; 3 cycles
+    469          }
+   \   000003 D7                    RET                          ;; 6 cycles
+   \   000004                       ; ------------------------------------- Block: 9 cycles
+   \   000004                       ; ------------------------------------- Total: 9 cycles
+   \   000004                       REQUIRE ?CLRL78_V1_0_L00
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant " :">`:
+   \   000000 203A00                DB " :"
+   \   000003 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant ", ">`:
+   \   000000 2C2000                DB ", "
+   \   000003 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "">`:
+   \   000000 00                    DB ""
+   \   000001 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant " E">`:
+   \   000000 204500                DB " E"
+   \   000003 00                    DB 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "C">`:
+   \   000000 4300                  DB "C"
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      0   hal_aci_tl_debug_print
+      8   hal_aci_tl_event_get
+        8   -- Indirect call
+        8   -> aci_queue_dequeue
+        8   -> aci_queue_is_empty
+        8   -> aci_queue_is_full
+        8   -> attachInterrupt
+        8   -> m_aci_data_print
+        8   -> m_aci_event_check
+        8   -> m_aci_reqn_enable
+      4   hal_aci_tl_event_peek
+        4   -> aci_queue_peek
+        4   -> m_aci_event_check
+      4   hal_aci_tl_init
+        4   -> CSI00_SendReceiveData
+        4   -> aci_queue_init
+        4   -> attachInterrupt
+        4   -> delay
+        4   -> digitalWrite
+        4   -> hal_aci_tl_pin_reset
+        4   -> m_aci_pins_set
+        4   -> pinMode
+      2   hal_aci_tl_pin_reset
+        2   -> delay
+        2   -> digitalWrite
+        2   -> pinMode
+      0   hal_aci_tl_q_flush
+        0   -> m_aci_q_flush
+      0   hal_aci_tl_rx_q_empty
+        0   -> aci_queue_is_empty
+      0   hal_aci_tl_rx_q_full
+        0   -> aci_queue_is_full
+      8   hal_aci_tl_send
+        8   -- Indirect call
+        8   -> aci_queue_enqueue
+        8   -> aci_queue_is_full
+        8   -> m_aci_data_print
+        8   -> m_aci_reqn_enable
+      0   hal_aci_tl_tx_q_empty
+        0   -> aci_queue_is_empty
+      0   hal_aci_tl_tx_q_full
+        0   -> aci_queue_is_full
+     18   m_aci_data_print
+       18   -- Indirect call
+     68   m_aci_event_check
+       68   -> aci_queue_dequeue
+       68   -> aci_queue_enqueue
+       68   -> aci_queue_is_empty
+       68   -> aci_queue_is_full
+       68   -> digitalRead
+       68   -> m_aci_reqn_enable
+       68   -> m_aci_spi_transfer
+     68   m_aci_isr
+       68   -> aci_queue_dequeue_from_isr
+       68   -> aci_queue_enqueue_from_isr
+       68   -> aci_queue_is_empty_from_isr
+       68   -> aci_queue_is_full_from_isr
+       68   -> detachInterrupt
+       68   -> m_aci_reqn_enable
+       68   -> m_aci_spi_transfer
+      0   m_aci_pins_set
+      0   m_aci_q_flush
+        0   -> aci_queue_init
+        0   -> interrupts
+        0   -> noInterrupts
+      2   m_aci_reqn_disable
+        2   -> digitalWrite
+      2   m_aci_reqn_enable
+        2   -> digitalWrite
+      6   m_aci_spi_transfer
+        6   -> m_aci_reqn_disable
+        6   -> m_aci_reqn_enable
+        6   -> spi_readwrite
+      0   spi_readwrite
+        0   -> CSI00_SendReceiveData
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ?<Constant " :">
+       4  ?<Constant " E">
+       2  ?<Constant "">
+       4  ?<Constant ", ">
+       2  ?<Constant "C">
+       2  a_pins_local_ptr
+       1  aci_debug_print
+     134  aci_rx_q
+     134  aci_tx_q
+       4  hal_aci_tl_debug_print
+     143  hal_aci_tl_event_get
+      32  hal_aci_tl_event_peek
+      83  hal_aci_tl_init
+      89  hal_aci_tl_pin_reset
+       4  hal_aci_tl_q_flush
+       7  hal_aci_tl_rx_q_empty
+       7  hal_aci_tl_rx_q_full
+      96  hal_aci_tl_send
+       7  hal_aci_tl_tx_q_empty
+       7  hal_aci_tl_tx_q_full
+     217  m_aci_data_print
+     114  m_aci_event_check
+      96  m_aci_isr
+       7  m_aci_pins_set
+      19  m_aci_q_flush
+      12  m_aci_reqn_disable
+      12  m_aci_reqn_enable
+     158  m_aci_spi_transfer
+       4  spi_readwrite
+
+ 
+ 1 118 bytes in segment CODE
+    16 bytes in segment NEAR_CONST
+   271 bytes in segment NEAR_Z
+ 
+ 1 118 bytes of CODE  memory
+    16 bytes of CONST memory
+   271 bytes of DATA  memory
+
+Errors: none
+Warnings: 1

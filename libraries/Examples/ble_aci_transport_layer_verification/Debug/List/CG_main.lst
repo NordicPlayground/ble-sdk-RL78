@@ -1,0 +1,304 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 05/Nov/2014  01:15:42
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_main.c
+#    Command line =  
+#        "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_main.c"
+#        --core rl78_1 --code_model near --data_model near
+#        --near_const_location rom0 -o "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\CG_main.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_main.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_main.c
+      1          /*
+      2          *******************************************************************************
+      3          * Copyright(C) 2011 Renesas Electronics Corporation
+      4          * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
+      5          * This program must be used solely for the purpose for which
+      6          * it was furnished by Renesas Electronics Corporation. No part of this
+      7          * program may be reproduced or disclosed to others, in any
+      8          * form, without the prior written permission of Renesas Electronics
+      9          * Corporation. 
+     10          *
+     11          * This device driver was created by Applilet3 for RL78/G13
+     12          * 16-Bit Single-Chip Microcontrollers
+     13          * Filename: CG_main.c
+     14          * Abstract: This file implements main function.
+     15          * APIlib: Applilet3 for RL78/G13 E1.00b [14 Jan 2011]
+     16          * Device: R5F100LE
+     17          * Compiler: IAR Systems iccrl78
+     18          * Creation date:  25/10/2014
+     19          *******************************************************************************
+     20          */
+     21          
+     22          /*
+     23          *******************************************************************************
+     24          ** Include files
+     25          *******************************************************************************
+     26          */
+     27          #include <stdint.h>
+     28          
+     29          #include "CG_macrodriver.h"
+
+   \                                 In  segment SADDR_A, at 0xfff07
+   \   union <unnamed> volatile __saddr _A_P7
+   \                     _A_P7:
+   \   000000                       DS 1
+     30          #include "CG_system.h"
+     31          #include "CG_serial.h"
+     32          #include "CG_timer.h"
+     33          #include "CG_port.h"
+     34          
+     35          /*
+     36          *******************************************************************************
+     37          **  Global define
+     38          *******************************************************************************
+     39          */
+     40          /* Set option bytes */
+     41          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     42          __root const UCHAR opbyte0 = 0xEFU;
+   \                     opbyte0:
+   \   000000 EF                    DB 239
+     43          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     44          __root const UCHAR opbyte1 = 0x73U;
+   \                     opbyte1:
+   \   000000 73                    DB 115
+     45          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     46          __root const UCHAR opbyte2 = 0xE8U;
+   \                     opbyte2:
+   \   000000 E8                    DB 232
+     47          #pragma location = "OPTBYTE"
+
+   \                                 In  segment OPTBYTE, align 1, root
+     48          __root const UCHAR opbyte3 = 0x85U;
+   \                     opbyte3:
+   \   000000 85                    DB 133
+     49          
+     50          /* Set security ID */
+     51          #pragma location = "SECUID"
+
+   \                                 In  segment SECUID, align 2, root
+     52          __root const UCHAR secuid[10] = 
+   \                     secuid:
+   \   000000 FFFFFFFFFFFF          DB 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+     53            {0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU};
+     54          
+     55          
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+     56          uint8_t Data[10] = {'0','1','2','3','4','5','6','7','8','9'};
+   \                     Data:
+   \   000000                       DS 10
+   \   00000A                       REQUIRE `?<Initializer for Data>`
+   \   00000A                       REQUIRE __INIT_NEAR_I
+     57          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     58           void  main(void)
+   \                     main:
+     59          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001                       ; Auto size: 2
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002                       ; ------------------------------------- Block: 2 cycles
+     60            volatile uint8_t dummy;
+     61            while (1)
+     62            {
+     63              delay(50);
+   \                     ??main_0:
+   \   000002 303200                MOVW      AX, #0x32          ;; 1 cycle
+   \   000005 FD....                CALL      delay              ;; 3 cycles
+     64              P7_bit.no7 = ~P7_bit.no7;
+   \   000008 717407                MOV1      CY, S:0xFFF07.7    ;; 1 cycle
+   \   00000B 72                    MOV       C, A               ;; 1 cycle
+   \   00000C F1                    CLRB      A                  ;; 1 cycle
+   \   00000D 61DC                  ROLC      A, 0x1             ;; 1 cycle
+   \   00000F 7CFF                  XOR       A, #0xFF           ;; 1 cycle
+   \   000011 72                    MOV       C, A               ;; 1 cycle
+   \   000012 717407                MOV1      CY, S:0xFFF07.7    ;; 1 cycle
+   \   000015 71C0                  NOT1      CY                 ;; 1 cycle
+   \   000017 717107                MOV1      S:0xFFF07.7, CY    ;; 2 cycles
+     65              printString("Hola amigo. Como estas? Esta es una prueba de un string mas largo que 64 bytes :D");
+   \   00001A 30....                MOVW      AX, #`?<Constant "Hola amigo. Como esta...">`  ;; 1 cycle
+   \   00001D FD....                CALL      printString        ;; 3 cycles
+     66              delay(50);
+   \   000020 303200                MOVW      AX, #0x32          ;; 1 cycle
+   \   000023 FD....                CALL      delay              ;; 3 cycles
+     67              printString("Hola amigo");
+   \   000026 30....                MOVW      AX, #`?<Constant "Hola amigo">`  ;; 1 cycle
+   \   000029 FD....                CALL      printString        ;; 3 cycles
+     68              delay(50);
+   \   00002C 303200                MOVW      AX, #0x32          ;; 1 cycle
+   \   00002F FD....                CALL      delay              ;; 3 cycles
+     69              printHex(0xFA);
+   \   000032 30FA00                MOVW      AX, #0xFA          ;; 1 cycle
+   \   000035 FD....                CALL      printHex           ;; 3 cycles
+     70              delay(50);
+   \   000038 303200                MOVW      AX, #0x32          ;; 1 cycle
+   \   00003B FD....                CALL      delay              ;; 3 cycles
+     71              printDec(75);
+   \   00003E 304B00                MOVW      AX, #0x4B          ;; 1 cycle
+   \   000041 FD....                CALL      printDec           ;; 3 cycles
+     72              delay(50);
+   \   000044 303200                MOVW      AX, #0x32          ;; 1 cycle
+   \   000047 FD....                CALL      delay              ;; 3 cycles
+     73              dummy = CSI00_SendReceiveData(0xFF);
+   \   00004A 51FF                  MOV       A, #0xFF           ;; 1 cycle
+   \   00004C FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   00004F 9800                  MOV       [SP], A            ;; 1 cycle
+     74              digitalWrite(ACI_MISO,0);
+   \   000051 F3                    CLRB      B                  ;; 1 cycle
+   \   000052 E1                    ONEB      A                  ;; 1 cycle
+   \   000053 FD....                CALL      digitalWrite       ;; 3 cycles
+     75              dummy = CSI00_SendReceiveData(0x01);
+   \   000056 E1                    ONEB      A                  ;; 1 cycle
+   \   000057 FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   00005A 9800                  MOV       [SP], A            ;; 1 cycle
+     76              digitalWrite(ACI_MISO,1);
+   \   00005C E3                    ONEB      B                  ;; 1 cycle
+   \   00005D E1                    ONEB      A                  ;; 1 cycle
+   \   00005E FD....                CALL      digitalWrite       ;; 3 cycles
+     77              dummy = CSI00_SendReceiveData(0x02);
+   \   000061 5102                  MOV       A, #0x2            ;; 1 cycle
+   \   000063 FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   000066 9800                  MOV       [SP], A            ;; 1 cycle
+     78              //digitalWrite(ACI_SCLK,0);
+     79              dummy = CSI00_SendReceiveData(0xAA);
+   \   000068 51AA                  MOV       A, #0xAA           ;; 1 cycle
+   \   00006A FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   00006D 9800                  MOV       [SP], A            ;; 1 cycle
+     80              digitalWrite(ACI_SCLK,1);
+   \   00006F E3                    ONEB      B                  ;; 1 cycle
+   \   000070 5102                  MOV       A, #0x2            ;; 1 cycle
+   \   000072 FD....                CALL      digitalWrite       ;; 3 cycles
+     81              digitalWrite(ACI_RESET,1);
+   \   000075 E3                    ONEB      B                  ;; 1 cycle
+   \   000076 5105                  MOV       A, #0x5            ;; 1 cycle
+   \   000078 FD....                CALL      digitalWrite       ;; 3 cycles
+     82              dummy = CSI00_SendReceiveData(0xCC);
+   \   00007B 51CC                  MOV       A, #0xCC           ;; 1 cycle
+   \   00007D FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   000080 9800                  MOV       [SP], A            ;; 1 cycle
+     83              digitalWrite(ACI_RESET,0);
+   \   000082 F3                    CLRB      B                  ;; 1 cycle
+   \   000083 5105                  MOV       A, #0x5            ;; 1 cycle
+   \   000085 FD....                CALL      digitalWrite       ;; 3 cycles
+     84              dummy = digitalRead(ACI_RDYN);
+   \   000088 5104                  MOV       A, #0x4            ;; 1 cycle
+   \   00008A FD....                CALL      digitalRead        ;; 3 cycles
+   \   00008D 9800                  MOV       [SP], A            ;; 1 cycle
+     85              dummy = CSI00_SendReceiveData(dummy);
+   \   00008F 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   000091 FD....                CALL      CSI00_SendReceiveData  ;; 3 cycles
+   \   000094 9800                  MOV       [SP], A            ;; 1 cycle
+     86              digitalWrite(ACI_RESET,1);
+   \   000096 E3                    ONEB      B                  ;; 1 cycle
+   \   000097 5105                  MOV       A, #0x5            ;; 1 cycle
+   \   000099 FD....                CALL      digitalWrite       ;; 3 cycles
+   \   00009C ED....                BR        N:??main_0         ;; 3 cycles
+   \   00009F                       ; ------------------------------------- Block: 114 cycles
+   \   00009F                       ; ------------------------------------- Total: 116 cycles
+   \   00009F                       REQUIRE ?CLRL78_V1_0_L00
+   \   00009F                       REQUIRE _A_P7
+     87              
+     88            }
+     89            
+     90          }
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for Data>`:
+   \   000000 303132333435          DB 48, 49, 50, 51, 52, 53, 54, 55, 56, 57
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Hola amigo. Como esta...">`:
+   \   000000 486F6C612061          DB 48H, 6FH, 6CH, 61H, 20H, 61H, 6DH, 69H
+   \   000008 676F2E20436F          DB 67H, 6FH, 2EH, 20H, 43H, 6FH, 6DH, 6FH
+   \   000010 206573746173          DB 20H, 65H, 73H, 74H, 61H, 73H, 3FH, 20H
+   \   000018 457374612065          DB 45H, 73H, 74H, 61H, 20H, 65H, 73H, 20H
+   \   000020 756E61207072          DB 75H, 6EH, 61H, 20H, 70H, 72H, 75H, 65H
+   \   000028 626120646520          DB 62H, 61H, 20H, 64H, 65H, 20H, 75H, 6EH
+   \   000030 20737472696E          DB 20H, 73H, 74H, 72H, 69H, 6EH, 67H, 20H
+   \   000038 6D6173206C61          DB 6DH, 61H, 73H, 20H, 6CH, 61H, 72H, 67H
+   \   000040 6F2071756520          DB 6FH, 20H, 71H, 75H, 65H, 20H, 36H, 34H
+   \   000048 206279746573          DB 20H, 62H, 79H, 74H, 65H, 73H, 20H, 3AH
+   \   000050 4400                  DB 44H, 0
+
+   \                                 In  segment NEAR_CONST, align 2
+   \                     `?<Constant "Hola amigo">`:
+   \   000000 486F6C612061          DB "Hola amigo"
+   \   00000B 00                    DB 0
+     91          
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      4   main
+        4   -> CSI00_SendReceiveData
+        4   -> delay
+        4   -> digitalRead
+        4   -> digitalWrite
+        4   -> printDec
+        4   -> printHex
+        4   -> printString
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      12  ?<Constant "Hola amigo">
+      82  ?<Constant "Hola amigo. Como esta...">
+      10  ?<Initializer for Data>
+      10  Data
+       1  _A_P7
+     159  main
+       1  opbyte0
+       1  opbyte1
+       1  opbyte2
+       1  opbyte3
+      10  secuid
+
+ 
+ 159 bytes in segment CODE
+  94 bytes in segment NEAR_CONST
+  10 bytes in segment NEAR_I
+  10 bytes in segment NEAR_ID
+   4 bytes in segment OPTBYTE
+   1 byte  in segment SADDR_A
+  10 bytes in segment SECUID
+ 
+ 159 bytes of CODE  memory
+ 118 bytes of CONST memory
+  10 bytes of DATA  memory (+ 1 byte shared)
+
+Errors: none
+Warnings: none

@@ -1,0 +1,539 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:40
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\aci_setup.cpp
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\BLE\aci_setup.cpp" --core rl78_1
+#        --code_model near --data_model near --near_const_location rom0 -o
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\aci_setup.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\aci_setup.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\BLE\aci_setup.cpp
+      1          /* Copyright (c) 2014, Nordic Semiconductor ASA
+      2           *
+      3           * Permission is hereby granted, free of charge, to any person obtaining a copy
+      4           * of this software and associated documentation files (the "Software"), to deal
+      5           * in the Software without restriction, including without limitation the rights
+      6           * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      7           * copies of the Software, and to permit persons to whom the Software is
+      8           * furnished to do so, subject to the following conditions:
+      9           *
+     10           * The above copyright notice and this permission notice shall be included in all
+     11           * copies or substantial portions of the Software.
+     12           *
+     13           * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     14           * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     15           * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     16           * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     17           * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     18           * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+     19           * SOFTWARE.
+     20           */
+     21          
+     22          #include <lib_aci.h>
+     23          #include "aci_setup.h"
+     24          
+     25          
+     26          // aci_struct that will contain 
+     27          // total initial credits
+     28          // current credit
+     29          // current state of the aci (setup/standby/active/sleep)
+     30          // open remote pipe pending
+     31          // close remote pipe pending
+     32          // Current pipe available bitmap
+     33          // Current pipe closed bitmap
+     34          // Current connection interval, slave latency and link supervision timeout
+     35          // Current State of the the GATT client (Service Discovery status)
+     36          
+     37          
+     38          extern hal_aci_data_t msg_to_send;
+     39          
+     40          
+     41          
+     42          /**************************************************************************                */
+     43          /* Utility function to fill the the ACI command queue                                      */
+     44          /* aci_stat               Pointer to the ACI state                                         */
+     45          /* num_cmd_offset(in/out) Offset in the Setup message array to start from                  */
+     46          /*                        offset is updated to the new index after the queue is filled     */
+     47          /*                        or the last message us placed in the queue                       */
+     48          /* Returns                true if at least one message was transferred                     */
+     49          /***************************************************************************/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     50          static bool aci_setup_fill(aci_state_t *aci_stat, uint8_t *num_cmd_offset)
+   \                     aci_setup_fill:
+     51          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C5                    PUSH      DE                 ;; 1 cycle
+   \   000001 C1                    PUSH      AX                 ;; 1 cycle
+   \   000002 C3                    PUSH      BC                 ;; 1 cycle
+   \   000003                       ; Auto size: 10
+   \   000003 2006                  SUBW      SP, #0x6           ;; 1 cycle
+     52            bool ret_val = false;
+   \   000005 F1                    CLRB      A                  ;; 1 cycle
+   \   000006 9800                  MOV       [SP], A            ;; 1 cycle
+   \   000008 EF09                  BR        S:??do_aci_setup_0  ;; 3 cycles
+   \   00000A                       ; ------------------------------------- Block: 9 cycles
+     53            
+     54            while (*num_cmd_offset < aci_stat->aci_setup_info.num_setup_msgs)
+     55            {
+     56            //Board dependent defines
+     57            #if defined (__AVR__)
+     58              //For Arduino copy the setup ACI message from Flash to RAM.
+     59              memcpy_P(&msg_to_send, &(aci_stat->aci_setup_info.setup_msgs[*num_cmd_offset]), 
+     60                    pgm_read_byte_near(&(aci_stat->aci_setup_info.setup_msgs[*num_cmd_offset].buffer[0]))+2); 
+     61            #elif defined(__PIC32MX__)
+     62              //In ChipKit we store the setup messages in RAM
+     63              //Add 2 bytes to the length byte for status byte, length for the total number of bytes
+     64              memcpy(&msg_to_send, &(aci_stat->aci_setup_info.setup_msgs[*num_cmd_offset]), 
+     65                    (aci_stat->aci_setup_info.setup_msgs[*num_cmd_offset].buffer[0]+2)); 
+     66            #elif defined(__ICCRL78__)
+     67              //In RL78 we store the setup messages in FLASH and copy them to RAM.
+     68              memcpy(&msg_to_send, &(aci_stat->aci_setup_info.setup_msgs[*num_cmd_offset]), 
+     69                    (aci_stat->aci_setup_info.setup_msgs[*num_cmd_offset].buffer[0]+2)); 
+     70            #endif
+     71          
+     72              //Put the Setup ACI message in the command queue
+     73              if (!hal_aci_tl_send(&msg_to_send))
+     74              {
+     75                //ACI Command Queue is full
+     76                // *num_cmd_offset is now pointing to the index of the Setup command that did not get sent
+     77                return ret_val;
+     78              }
+     79             
+     80              ret_val = true;
+   \                     ??aci_setup_fill_0:
+   \   00000A E1                    ONEB      A                  ;; 1 cycle
+   \   00000B 9800                  MOV       [SP], A            ;; 1 cycle
+     81              
+     82              (*num_cmd_offset)++;
+   \   00000D A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   00000F 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000010 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000011 81                    INC       A                  ;; 1 cycle
+   \   000012 9B                    MOV       [HL], A            ;; 1 cycle
+   \   000013                       ; ------------------------------------- Block: 7 cycles
+   \                     ??do_aci_setup_0:
+   \   000013 A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   000015 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000016 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000017 73                    MOV       B, A               ;; 1 cycle
+   \   000018 A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   00001A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00001B 8C11                  MOV       A, [HL+0x11]       ;; 1 cycle
+   \   00001D 6143                  CMP       B, A               ;; 1 cycle
+   \   00001F DE7E                  BNC       ??do_aci_setup_1   ;; 4 cycles
+   \   000021                       ; ------------------------------------- Block: 12 cycles
+   \   000021 F6                    CLRW      AX                 ;; 1 cycle
+   \   000022 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000023                       ; ------------------------------------- Block: 2 cycles
+   \                     ??aci_setup_fill_1:
+   \   000023 A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   000025 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000026 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000027 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000028 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000029 8A0F                  MOV       A, [DE+0x0F]       ;; 1 cycle
+   \   00002B 73                    MOV       B, A               ;; 1 cycle
+   \   00002C AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00002E 040400                ADDW      AX, #0x4           ;; 1 cycle
+   \   000031 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000032 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000033 63                    MOV       A, B               ;; 1 cycle
+   \   000034 99                    MOV       [DE], A            ;; 1 cycle
+   \   000035 A7                    INCW      HL                 ;; 1 cycle
+   \   000036 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000037 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   00003A 37                    XCHW      AX, HL             ;; 1 cycle
+   \   00003B DCE6                  BC        ??aci_setup_fill_1  ;; 4 cycles
+   \   00003D                       ; ------------------------------------- Block: 21 cycles
+   \   00003D F6                    CLRW      AX                 ;; 1 cycle
+   \   00003E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00003F                       ; ------------------------------------- Block: 2 cycles
+   \                     ??aci_setup_fill_2:
+   \   00003F A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   000041 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000042 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000043 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000044 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000045 8A0F                  MOV       A, [DE+0x0F]       ;; 1 cycle
+   \   000047 73                    MOV       B, A               ;; 1 cycle
+   \   000048 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00004A 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   00004D 07                    ADDW      AX, HL             ;; 1 cycle
+   \   00004E 14                    MOVW      DE, AX             ;; 1 cycle
+   \   00004F 63                    MOV       A, B               ;; 1 cycle
+   \   000050 99                    MOV       [DE], A            ;; 1 cycle
+   \   000051 A7                    INCW      HL                 ;; 1 cycle
+   \   000052 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000053 440200                CMPW      AX, #0x2           ;; 1 cycle
+   \   000056 37                    XCHW      AX, HL             ;; 1 cycle
+   \   000057 DCE6                  BC        ??aci_setup_fill_2  ;; 4 cycles
+   \   000059                       ; ------------------------------------- Block: 21 cycles
+   \   000059 A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   00005B 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00005C 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00005D 70                    MOV       X, A               ;; 1 cycle
+   \   00005E F1                    CLRB      A                  ;; 1 cycle
+   \   00005F 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   000062 FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000065 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000066 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   000068 07                    ADDW      AX, HL             ;; 1 cycle
+   \   000069 A1                    INCW      AX                 ;; 1 cycle
+   \   00006A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00006B 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   00006C 70                    MOV       X, A               ;; 1 cycle
+   \   00006D F1                    CLRB      A                  ;; 1 cycle
+   \   00006E 040200                ADDW      AX, #0x2           ;; 1 cycle
+   \   000071 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000072 C3                    PUSH      BC                 ;; 1 cycle
+   \   000073 C6                    POP       HL                 ;; 1 cycle
+   \   000074 A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   000076 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000077 89                    MOV       A, [DE]            ;; 1 cycle
+   \   000078 70                    MOV       X, A               ;; 1 cycle
+   \   000079 F1                    CLRB      A                  ;; 1 cycle
+   \   00007A 322100                MOVW      BC, #0x21          ;; 1 cycle
+   \   00007D FD....                CALL      N:?I_MUL_L02       ;; 3 cycles
+   \   000080 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000081 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000083 14                    MOVW      DE, AX             ;; 1 cycle
+   \   000084 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000085 03                    ADDW      AX, BC             ;; 1 cycle
+   \   000086 35                    XCHW      AX, DE             ;; 1 cycle
+   \   000087 C7                    PUSH      HL                 ;; 1 cycle
+   \   000088 C2                    POP       BC                 ;; 1 cycle
+   \   000089 36....                MOVW      HL, #msg_to_send   ;; 1 cycle
+   \   00008C C7                    PUSH      HL                 ;; 1 cycle
+   \   00008D 13                    MOVW      AX, BC             ;; 1 cycle
+   \   00008E FD....                CALL      N:?MEMCPY_NEAR     ;; 3 cycles
+   \   000091 C0                    POP       AX                 ;; 1 cycle
+   \   000092 FD....                CALL      hal_aci_tl_send    ;; 3 cycles
+   \   000095 D1                    CMP0      A                  ;; 1 cycle
+   \   000096 61E8                  SKZ                          ;; 4 cycles
+   \   000098 ED....                BR        N:??aci_setup_fill_0  ;; 4 cycles
+   \   00009B                       ; ------------------------------------- Block: 53 cycles
+   \   00009B 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   00009D EF02                  BR        S:??do_aci_setup_2  ;; 3 cycles
+   \   00009F                       ; ------------------------------------- Block: 4 cycles
+     83            }
+     84            
+     85            return ret_val;
+   \                     ??do_aci_setup_1:
+   \   00009F 8800                  MOV       A, [SP]            ;; 1 cycle
+   \   0000A1                       ; ------------------------------------- Block: 1 cycles
+   \                     ??do_aci_setup_2:
+   \   0000A1 100A                  ADDW      SP, #0xA           ;; 1 cycle
+   \   0000A3 C4                    POP       DE                 ;; 1 cycle
+   \   0000A4 D7                    RET                          ;; 6 cycles
+   \   0000A5                       ; ------------------------------------- Block: 8 cycles
+   \   0000A5                       ; ------------------------------------- Total: 140 cycles
+   \   0000A5                       REQUIRE ?CLRL78_V1_0_L00
+     86          }
+     87          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     88          uint8_t do_aci_setup(aci_state_t *aci_stat)
+   \                     do_aci_setup:
+     89          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000 C3                    PUSH      BC                 ;; 1 cycle
+   \   000001 C5                    PUSH      DE                 ;; 1 cycle
+   \   000002 C1                    PUSH      AX                 ;; 1 cycle
+   \   000003                       ; Auto size: 16
+   \   000003 200E                  SUBW      SP, #0xE           ;; 1 cycle
+     90            uint8_t setup_offset         = 0;
+   \   000005 F1                    CLRB      A                  ;; 1 cycle
+   \   000006 9800                  MOV       [SP], A            ;; 1 cycle
+     91            uint32_t i                   = 0x0000;
+   \   000008 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   00000A 040600                ADDW      AX, #0x6           ;; 1 cycle
+   \   00000D 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00000E F6                    CLRW      AX                 ;; 1 cycle
+   \   00000F BB                    MOVW      [HL], AX           ;; 1 cycle
+   \   000010 F6                    CLRW      AX                 ;; 1 cycle
+   \   000011 BC02                  MOVW      [HL+0x02], AX      ;; 1 cycle
+     92            aci_evt_t * aci_evt          = NULL;
+   \   000013 F6                    CLRW      AX                 ;; 1 cycle
+   \   000014 B804                  MOVW      [SP+0x04], AX      ;; 1 cycle
+     93            aci_status_code_t cmd_status = ACI_STATUS_ERROR_CRC_MISMATCH;
+   \   000016 5588                  MOV       D, #0x88           ;; 1 cycle
+     94            
+     95            /*
+     96            We are using the same buffer since we are copying the contents of the buffer 
+     97            when queuing and immediately processing the buffer when receiving
+     98            */
+     99            hal_aci_evt_t  *aci_data = (hal_aci_evt_t *)&msg_to_send;
+   \   000018 30....                MOVW      AX, #msg_to_send   ;; 1 cycle
+   \   00001B B802                  MOVW      [SP+0x02], AX      ;; 1 cycle
+    100            
+    101            /* Messages in the outgoing queue must be handled before the Setup routine can run.
+    102             * If it is non-empty we return. The user should then process the messages before calling
+    103             * do_aci_setup() again.
+    104             */
+    105            if (!lib_aci_command_queue_empty())
+   \   00001D FD....                CALL      lib_aci_command_queue_empty  ;; 3 cycles
+   \   000020 D1                    CMP0      A                  ;; 1 cycle
+   \   000021 DF04                  BNZ       ??do_aci_setup_3   ;; 4 cycles
+   \   000023                       ; ------------------------------------- Block: 26 cycles
+    106            {
+    107              return SETUP_FAIL_COMMAND_QUEUE_NOT_EMPTY;
+   \   000023 E1                    ONEB      A                  ;; 1 cycle
+   \   000024 ED....                BR        N:??do_aci_setup_4  ;; 3 cycles
+   \   000027                       ; ------------------------------------- Block: 4 cycles
+    108            }
+    109            
+    110            /* If there are events pending from the device that are not relevant to setup, we return false
+    111             * so that the user can handle them. At this point we don't care what the event is,
+    112             * as any event is an error.
+    113             */
+    114            if (lib_aci_event_peek(aci_data))
+   \                     ??do_aci_setup_3:
+   \   000027 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000029 FD....                CALL      lib_aci_event_peek  ;; 3 cycles
+   \   00002C D1                    CMP0      A                  ;; 1 cycle
+   \   00002D DD05                  BZ        ??do_aci_setup_5   ;; 4 cycles
+   \   00002F                       ; ------------------------------------- Block: 9 cycles
+    115            {
+    116              return SETUP_FAIL_EVENT_QUEUE_NOT_EMPTY;
+   \   00002F 5102                  MOV       A, #0x2            ;; 1 cycle
+   \   000031 ED....                BR        N:??do_aci_setup_4  ;; 3 cycles
+   \   000034                       ; ------------------------------------- Block: 4 cycles
+    117            }
+    118            
+    119            /* Fill the ACI command queue with as many Setup messages as it will hold. */
+    120            aci_setup_fill(aci_stat, &setup_offset);
+   \                     ??do_aci_setup_5:
+   \   000034 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000036 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000037 A80E                  MOVW      AX, [SP+0x0E]      ;; 1 cycle
+   \   000039 FD....                CALL      aci_setup_fill     ;; 3 cycles
+   \   00003C EF44                  BR        S:??do_aci_setup_6  ;; 3 cycles
+   \   00003E                       ; ------------------------------------- Block: 9 cycles
+    121            
+    122            while (cmd_status != ACI_STATUS_TRANSACTION_COMPLETE)
+    123            {
+    124              /* This counter is used to ensure that this function does not loop forever. When the device
+    125               * returns a valid response, we reset the counter.
+    126               */
+    127              if (i++ > 0xFFFFE)
+    128              {
+    129                return SETUP_FAIL_TIMEOUT;  
+    130              }
+    131              
+    132              if (lib_aci_event_peek(aci_data))
+   \                     ??do_aci_setup_7:
+   \   00003E A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000040 FD....                CALL      lib_aci_event_peek  ;; 3 cycles
+   \   000043 D1                    CMP0      A                  ;; 1 cycle
+   \   000044 DD3C                  BZ        ??do_aci_setup_6   ;; 4 cycles
+   \   000046                       ; ------------------------------------- Block: 9 cycles
+    133              {
+    134                aci_evt = &(aci_data->evt);
+   \   000046 A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   000048 A1                    INCW      AX                 ;; 1 cycle
+   \   000049 B804                  MOVW      [SP+0x04], AX      ;; 1 cycle
+    135                
+    136                if (ACI_EVT_CMD_RSP != aci_evt->evt_opcode)
+   \   00004B A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00004D A1                    INCW      AX                 ;; 1 cycle
+   \   00004E 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00004F 8B                    MOV       A, [HL]            ;; 1 cycle
+   \   000050 4C84                  CMP       A, #0x84           ;; 1 cycle
+   \   000052 DD04                  BZ        ??do_aci_setup_8   ;; 4 cycles
+   \   000054                       ; ------------------------------------- Block: 12 cycles
+    137                {
+    138                  //Receiving something other than a Command Response Event is an error.
+    139                  return SETUP_FAIL_NOT_COMMAND_RESPONSE;
+   \   000054 5105                  MOV       A, #0x5            ;; 1 cycle
+   \   000056 EF76                  BR        S:??do_aci_setup_4  ;; 3 cycles
+   \   000058                       ; ------------------------------------- Block: 4 cycles
+    140                }
+    141                
+    142                cmd_status = (aci_status_code_t) aci_evt->params.cmd_rsp.cmd_status;
+   \                     ??do_aci_setup_8:
+   \   000058 A804                  MOVW      AX, [SP+0x04]      ;; 1 cycle
+   \   00005A 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00005B 8C03                  MOV       A, [HL+0x03]       ;; 1 cycle
+   \   00005D 75                    MOV       D, A               ;; 1 cycle
+    143                switch (cmd_status)
+   \   00005E 65                    MOV       A, D               ;; 1 cycle
+   \   00005F 91                    DEC       A                  ;; 1 cycle
+   \   000060 DD05                  BZ        ??do_aci_setup_9   ;; 4 cycles
+   \   000062                       ; ------------------------------------- Block: 10 cycles
+   \   000062 91                    DEC       A                  ;; 1 cycle
+   \   000063 DD15                  BZ        ??do_aci_setup_10  ;; 4 cycles
+   \   000065                       ; ------------------------------------- Block: 5 cycles
+   \   000065 EF62                  BR        S:??do_aci_setup_11  ;; 3 cycles
+   \   000067                       ; ------------------------------------- Block: 3 cycles
+    144                {
+    145                  case ACI_STATUS_TRANSACTION_CONTINUE:
+    146                    //As the device is responding, reset guard counter
+    147                    i = 0;
+   \                     ??do_aci_setup_9:
+   \   000067 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000069 040600                ADDW      AX, #0x6           ;; 1 cycle
+   \   00006C 16                    MOVW      HL, AX             ;; 1 cycle
+   \   00006D F6                    CLRW      AX                 ;; 1 cycle
+   \   00006E BB                    MOVW      [HL], AX           ;; 1 cycle
+   \   00006F F6                    CLRW      AX                 ;; 1 cycle
+   \   000070 BC02                  MOVW      [HL+0x02], AX      ;; 1 cycle
+    148                    
+    149                    /* As the device has processed the Setup messages we put in the command queue earlier,
+    150                     * we can proceed to fill the queue with new messages
+    151                     */
+    152                    aci_setup_fill(aci_stat, &setup_offset);
+   \   000072 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000074 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000075 A80E                  MOVW      AX, [SP+0x0E]      ;; 1 cycle
+   \   000077 FD....                CALL      aci_setup_fill     ;; 3 cycles
+    153                    break;
+   \   00007A                       ; ------------------------------------- Block: 13 cycles
+    154                  
+    155                  case ACI_STATUS_TRANSACTION_COMPLETE:
+    156                    //Break out of the while loop when this status code appears
+    157                    break;
+    158                  
+    159                  default:
+    160                    //An event with any other status code should be handled by the application
+    161                    return SETUP_FAIL_NOT_SETUP_EVENT;
+    162                }
+    163                
+    164                /* If we haven't returned at this point, the event was either ACI_STATUS_TRANSACTION_CONTINUE
+    165                 * or ACI_STATUS_TRANSACTION_COMPLETE. We don't need the event itself, so we simply
+    166                 * remove it from the queue.
+    167                 */
+    168                 lib_aci_event_get (aci_stat, aci_data);
+   \                     ??do_aci_setup_10:
+   \   00007A A802                  MOVW      AX, [SP+0x02]      ;; 1 cycle
+   \   00007C 12                    MOVW      BC, AX             ;; 1 cycle
+   \   00007D A80E                  MOVW      AX, [SP+0x0E]      ;; 1 cycle
+   \   00007F FD....                CALL      lib_aci_event_get  ;; 3 cycles
+   \   000082                       ; ------------------------------------- Block: 6 cycles
+   \                     ??do_aci_setup_6:
+   \   000082 65                    MOV       A, D               ;; 1 cycle
+   \   000083 4C02                  CMP       A, #0x2            ;; 1 cycle
+   \   000085 75                    MOV       D, A               ;; 1 cycle
+   \   000086 DD45                  BZ        ??do_aci_setup_12  ;; 4 cycles
+   \   000088                       ; ------------------------------------- Block: 7 cycles
+   \   000088 A806                  MOVW      AX, [SP+0x06]      ;; 1 cycle
+   \   00008A B80A                  MOVW      [SP+0x0A], AX      ;; 1 cycle
+   \   00008C A808                  MOVW      AX, [SP+0x08]      ;; 1 cycle
+   \   00008E B80C                  MOVW      [SP+0x0C], AX      ;; 1 cycle
+   \   000090 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   000092 040A00                ADDW      AX, #0xA           ;; 1 cycle
+   \   000095 16                    MOVW      HL, AX             ;; 1 cycle
+   \   000096 AC02                  MOVW      AX, [HL+0x02]      ;; 1 cycle
+   \   000098 12                    MOVW      BC, AX             ;; 1 cycle
+   \   000099 AB                    MOVW      AX, [HL]           ;; 1 cycle
+   \   00009A 040100                ADDW      AX, #0x1           ;; 1 cycle
+   \   00009D 61D8                  SKNC
+   \   00009F A3                    INCW      BC                 ;; 5 cycles
+   \   0000A0 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000A1 040000                ADDW      AX, #0x0           ;; 1 cycle
+   \   0000A4 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000A5 37                    XCHW      AX, HL             ;; 1 cycle
+   \   0000A6 AEF8                  MOVW      AX, SP             ;; 1 cycle
+   \   0000A8 040600                ADDW      AX, #0x6           ;; 1 cycle
+   \   0000AB 37                    XCHW      AX, HL             ;; 1 cycle
+   \   0000AC BB                    MOVW      [HL], AX           ;; 1 cycle
+   \   0000AD 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000AE BC02                  MOVW      [HL+0x02], AX      ;; 1 cycle
+   \   0000B0 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000B1 A80C                  MOVW      AX, [SP+0x0C]      ;; 1 cycle
+   \   0000B3 12                    MOVW      BC, AX             ;; 1 cycle
+   \   0000B4 A80A                  MOVW      AX, [SP+0x0A]      ;; 1 cycle
+   \   0000B6 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000B7 440F00                CMPW      AX, #0xF           ;; 1 cycle
+   \   0000BA 33                    XCHW      AX, BC             ;; 1 cycle
+   \   0000BB 61F8                  SKNZ                         ;; 4 cycles
+   \   0000BD                       ; ------------------------------------- Block: 37 cycles
+   \   0000BD 44FFFF                CMPW      AX, #0xFFFF        ;; 1 cycle
+   \   0000C0                       ; ------------------------------------- Block: 1 cycles
+   \                     ??do_aci_setup_13:
+   \   0000C0 61D8                  SKNC                         ;; 4 cycles
+   \   0000C2 ED....                BR        N:??do_aci_setup_7  ;; 4 cycles
+   \   0000C5                       ; ------------------------------------- Block: 4 cycles
+   \   0000C5 5103                  MOV       A, #0x3            ;; 1 cycle
+   \   0000C7 EF05                  BR        S:??do_aci_setup_4  ;; 3 cycles
+   \   0000C9                       ; ------------------------------------- Block: 4 cycles
+   \                     ??do_aci_setup_11:
+   \   0000C9 5104                  MOV       A, #0x4            ;; 1 cycle
+   \   0000CB EF01                  BR        S:??do_aci_setup_4  ;; 3 cycles
+   \   0000CD                       ; ------------------------------------- Block: 4 cycles
+    169              }
+    170            }
+    171            
+    172            return SETUP_SUCCESS;
+   \                     ??do_aci_setup_12:
+   \   0000CD F1                    CLRB      A                  ;; 1 cycle
+   \   0000CE                       ; ------------------------------------- Block: 1 cycles
+   \                     ??do_aci_setup_4:
+   \   0000CE 1010                  ADDW      SP, #0x10          ;; 1 cycle
+   \   0000D0 C4                    POP       DE                 ;; 1 cycle
+   \   0000D1 C2                    POP       BC                 ;; 1 cycle
+   \   0000D2 D7                    RET                          ;; 6 cycles
+   \   0000D3                       ; ------------------------------------- Block: 9 cycles
+   \   0000D3                       ; ------------------------------------- Total: 181 cycles
+   \   0000D3                       REQUIRE ?CLRL78_V1_0_L00
+    173          }
+    174            
+    175          
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+     14   aci_setup_fill
+       12   -> hal_aci_tl_send
+     20   do_aci_setup
+       20   -> aci_setup_fill
+       20   -> lib_aci_command_queue_empty
+       20   -> lib_aci_event_get
+       20   -> lib_aci_event_peek
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+     165  aci_setup_fill
+     211  do_aci_setup
+
+ 
+ 376 bytes in segment CODE
+ 
+ 376 bytes of CODE memory
+
+Errors: none
+Warnings: 1

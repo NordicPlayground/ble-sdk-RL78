@@ -1,0 +1,189 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V1.40.1.861 for RL78                 02/Dec/2014  00:18:41
+# Copyright 2011-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Renesas RL78, 16K KickStart Edition 1.40
+#
+#    Core         =  rl78_1
+#    Code model   =  Near
+#    Data model   =  Near
+#                 =   
+#    Source file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\RL78\CG_systeminit.c
+#    Command line =  
+#        "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\RL78\CG_systeminit.c" --core
+#        rl78_1 --code_model near --data_model near --near_const_location rom0
+#        -o "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\rl78\LIB\dlrl78nn1f.h" -e -Ol --no_cse --no_unroll --no_inline
+#        --no_code_motion --no_tbaa --no_crosscall --no_scheduling
+#        --no_clustering --debug -lCN "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\RL78\"
+#        -I "C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\..\..\BLE\"
+#    List file    =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\List\CG_systeminit.lst
+#    Object file  =  
+#        C:\Users\Emilio
+#        García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_systeminit.r87
+#
+###############################################################################
+
+C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\RL78\CG_systeminit.c
+      1          /*
+      2          *******************************************************************************
+      3          * Copyright(C) 2011 Renesas Electronics Corporation
+      4          * RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY
+      5          * This program must be used solely for the purpose for which
+      6          * it was furnished by Renesas Electronics Corporation. No part of this
+      7          * program may be reproduced or disclosed to others, in any
+      8          * form, without the prior written permission of Renesas Electronics
+      9          * Corporation. 
+     10          *
+     11          * This device driver was created by Applilet3 for RL78/G13
+     12          * 16-Bit Single-Chip Microcontrollers
+     13          * Filename: CG_systeminit.c
+     14          * Abstract: This file implements system initializing function.
+     15          * APIlib: Applilet3 for RL78/G13 E1.00b [14 Jan 2011]
+     16          * Device: R5F100LE
+     17          * Compiler: IAR Systems iccrl78
+     18          * Creation date:  25/10/2014
+     19          *******************************************************************************
+     20          */
+     21          
+     22          /*
+     23          *******************************************************************************
+     24          ** Include files
+     25          *******************************************************************************
+     26          */
+     27          #include "CG_macrodriver.h"
+
+   \                                 In  segment NEAR_A, at 0xf0077
+   \   union <unnamed> volatile __no_bit_access _A_PIOR
+   \                     _A_PIOR:
+   \   000000                       DS 1
+     28          #include "CG_system.h"
+     29          #include "CG_serial.h"
+     30          #include "CG_timer.h"
+     31          #include "CG_port.h"
+     32          
+     33          /*
+     34          *******************************************************************************
+     35          **  Global define
+     36          *******************************************************************************
+     37          */
+     38          int __low_level_init(void);
+     39          void systeminit(void);
+     40          
+     41          /*
+     42          **-----------------------------------------------------------------------------
+     43          **
+     44          **  Abstract:
+     45          **  This function initializes every macro.
+     46          **
+     47          **  Parameters:
+     48          **  None
+     49          **
+     50          **  Returns:
+     51          **  None
+     52          **
+     53          **-----------------------------------------------------------------------------
+     54          */
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     55          void systeminit(void)
+   \                     systeminit:
+     56          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     57            PIOR = 0x00U;
+   \   000000 CF770000              MOV       0x77, #0x0         ;; 1 cycle
+     58            PORT_Init();
+   \   000004 FD....                CALL      PORT_Init          ;; 3 cycles
+     59            CLOCK_Init();
+   \   000007 FD....                CALL      CLOCK_Init         ;; 3 cycles
+     60            TAU0_Init();
+   \   00000A FD....                CALL      TAU0_Init          ;; 3 cycles
+     61            SAU0_Init();
+   \   00000D FD....                CALL      SAU0_Init          ;; 3 cycles
+     62          }
+   \   000010 D7                    RET                          ;; 6 cycles
+   \   000011                       ; ------------------------------------- Block: 19 cycles
+   \   000011                       ; ------------------------------------- Total: 19 cycles
+   \   000011                       REQUIRE ?CLRL78_V1_0_L00
+   \   000011                       REQUIRE _A_PIOR
+     63          /*
+     64          **-----------------------------------------------------------------------------
+     65          **
+     66          **  Abstract:
+     67          **  This function initializes hardware setting.
+     68          **
+     69          **  Parameters:
+     70          **  None
+     71          **
+     72          **  Returns:
+     73          **  None
+     74          **
+     75          **-----------------------------------------------------------------------------
+     76          */
+
+   \                                 In  segment CODE, align 1, keep-with-next, root
+     77          int __low_level_init(void)
+   \                     __low_level_init:
+     78          {
+   \   000000                       ; * Stack frame (at entry) *
+   \   000000                       ; Param size: 0
+   \   000000                       ; Auto size: 0
+     79            
+     80            DI();
+   \   000000 717BFA                DI                           ;; 2 cycles
+     81            systeminit();
+   \   000003 FD....                CALL      systeminit         ;; 3 cycles
+     82            EI();
+   \   000006 717AFA                EI                           ;; 2 cycles
+     83            
+     84            return MD_TRUE;
+   \   000009 E6                    ONEW      AX                 ;; 1 cycle
+   \   00000A D7                    RET                          ;; 6 cycles
+   \   00000B                       ; ------------------------------------- Block: 14 cycles
+   \   00000B                       ; ------------------------------------- Total: 14 cycles
+   \   00000B                       REQUIRE ?CLRL78_V1_0_L00
+     85          }
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+      0   __low_level_init
+        0   -> systeminit
+      0   systeminit
+        0   -> CLOCK_Init
+        0   -> PORT_Init
+        0   -> SAU0_Init
+        0   -> TAU0_Init
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       1  _A_PIOR
+      11  __low_level_init
+      17  systeminit
+
+ 
+ 28 bytes in segment CODE
+  1 byte  in segment NEAR_A
+ 
+ 28 bytes of CODE memory
+  0 bytes of DATA memory (+ 1 byte shared)
+
+Errors: none
+Warnings: none

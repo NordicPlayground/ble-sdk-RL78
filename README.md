@@ -142,7 +142,7 @@ Quick start guide
      * Tab `Optmizations`:
          * `Level` : Low.
      * Tab `Preprocessor`:
-        * `Additional include directories` add two lines, `$PROJ_DIR$\..\..\RL78\` and `$PROJ_DIR$\..\..\BLE\`
+        * `Additional include directories` add three lines, `$PROJ_DIR$\..\..\RL78\`, `$PROJ_DIR$\..\..\BLE\` and `$PROJ_DIR$\include\`
   * On the Category `Linker` select:
      * Tab `List`:
          * Tick `Generate Linker list`.

@@ -1,0 +1,2431 @@
+################################################################################
+#                                                                              #
+#      IAR Universal Linker V6.0.3.49                                          #
+#                                                                              #
+#           Link time     =  05/Dec/2014  14:43:21                             #
+#           Target CPU    =  RL78                                              #
+#           List file     =  "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\List\ble_aci_transport_layer_verificatio #
+#                            n.map"                                            #
+#           Output file 1 =  "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Exe\ble_aci_transport_layer_verification #
+#                            .d87"                                             #
+#                            Format: debug                                     #
+#                            UBROF version 10.0.6                              #
+#                            Using library modules for C-SPY (-rt)             #
+#           Command line  =  "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\aci_queue.r87"                       #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\aci_setup.r87"                       #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\acilib.r87"                          #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\CG_port.r87"                         #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\CG_serial.r87"                       #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\CG_system.r87"                       #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\CG_systeminit.r87"                   #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\CG_timer.r87"                        #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\hal_aci_tl.r87"                      #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\hal_platform.r87"                    #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\lib_aci.r87"                         #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Obj\main.r87"                            #
+#                            -D_HUGE_HEAP_SIZE=1000 -o                         #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\Exe\ble_aci_transport_layer_verification #
+#                            .d87"                                             #
+#                            -l                                                #
+#                            "C:\Users\Emilio García\Desktop\ble-sdk-rl78\libr #
+#                            aries\Examples\ble_aci_transport_layer_verificati #
+#                            on\Debug\List\ble_aci_transport_layer_verificatio #
+#                            n.map"                                            #
+#                            -xms                                              #
+#                            "-IC:\Program Files (x86)\IAR Systems\Embedded Wo #
+#                            rkbench 7.0\rl78\LIB\"                            #
+#                            -f                                                #
+#                            "C:\Program Files (x86)\IAR Systems\Embedded Work #
+#                            bench 7.0\rl78\config\lnkr5f100le.xcl"            #
+#                            (-cRL78 -Z(CODE)INTVEC=00000-0007F                #
+#                            -Z(CODE)CLTVEC=00080-000BF                        #
+#                            -Z(CODE)OPTBYTE=000C0-000C3                       #
+#                            -Z(CODE)SECUID=000C4-000CD --segment_mirror       #
+#                            @NEAR_CONST=NEAR_CONST_ID                         #
+#                            -Z(CONST)NEAR_CONST_ID=_NEAR_CONST_LOCATION_START #
+#                            -_NEAR_CONST_LOCATION_END                         #
+#                            -Z(DATA)NEAR_CONST=(_NEAR_CONST_LOCATION_START|F0 #
+#                            000)-(_NEAR_CONST_LOCATION_END|F0000)             #
+#                            -Z(CODE)RCODE,CODE=000D8-0FDFF                    #
+#                            -Z(CONST)SWITCH=000D8-0FDFF                       #
+#                            -Z(CONST)NEAR_ID=[000D8-0FDFF]/10000              #
+#                            -Z(CONST)SADDR_ID=[000D8-0FDFF]/10000             #
+#                            -Z(CONST)DIFUNCT=[000D8-0FDFF]/10000              #
+#                            -Z(CONST)HUGE_ID#0FDFF                            #
+#                            -Z(DATA)HUGE_I=FEF00-FFE1F                        #
+#                            -Z(CONST)FAR_ID#0FDFF -Z(DATA)FAR_I=FEF00-FFE1F   #
+#                            -P(CONST)HUGE_CONST=000D8-0FDFF                   #
+#                            -P(CONST)FAR_CONST,FSWITCH=[000D8-0FDFF]/10000    #
+#                            -P(CODE)XCODE=[000D8-0FDFF]/10000                 #
+#                            -Z(CONST)EEPROM=F1000-F1FFF                       #
+#                            -Z(DATA)WRKSEG=FFE20-FFEDF                        #
+#                            -Z(DATA)SADDR_I,SADDR_Z,SADDR_N=FFE20-FFEDF       #
+#                            -Z(DATA)NEAR_I,NEAR_Z,NEAR_N=FEF00-FFE1F          #
+#                            -Z(DATA)HUGE_Z=FEF00-FFE1F                        #
+#                            -P(DATA)HUGE_N=FEF00-FFE1F                        #
+#                            -Z(DATA)FAR_Z=[FEF00-FFE1F]/10000                 #
+#                            -P(DATA)FAR_N=[FEF00-FFE1F]/10000                 #
+#                            -Z(DATA)NEAR_HEAP+_NEAR_HEAP_SIZE=FEF00-FFE1F     #
+#                            -Z(DATA)HUGE_HEAP+_HUGE_HEAP_SIZE=FEF00-FFE1F     #
+#                            -Z(DATA)FAR_HEAP+_FAR_HEAP_SIZE=[FEF00-FFE1F]/100 #
+#                            00                                                #
+#                            -Z(DATA)CSTACK+_CSTACK_SIZE=FEF00-FFE1F) -rt -s   #
+#                            __program_start -D_NEAR_CONST_LOCATION=0          #
+#                            -D_NEAR_CONST_LOCATION_START=2000                 #
+#                            -D_NEAR_CONST_LOCATION_END=EEFF                   #
+#                            "C:\Program Files (x86)\IAR Systems\Embedded Work #
+#                            bench 7.0\rl78\LIB\dlrl78nn1f.r87"                #
+#                            -e_PrintfSmall=_Printf -e_ScanfSmall=_Scanf       #
+#                            -D_CSTACK_SIZE=100 -D_NEAR_HEAP_SIZE=100          #
+#                            -D_FAR_HEAP_SIZE=1000                             #
+#                                                                              #
+#                           Copyright (C) 1987-2014 IAR Systems AB.            #
+################################################################################
+
+
+
+
+
+                ****************************************
+                *                                      *
+                *           CROSS REFERENCE            *
+                *                                      *
+                ****************************************
+
+       Program entry at :           000000DD  Relocatable, from module : ?CSTARTUP
+
+
+
+
+                ****************************************
+                *                                      *
+                *            RUNTIME MODEL             *
+                *                                      *
+                ****************************************
+
+  __Heap_Handler             = Basic
+  __SystemLibrary            = DLib
+  __code_model               = near
+  __core                     = rl78_1
+  __data_model               = near
+  __dlib_file_descriptor     = 1
+  __dlib_full_locale_support = 1
+  __far_rt_calls             = false
+  __rt_version               = 1
+
+                ****************************************
+                *                                      *
+                *    AUTOMATIC SYMBOL REDIRECTIONS     *
+                *                                      *
+                ****************************************
+
+                  There are no automatic symbol redirections.
+
+
+
+                ****************************************
+                *                                      *
+                *              MODULE MAP              *
+                *                                      *
+                ****************************************
+
+
+  DEFINED ABSOLUTE ENTRIES
+    *************************************************************************
+
+  DEFINED ABSOLUTE ENTRIES
+  PROGRAM MODULE, NAME : ?ABS_ENTRY_MOD
+
+Absolute parts
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _FAR_HEAP_SIZE          00001000 
+           _NEAR_HEAP_SIZE         00000100 
+           _CSTACK_SIZE            00000100 
+           _NEAR_CONST_LOCATION_END
+                                   0000EEFF 
+           _NEAR_CONST_LOCATION_START
+                                   00002000 
+           _NEAR_CONST_LOCATION    00000000        Segment part 4 (?CSTARTUP)
+           _HUGE_HEAP_SIZE         00001000 
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\aci_queue.r87
+  PROGRAM MODULE, NAME : aci_queue
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 000001E9 - 0000023C (0x54 bytes), align: 0
+  Segment part 3.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_init          000001E9        hal_aci_tl_init (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000006 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000023D - 000002A0 (0x64 bytes), align: 0
+  Segment part 4.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_dequeue       0000023D        hal_aci_tl_event_get (hal_aci_tl)
+                                                   m_aci_event_check (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000006 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000002A1 - 00000304 (0x64 bytes), align: 0
+  Segment part 5.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_dequeue_from_isr
+                                   000002A1        m_aci_isr (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000006 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000305 - 00000397 (0x93 bytes), align: 0
+  Segment part 6.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_enqueue       00000305        hal_aci_tl_send (hal_aci_tl)
+                                                   m_aci_event_check (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000398 - 0000042A (0x93 bytes), align: 0
+  Segment part 7.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_enqueue_from_isr
+                                   00000398        m_aci_isr (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000042B - 0000045C (0x32 bytes), align: 0
+  Segment part 8.             Intra module refs:   aci_queue_dequeue
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_is_empty      0000042B        hal_aci_tl_event_get (hal_aci_tl)
+                                                   m_aci_event_check (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000006 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000045D - 0000047D (0x21 bytes), align: 0
+  Segment part 9.             Intra module refs:   aci_queue_dequeue_from_isr
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_is_empty_from_isr
+                                   0000045D        m_aci_isr (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000047E - 000004AC (0x2f bytes), align: 0
+  Segment part 10.            Intra module refs:   aci_queue_enqueue
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_is_full       0000047E        hal_aci_tl_event_get (hal_aci_tl)
+                                                   hal_aci_tl_send (hal_aci_tl)
+                                                   m_aci_event_check (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000004AD - 000004D3 (0x27 bytes), align: 0
+  Segment part 11.            Intra module refs:   aci_queue_enqueue_from_isr
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_queue_is_full_from_isr
+                                   000004AD        m_aci_isr (hal_aci_tl)
+               calls direct
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2000 - 000F2047 (0x48 bytes), align: 1
+  Segment part 2.             Intra module refs:   aci_queue_dequeue
+                                                   aci_queue_dequeue_from_isr
+                                                   aci_queue_enqueue
+                                                   aci_queue_enqueue_from_isr
+                                                   aci_queue_init
+                                                   aci_queue_is_empty
+                                                   aci_queue_is_empty_from_isr
+                                                   aci_queue_is_full
+                                                   aci_queue_is_full_from_isr
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002000 - 00002047 (0x48 bytes), align: 1
+  Segment part 14.            Intra module refs:   Segment part 2
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\aci_setup.r87
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\acilib.r87
+  PROGRAM MODULE, NAME : acilib
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 000004D4 - 000004E2 (0xf bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           acil_encode_cmd_set_test_mode
+                                   000004D4        lib_aci_test (lib_aci)
+               CSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000004E3 - 000004FD (0x1b bytes), align: 0
+  Segment part 18.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           acil_encode_cmd_echo_msg
+                                   000004E3        lib_aci_echo_msg (lib_aci)
+               CSTACK = 00000000 ( 00000004 )
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_port.r87
+  PROGRAM MODULE, NAME : CG_port
+
+  SEGMENTS IN THE MODULE
+  ======================
+SADDR_A
+  Relative segment, address: 000FFF01 - 000FFF01 (0x1 bytes), align: 0
+  Segment part 1. ROOT        Intra module refs:   CSI00_Init (CG_serial)
+                                                   digitalRead
+                                                   digitalWrite
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_P1                   000FFF01 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           P1                      000FFF01 
+           P1_bit                  000FFF01 
+    -------------------------------------------------------------------------
+SADDR_A
+  Relative segment, address: 000FFF07 - 000FFF07 (0x1 bytes), align: 0
+  Segment part 2. ROOT        Intra module refs:   PORT_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_P7                   000FFF07 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           P7                      000FFF07 
+           P7_bit                  000FFF07 
+    -------------------------------------------------------------------------
+SADDR_A
+  Relative segment, address: 000FFF0E - 000FFF0E (0x1 bytes), align: 0
+  Segment part 3. ROOT        Intra module refs:   PORT_Init
+                                                   digitalRead
+                                                   digitalWrite
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_P14                  000FFF0E 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           P14                     000FFF0E 
+           P14_bit                 000FFF0E 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFF27 - 000FFF27 (0x1 bytes), align: 0
+  Segment part 4. ROOT        Intra module refs:   PORT_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PM7                  000FFF27 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PM7                     000FFF27 
+           PM7_bit                 000FFF27 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFF2E - 000FFF2E (0x1 bytes), align: 0
+  Segment part 5. ROOT        Intra module refs:   PORT_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PM14                 000FFF2E 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PM14                    000FFF2E 
+           PM14_bit                000FFF2E 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F003E - 000F003E (0x1 bytes), align: 0
+  Segment part 6. ROOT        Intra module refs:   PORT_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PU14                 000F003E 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PU14                    000F003E 
+           PU14_bit                000F003E 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F006E - 000F006E (0x1 bytes), align: 0
+  Segment part 7. ROOT        Intra module refs:   PORT_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PMC14                000F006E 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PMC14                   000F006E 
+           PMC14_bit               000F006E 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000004FE - 00000512 (0x15 bytes), align: 0
+  Segment part 9.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           PORT_Init               000004FE        systeminit (CG_systeminit)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000513 - 0000055C (0x4a bytes), align: 0
+  Segment part 10.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           digitalRead             00000513        m_aci_event_check (hal_aci_tl)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000055D - 000005B8 (0x5c bytes), align: 0
+  Segment part 11.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           digitalWrite            0000055D        hal_aci_tl_init (hal_aci_tl)
+                                                   hal_aci_tl_pin_reset (hal_aci_tl)
+                                                   m_aci_reqn_disable (hal_aci_tl)
+                                                   m_aci_reqn_enable (hal_aci_tl)
+               CSTACK = 00000000 ( 00000002 )
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_serial.r87
+  PROGRAM MODULE, NAME : CG_serial
+
+  SEGMENTS IN THE MODULE
+  ======================
+SADDR_A
+  Relative segment, address: 000FFF00 - 000FFF00 (0x1 bytes), align: 0
+  Segment part 1. ROOT        Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_P0                   000FFF00 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           P0                      000FFF00 
+           P0_bit                  000FFF00 
+    -------------------------------------------------------------------------
+SADDR_A
+  Relative segment, address: 000FFF10 - 000FFF11 (0x2 bytes), align: 0
+  Segment part 3. ROOT        Intra module refs:   CSI00_Init
+                                                   CSI00_SendReceiveData
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SDR00                000FFF10 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SDR00                   000FFF10 
+           SDR00_bit               000FFF10 
+           SIO00                   000FFF10 
+           SIO00_bit               000FFF10 
+           TXD0                    000FFF10 
+           TXD0_bit                000FFF10 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFF20 - 000FFF20 (0x1 bytes), align: 0
+  Segment part 4. ROOT        Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PM0                  000FFF20 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PM0                     000FFF20 
+           PM0_bit                 000FFF20 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFF21 - 000FFF21 (0x1 bytes), align: 0
+  Segment part 5. ROOT        Intra module refs:   CSI00_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PM1                  000FFF21 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PM1                     000FFF21 
+           PM1_bit                 000FFF21 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFF44 - 000FFF45 (0x2 bytes), align: 0
+  Segment part 6. ROOT        Intra module refs:   UART1_Init
+                                                   UARTtxInterrupt
+                                                   printDec
+                                                   printHex
+                                                   printString
+                                                   writeByte
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SDR02                000FFF44 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SDR02                   000FFF44 
+           SDR02_bit               000FFF44 
+           SIO10                   000FFF44 
+           SIO10_bit               000FFF44 
+           TXD1                    000FFF44 
+           TXD1_bit                000FFF44 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFF46 - 000FFF47 (0x2 bytes), align: 0
+  Segment part 7. ROOT        Intra module refs:   UART1_Init
+                                                   UARTrxInterrupt
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SDR03                000FFF46 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           RXD1                    000FFF46 
+           RXD1_bit                000FFF46 
+           SDR03                   000FFF46 
+           SDR03_bit               000FFF46 
+           SIO11                   000FFF46 
+           SIO11_bit               000FFF46 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFE0 - 000FFFE1 (0x2 bytes), align: 0
+  Segment part 8. ROOT        Intra module refs:   CSI00_Init
+                                                   CSI00_SendReceiveData
+                                                   CSI00_Start
+                                                   TAU0_Init (CG_timer)
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_IF0                  000FFFE0 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           IF0                     000FFFE0 
+           IF0H                    000FFFE1 
+           IF0H_bit                000FFFE1 
+           IF0L                    000FFFE0 
+           IF0L_bit                000FFFE0 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFE2 - 000FFFE3 (0x2 bytes), align: 0
+  Segment part 9. ROOT        Intra module refs:   TAU0_Channel0_Start (CG_timer)
+                                                   TAU0_Channel0_Stop (CG_timer)
+                                                   TAU0_Init (CG_timer)
+                                                   UART1_Init
+                                                   UART1_Start
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_IF1                  000FFFE2 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           IF1                     000FFFE2 
+           IF1H                    000FFFE3 
+           IF1H_bit                000FFFE3 
+           IF1L                    000FFFE2 
+           IF1L_bit                000FFFE2 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFE4 - 000FFFE5 (0x2 bytes), align: 0
+  Segment part 10. ROOT       Intra module refs:   CSI00_Init
+                                                   TAU0_Init (CG_timer)
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_MK0                  000FFFE4 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           MK0                     000FFFE4 
+           MK0H                    000FFFE5 
+           MK0H_bit                000FFFE5 
+           MK0L                    000FFFE4 
+           MK0L_bit                000FFFE4 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFE6 - 000FFFE7 (0x2 bytes), align: 0
+  Segment part 11. ROOT       Intra module refs:   TAU0_Channel0_Start (CG_timer)
+                                                   TAU0_Channel0_Stop (CG_timer)
+                                                   TAU0_Init (CG_timer)
+                                                   UART1_Init
+                                                   UART1_Start
+                                                   printDec
+                                                   printHex
+                                                   printString
+                                                   writeByte
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_MK1                  000FFFE6 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           MK1                     000FFFE6 
+           MK1H                    000FFFE7 
+           MK1H_bit                000FFFE7 
+           MK1L                    000FFFE6 
+           MK1L_bit                000FFFE6 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFE8 - 000FFFE9 (0x2 bytes), align: 0
+  Segment part 12. ROOT       Intra module refs:   CSI00_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PR00                 000FFFE8 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PR00                    000FFFE8 
+           PR00H                   000FFFE9 
+           PR00H_bit               000FFFE9 
+           PR00L                   000FFFE8 
+           PR00L_bit               000FFFE8 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFEA - 000FFFEB (0x2 bytes), align: 0
+  Segment part 13. ROOT       Intra module refs:   TAU0_Init (CG_timer)
+                                                   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PR01                 000FFFEA 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PR01                    000FFFEA 
+           PR01H                   000FFFEB 
+           PR01H_bit               000FFFEB 
+           PR01L                   000FFFEA 
+           PR01L_bit               000FFFEA 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFEC - 000FFFED (0x2 bytes), align: 0
+  Segment part 14. ROOT       Intra module refs:   CSI00_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PR10                 000FFFEC 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PR10                    000FFFEC 
+           PR10H                   000FFFED 
+           PR10H_bit               000FFFED 
+           PR10L                   000FFFEC 
+           PR10L_bit               000FFFEC 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFEE - 000FFFEF (0x2 bytes), align: 0
+  Segment part 15. ROOT       Intra module refs:   TAU0_Init (CG_timer)
+                                                   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PR11                 000FFFEE 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PR11                    000FFFEE 
+           PR11H                   000FFFEF 
+           PR11H_bit               000FFFEF 
+           PR11L                   000FFFEE 
+           PR11L_bit               000FFFEE 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0060 - 000F0060 (0x1 bytes), align: 0
+  Segment part 16. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PMC0                 000F0060 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PMC0                    000F0060 
+           PMC0_bit                000F0060 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0070 - 000F0070 (0x1 bytes), align: 0
+  Segment part 17. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_NFEN0                000F0070 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           NFEN0                   000F0070 
+           NFEN0_bit               000F0070 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F00F0 - 000F00F0 (0x1 bytes), align: 0
+  Segment part 18. ROOT       Intra module refs:   SAU0_Init
+                                                   TAU0_Init (CG_timer)
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PER0                 000F00F0 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PER0                    000F00F0 
+           PER0_bit                000F00F0 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0110 - 000F0111 (0x2 bytes), align: 0
+  Segment part 19. ROOT       Intra module refs:   CSI00_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SMR00                000F0110 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SMR00                   000F0110 
+           SMR00_bit               000F0110 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0114 - 000F0115 (0x2 bytes), align: 0
+  Segment part 20. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SMR02                000F0114 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SMR02                   000F0114 
+           SMR02_bit               000F0114 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0116 - 000F0117 (0x2 bytes), align: 0
+  Segment part 21. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SMR03                000F0116 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SMR03                   000F0116 
+           SMR03_bit               000F0116 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0118 - 000F0119 (0x2 bytes), align: 0
+  Segment part 22. ROOT       Intra module refs:   CSI00_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SCR00                000F0118 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SCR00                   000F0118 
+           SCR00_bit               000F0118 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F011C - 000F011D (0x2 bytes), align: 0
+  Segment part 23. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SCR02                000F011C 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SCR02                   000F011C 
+           SCR02_bit               000F011C 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F011E - 000F011F (0x2 bytes), align: 0
+  Segment part 24. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SCR03                000F011E 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SCR03                   000F011E 
+           SCR03_bit               000F011E 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0122 - 000F0123 (0x2 bytes), align: 0
+  Segment part 25. ROOT       Intra module refs:   CSI00_Start
+                                                   UART1_Start
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SS0                  000F0122 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SS0                     000F0122 
+           SS0L                    000F0122 
+           SS0L_bit                000F0122 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0124 - 000F0125 (0x2 bytes), align: 0
+  Segment part 26. ROOT       Intra module refs:   CSI00_Init
+                                                   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_ST0                  000F0124 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           ST0                     000F0124 
+           ST0L                    000F0124 
+           ST0L_bit                000F0124 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0126 - 000F0127 (0x2 bytes), align: 0
+  Segment part 27. ROOT       Intra module refs:   SAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SPS0                 000F0126 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SPS0                    000F0126 
+           SPS0L                   000F0126 
+           SPS0L_bit               000F0126 
+           SPS0_bit                000F0126 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0128 - 000F0129 (0x2 bytes), align: 0
+  Segment part 28. ROOT       Intra module refs:   CSI00_Init
+                                                   CSI00_Start
+                                                   UART1_Init
+                                                   UART1_Start
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SO0                  000F0128 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SO0                     000F0128 
+           SO0_bit                 000F0128 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F012A - 000F012B (0x2 bytes), align: 0
+  Segment part 29. ROOT       Intra module refs:   CSI00_Init
+                                                   CSI00_Start
+                                                   UART1_Init
+                                                   UART1_Start
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SOE0                 000F012A 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SOE0                    000F012A 
+           SOE0L                   000F012A 
+           SOE0L_bit               000F012A 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0134 - 000F0135 (0x2 bytes), align: 0
+  Segment part 30. ROOT       Intra module refs:   UART1_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_SOL0                 000F0134 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           SOL0                    000F0134 
+           SOL0L                   000F0134 
+           SOL0L_bit               000F0134 
+           SOL0_bit                000F0134 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FEF00 - 000FEF01 (0x2 bytes), align: 1
+  Segment part 35.            Intra module refs:   UARTtxInterrupt
+                                                   printDec
+                                                   printHex
+                                                   printString
+                                                   writeByte
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           addByte                 000FEF00 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF006 - 000FF006 (0x1 bytes), align: 0
+  Segment part 36.            Intra module refs:   UARTtxInterrupt
+                                                   printDec
+                                                   printHex
+                                                   printString
+                                                   writeByte
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           TXcnt                   000FF006 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF007 - 000FF007 (0x1 bytes), align: 0
+  Segment part 37.            Intra module refs:   UART1_Start
+                                                   UARTrxInterrupt
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           RXcnt                   000FF007 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FEF02 - 000FEF81 (0x80 bytes), align: 1
+  Segment part 38.            Intra module refs:   printDec
+                                                   printHex
+                                                   printString
+                                                   writeByte
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           bufferUARTtx            000FEF02 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FEF82 - 000FF001 (0x80 bytes), align: 1
+  Segment part 39.            Intra module refs:   UARTrxInterrupt
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           bufferUARTrx            000FEF82 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF008 - 000FF00D (0x6 bytes), align: 0
+  Segment part 40.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           Serial                  000FF008        __ble_assert (main)
+                                                   hal_aci_tl_event_get (hal_aci_tl)
+                                                   hal_aci_tl_send (hal_aci_tl)
+                                                   loop (main)
+                                                   m_aci_data_print (hal_aci_tl)
+                                                   setup (main)
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2048 - 000F2057 (0x10 bytes), align: 1
+  Segment part 41.            Intra module refs:   printDec
+                                                   printHex
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           tableAscii              000F2048 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF00E - 000FF00E (0x1 bytes), align: 0
+  Segment part 42.            Intra module refs:   CSI00_SendReceiveData
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           RxSPIByte               000FF00E 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000005B9 - 000005D4 (0x1c bytes), align: 0
+  Segment part 43.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           SAU0_Init               000005B9        systeminit (CG_systeminit)
+               calls direct
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000005D5 - 00000648 (0x74 bytes), align: 0
+  Segment part 44.            Intra module refs:   SAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           UART1_Init              000005D5 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000649 - 00000675 (0x2d bytes), align: 0
+  Segment part 45.            Intra module refs:   SAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           UART1_Start             00000649 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000676 - 000007FC (0x187 bytes), align: 0
+  Segment part 47.            Intra module refs:   selectPrint
+                                                   selectPrintln
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           printString             00000676 
+               calls direct
+               CSTACK = 00000000 ( 0000000A )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000007FD - 0000093C (0x140 bytes), align: 0
+  Segment part 48.            Intra module refs:   selectPrint
+                                                   selectPrintln
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           printHex                000007FD 
+               calls direct
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000093D - 00000AAC (0x170 bytes), align: 0
+  Segment part 49.            Intra module refs:   selectPrint
+                                                   selectPrintln
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           printDec                0000093D 
+               calls direct
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000AAD - 00000AD2 (0x26 bytes), align: 0
+  Segment part 50.            Intra module refs:   initializeSerialMonitor
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           selectPrint             00000AAD 
+               calls direct
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000AD3 - 00000AF8 (0x26 bytes), align: 0
+  Segment part 51.            Intra module refs:   initializeSerialMonitor
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           selectPrintln           00000AD3 
+               calls direct
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000AF9 - 00000B48 (0x50 bytes), align: 0
+  Segment part 52.            Intra module refs:   initializeSerialMonitor
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           writeByte               00000AF9 
+               CSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000B49 - 00000BB3 (0x6b bytes), align: 0
+  Segment part 53.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           initializeSerialMonitor
+                                   00000B49        setup (main)
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000BB4 - 00000BD5 (0x22 bytes), align: 0
+  Segment part 54.            Intra module refs:   UARTtxInterrupt::??INTVEC 36
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           UARTtxInterrupt         00000BB4 
+               interrupt function
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000BD6 - 00000BF6 (0x21 bytes), align: 0
+  Segment part 57.            Intra module refs:   UARTrxInterrupt::??INTVEC 38
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           UARTrxInterrupt         00000BD6 
+               interrupt function
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000BF7 - 00000C44 (0x4e bytes), align: 0
+  Segment part 58.            Intra module refs:   SAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           CSI00_Init              00000BF7 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000C45 - 00000C6A (0x26 bytes), align: 0
+  Segment part 59.            Intra module refs:   SAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           CSI00_Start             00000C45 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000C6B - 00000C7E (0x14 bytes), align: 0
+  Segment part 61.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           CSI00_SendReceiveData   00000C6B        hal_aci_tl_init (hal_aci_tl)
+                                                   spi_readwrite (hal_aci_tl)
+    -------------------------------------------------------------------------
+INTVEC
+  Common segment, address: 00000000 - 00000025 (0x26 bytes), align: 1
+  Segment part 31. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           UARTtxInterrupt::??INTVEC 36
+                                   00000024 
+    -------------------------------------------------------------------------
+INTVEC
+  Common segment, address: 00000000 - 00000027 (0x28 bytes), align: 1
+  Segment part 32. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           UARTrxInterrupt::??INTVEC 38
+                                   00000026 
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002048 - 00002057 (0x10 bytes), align: 1
+  Segment part 62.            Intra module refs:   tableAscii
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_system.r87
+  PROGRAM MODULE, NAME : CG_system
+
+  SEGMENTS IN THE MODULE
+  ======================
+NEAR_A
+  Relative segment, address: 000FFFA0 - 000FFFA0 (0x1 bytes), align: 0
+  Segment part 1. ROOT        Intra module refs:   CLOCK_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_CMC                  000FFFA0 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           CMC                     000FFFA0 
+           CMC_bit                 000FFFA0 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFA1 - 000FFFA1 (0x1 bytes), align: 0
+  Segment part 2. ROOT        Intra module refs:   CLOCK_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_CSC                  000FFFA1 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           CSC                     000FFFA1 
+           CSC_bit                 000FFFA1 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFA4 - 000FFFA4 (0x1 bytes), align: 0
+  Segment part 3. ROOT        Intra module refs:   CLOCK_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_CKC                  000FFFA4 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           CKC                     000FFFA4 
+           CKC_bit                 000FFFA4 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F00F3 - 000F00F3 (0x1 bytes), align: 0
+  Segment part 4. ROOT        Intra module refs:   CLOCK_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_OSMC                 000F00F3 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           OSMC                    000F00F3 
+           OSMC_bit                000F00F3 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000C7F - 00000C8C (0xe bytes), align: 0
+  Segment part 6.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           CLOCK_Init              00000C7F        systeminit (CG_systeminit)
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_systeminit.r87
+  PROGRAM MODULE, NAME : CG_systeminit
+
+  SEGMENTS IN THE MODULE
+  ======================
+NEAR_A
+  Relative segment, address: 000F0077 - 000F0077 (0x1 bytes), align: 0
+  Segment part 1. ROOT        Intra module refs:   systeminit
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_PIOR                 000F0077 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           PIOR                    000F0077 
+           PIOR_bit                000F0077 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000C8D - 00000C9D (0x11 bytes), align: 0
+  Segment part 3.             Intra module refs:   __low_level_init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           systeminit              00000C8D 
+               calls direct
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000C9E - 00000CA8 (0xb bytes), align: 0
+  Segment part 4. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           __low_level_init        00000C9E        Segment part 4 (?CSTARTUP)
+               calls direct
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\CG_timer.r87
+  PROGRAM MODULE, NAME : CG_timer
+
+  SEGMENTS IN THE MODULE
+  ======================
+SADDR_A
+  Relative segment, address: 000FFF18 - 000FFF19 (0x2 bytes), align: 0
+  Segment part 1. ROOT        Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TDR00                000FFF18 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TDR00                   000FFF18 
+           TDR00_bit               000FFF18 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFD0 - 000FFFD1 (0x2 bytes), align: 0
+  Segment part 2. ROOT        Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_IF2                  000FFFD0 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           IF2                     000FFFD0 
+           IF2H                    000FFFD1 
+           IF2H_bit                000FFFD1 
+           IF2L                    000FFFD0 
+           IF2L_bit                000FFFD0 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000FFFD4 - 000FFFD5 (0x2 bytes), align: 0
+  Segment part 3. ROOT        Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_MK2                  000FFFD4 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           MK2                     000FFFD4 
+           MK2H                    000FFFD5 
+           MK2H_bit                000FFFD5 
+           MK2L                    000FFFD4 
+           MK2L_bit                000FFFD4 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F0190 - 000F0191 (0x2 bytes), align: 0
+  Segment part 11. ROOT       Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TMR00                000F0190 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TMR00                   000F0190 
+           TMR00_bit               000F0190 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F01B2 - 000F01B3 (0x2 bytes), align: 0
+  Segment part 12. ROOT       Intra module refs:   TAU0_Channel0_Start
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TS0                  000F01B2 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TS0                     000F01B2 
+           TS0L                    000F01B2 
+           TS0L_bit                000F01B2 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F01B4 - 000F01B5 (0x2 bytes), align: 0
+  Segment part 13. ROOT       Intra module refs:   TAU0_Channel0_Stop
+                                                   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TT0                  000F01B4 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TT0                     000F01B4 
+           TT0L                    000F01B4 
+           TT0L_bit                000F01B4 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F01B6 - 000F01B7 (0x2 bytes), align: 0
+  Segment part 14. ROOT       Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TPS0                 000F01B6 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TPS0                    000F01B6 
+           TPS0_bit                000F01B6 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F01B8 - 000F01B9 (0x2 bytes), align: 0
+  Segment part 15. ROOT       Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TO0                  000F01B8 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TO0                     000F01B8 
+           TO0L                    000F01B8 
+           TO0L_bit                000F01B8 
+           TO0_bit                 000F01B8 
+    -------------------------------------------------------------------------
+NEAR_A
+  Relative segment, address: 000F01BA - 000F01BB (0x2 bytes), align: 0
+  Segment part 16. ROOT       Intra module refs:   TAU0_Init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _A_TOE0                 000F01BA 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TOE0                    000F01BA 
+           TOE0L                   000F01BA 
+           TOE0L_bit               000F01BA 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF002 - 000FF003 (0x2 bytes), align: 1
+  Segment part 19.            Intra module refs:   MD_INTTM00
+                                                   delay
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           delay_counter           000FF002 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000CA9 - 00000D0C (0x64 bytes), align: 0
+  Segment part 20.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           TAU0_Init               00000CA9        systeminit (CG_systeminit)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000D0D - 00000D17 (0xb bytes), align: 0
+  Segment part 21.            Intra module refs:   delay
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           TAU0_Channel0_Start     00000D0D 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000D18 - 00000D23 (0xc bytes), align: 0
+  Segment part 22.            Intra module refs:   delay
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           TAU0_Channel0_Stop      00000D18 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000D24 - 00000D37 (0x14 bytes), align: 0
+  Segment part 24.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           delay                   00000D24        hal_aci_tl_init (hal_aci_tl)
+                                                   hal_aci_tl_pin_reset (hal_aci_tl)
+                                                   loop (main)
+                                                   printDec (CG_serial)
+                                                   printHex (CG_serial)
+                                                   printString (CG_serial)
+               calls direct
+               CSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000D38 - 00000D3C (0x5 bytes), align: 0
+  Segment part 25.            Intra module refs:   MD_INTTM00::??INTVEC 44
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           MD_INTTM00              00000D38 
+               interrupt function
+    -------------------------------------------------------------------------
+INTVEC
+  Common segment, address: 00000000 - 0000002D (0x2e bytes), align: 1
+  Segment part 17. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           MD_INTTM00::??INTVEC 44
+                                   0000002C 
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\hal_aci_tl.r87
+  PROGRAM MODULE, NAME : hal_aci_tl
+
+  SEGMENTS IN THE MODULE
+  ======================
+NEAR_Z
+  Relative segment, address: 000FF00F - 000FF00F (0x1 bytes), align: 0
+  Segment part 7.             Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_init
+                                                   hal_aci_tl_send
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           aci_debug_print         000FF00F 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF010 - 000FF095 (0x86 bytes), align: 0
+  Segment part 8.             Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_init
+                                                   hal_aci_tl_send
+                                                   m_aci_event_check
+                                                   m_aci_isr
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_tx_q                000FF010 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF096 - 000FF11B (0x86 bytes), align: 0
+  Segment part 9.             Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_init
+                                                   hal_aci_tl_send
+                                                   m_aci_event_check
+                                                   m_aci_isr
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           aci_rx_q                000FF096 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF004 - 000FF005 (0x2 bytes), align: 1
+  Segment part 10.            Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_pin_reset
+                                                   m_aci_event_check
+                                                   m_aci_isr
+                                                   m_aci_pins_set
+                                                   m_aci_reqn_disable
+                                                   m_aci_reqn_enable
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           a_pins_local_ptr        000FF004 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000D3D - 00000E15 (0xd9 bytes), align: 0
+  Segment part 11.            Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_send
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_data_print        00000D3D 
+               calls indirect
+               CSTACK = 00000000 ( 00000012 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000E16 - 00000E75 (0x60 bytes), align: 0
+  Segment part 12.            Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_init
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_isr               00000E16 
+               calls direct
+               CSTACK = 00000000 ( 00000044 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000E76 - 00000EE7 (0x72 bytes), align: 0
+  Segment part 13.            Intra module refs:   hal_aci_tl_event_get
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_event_check       00000E76 
+               calls direct
+               CSTACK = 00000000 ( 00000044 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000EE8 - 00000EEE (0x7 bytes), align: 0
+  Segment part 14.            Intra module refs:   hal_aci_tl_init
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_pins_set          00000EE8 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000EEF - 00000EFA (0xc bytes), align: 0
+  Segment part 15.            Intra module refs:   m_aci_spi_transfer
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_reqn_disable      00000EEF 
+               calls direct
+               CSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000EFB - 00000F06 (0xc bytes), align: 0
+  Segment part 16.            Intra module refs:   hal_aci_tl_event_get
+                                                   hal_aci_tl_send
+                                                   m_aci_event_check
+                                                   m_aci_isr
+                                                   m_aci_spi_transfer
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_reqn_enable       00000EFB 
+               calls direct
+               CSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000F07 - 00000FA4 (0x9e bytes), align: 0
+  Segment part 18.            Intra module refs:   m_aci_event_check
+                                                   m_aci_isr
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           m_aci_spi_transfer      00000F07 
+               calls direct
+               CSTACK = 00000000 ( 00000006 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000FA5 - 00000FFD (0x59 bytes), align: 0
+  Segment part 20.            Intra module refs:   hal_aci_tl_init
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           hal_aci_tl_pin_reset    00000FA5 
+               calls direct
+               CSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00000FFE - 0000108C (0x8f bytes), align: 0
+  Segment part 22.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           hal_aci_tl_event_get    00000FFE        lib_aci_event_get (lib_aci)
+               calls direct and indirect
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000108D - 000010DF (0x53 bytes), align: 0
+  Segment part 23.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           hal_aci_tl_init         0000108D        setup (main)
+               calls direct
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000010E0 - 0000113F (0x60 bytes), align: 0
+  Segment part 24.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           hal_aci_tl_send         000010E0        lib_aci_echo_msg (lib_aci)
+                                                   lib_aci_test (lib_aci)
+               calls direct and indirect
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00001140 - 00001143 (0x4 bytes), align: 0
+  Segment part 25.            Intra module refs:   m_aci_spi_transfer
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           spi_readwrite           00001140 
+               calls direct
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2058 - 000F205B (0x4 bytes), align: 1
+  Segment part 2.             Intra module refs:   m_aci_data_print
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F205C - 000F205F (0x4 bytes), align: 1
+  Segment part 3.             Intra module refs:   m_aci_data_print
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2060 - 000F2061 (0x2 bytes), align: 1
+  Segment part 4.             Intra module refs:   m_aci_data_print
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2062 - 000F2065 (0x4 bytes), align: 1
+  Segment part 5.             Intra module refs:   hal_aci_tl_event_get
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2066 - 000F2067 (0x2 bytes), align: 1
+  Segment part 6.             Intra module refs:   hal_aci_tl_send
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002058 - 0000205B (0x4 bytes), align: 1
+  Segment part 31.            Intra module refs:   Segment part 2
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000205C - 0000205F (0x4 bytes), align: 1
+  Segment part 32.            Intra module refs:   Segment part 3
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002060 - 00002061 (0x2 bytes), align: 1
+  Segment part 33.            Intra module refs:   Segment part 4
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002062 - 00002065 (0x4 bytes), align: 1
+  Segment part 34.            Intra module refs:   Segment part 5
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002066 - 00002067 (0x2 bytes), align: 1
+  Segment part 35.            Intra module refs:   Segment part 6
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\hal_platform.r87
+  PROGRAM MODULE, NAME : hal_platform
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 00001144 - 00001144 (0x1 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           pinMode                 00001144        hal_aci_tl_init (hal_aci_tl)
+                                                   hal_aci_tl_pin_reset (hal_aci_tl)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00001145 - 00001145 (0x1 bytes), align: 0
+  Segment part 3.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           attachInterrupt         00001145        hal_aci_tl_event_get (hal_aci_tl)
+                                                   hal_aci_tl_init (hal_aci_tl)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00001146 - 00001146 (0x1 bytes), align: 0
+  Segment part 4.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           detachInterrupt         00001146        m_aci_isr (hal_aci_tl)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00001147 - 0000114A (0x4 bytes), align: 0
+  Segment part 5.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           noInterrupts            00001147        aci_queue_is_empty (aci_queue)
+                                                   aci_queue_is_full (aci_queue)
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000114B - 0000114E (0x4 bytes), align: 0
+  Segment part 6.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           interrupts              0000114B        aci_queue_is_empty (aci_queue)
+                                                   aci_queue_is_full (aci_queue)
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\lib_aci.r87
+  PROGRAM MODULE, NAME : lib_aci
+
+  SEGMENTS IN THE MODULE
+  ======================
+NEAR_Z
+  Relative segment, address: 000FF11C - 000FF13C (0x21 bytes), align: 0
+  Segment part 2.             Intra module refs:   lib_aci_echo_msg
+                                                   lib_aci_test
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           msg_to_send             000FF11C 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000114F - 00001165 (0x17 bytes), align: 0
+  Segment part 22.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           lib_aci_test            0000114F        loop (main)
+               calls direct
+               CSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00001166 - 000011A1 (0x3c bytes), align: 0
+  Segment part 43.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           lib_aci_echo_msg        00001166        loop (main)
+               calls direct
+               CSTACK = 00000000 ( 00000024 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000011A2 - 000012C0 (0x11f bytes), align: 0
+  Segment part 46.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           lib_aci_event_get       000011A2        loop (main)
+               calls direct
+               CSTACK = 00000000 ( 00000006 )
+
+    *************************************************************************
+
+  FILE NAME : C:\Users\Emilio García\Desktop\ble-sdk-rl78\libraries\Examples\ble_aci_transport_layer_verification\Debug\Obj\main.r87
+  PROGRAM MODULE, NAME : main
+
+  SEGMENTS IN THE MODULE
+  ======================
+OPTBYTE
+  Relative segment, address: 000000C0 - 000000C0 (0x1 bytes), align: 0
+  Segment part 17. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           opbyte0                 000000C0 
+    -------------------------------------------------------------------------
+OPTBYTE
+  Relative segment, address: 000000C1 - 000000C1 (0x1 bytes), align: 0
+  Segment part 18. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           opbyte1                 000000C1 
+    -------------------------------------------------------------------------
+OPTBYTE
+  Relative segment, address: 000000C2 - 000000C2 (0x1 bytes), align: 0
+  Segment part 19. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           opbyte2                 000000C2 
+    -------------------------------------------------------------------------
+OPTBYTE
+  Relative segment, address: 000000C3 - 000000C3 (0x1 bytes), align: 0
+  Segment part 20. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           opbyte3                 000000C3 
+    -------------------------------------------------------------------------
+SECUID
+  Relative segment, address: 000000C4 - 000000CD (0xa bytes), align: 1
+  Segment part 21. ROOT 
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           secuid                  000000C4 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF13D - 000FF169 (0x2d bytes), align: 0
+  Segment part 22.            Intra module refs:   loop
+                                                   setup
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           aci_state               000FF13D 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF16A - 000FF18B (0x22 bytes), align: 0
+  Segment part 23.            Intra module refs:   loop
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           aci_data                000FF16A 
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2068 - 000F207B (0x14 bytes), align: 1
+  Segment part 24.            Intra module refs:   loop
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           echo_data               000F2068 
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: 000FF18C - 000FF18C (0x1 bytes), align: 0
+  Segment part 25.            Intra module refs:   loop
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           aci_echo_cmd            000FF18C 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 000012C1 - 00001379 (0xb9 bytes), align: 0
+  Segment part 26.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           __ble_assert            000012C1        aci_queue_dequeue (aci_queue)
+                                                   aci_queue_dequeue_from_isr (aci_queue)
+                                                   aci_queue_enqueue (aci_queue)
+                                                   aci_queue_enqueue_from_isr (aci_queue)
+                                                   aci_queue_init (aci_queue)
+                                                   aci_queue_is_empty (aci_queue)
+                                                   aci_queue_is_empty_from_isr (aci_queue)
+                                                   aci_queue_is_full (aci_queue)
+                                                   aci_queue_is_full_from_isr (aci_queue)
+               calls indirect
+               CSTACK = 00000000 ( 00000010 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000137A - 00001401 (0x88 bytes), align: 0
+  Segment part 27.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           setup                   0000137A 
+               calls direct and indirect
+               CSTACK = 00000000 ( 00000008 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 00001402 - 0000164C (0x24b bytes), align: 0
+  Segment part 28.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           loop                    00001402 
+               calls direct and indirect
+               CSTACK = 00000000 ( 0000001C )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: 0000164D - 00001654 (0x8 bytes), align: 0
+  Segment part 29.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           main                    0000164D        Segment part 1 (?__MAIN_CALL)
+               calls direct
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F207C - 000F2083 (0x8 bytes), align: 1
+  Segment part 2.             Intra module refs:   __ble_assert
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2084 - 000F2087 (0x4 bytes), align: 1
+  Segment part 3.             Intra module refs:   __ble_assert
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2088 - 000F2089 (0x2 bytes), align: 1
+  Segment part 4.             Intra module refs:   __ble_assert
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F208A - 000F2097 (0xe bytes), align: 1
+  Segment part 5.             Intra module refs:   setup
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2098 - 000F20AB (0x14 bytes), align: 1
+  Segment part 6.             Intra module refs:   setup
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F20AC - 000F20C5 (0x1a bytes), align: 1
+  Segment part 7.             Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F20C6 - 000F20E1 (0x1c bytes), align: 1
+  Segment part 8.             Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F20E2 - 000F20FB (0x1a bytes), align: 1
+  Segment part 9.             Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F20FC - 000F2117 (0x1c bytes), align: 1
+  Segment part 10.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F2118 - 000F214D (0x36 bytes), align: 1
+  Segment part 11.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F214E - 000F217B (0x2e bytes), align: 1
+  Segment part 12.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F217C - 000F218B (0x10 bytes), align: 1
+  Segment part 13.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F218C - 000F21C3 (0x38 bytes), align: 1
+  Segment part 14.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F21C4 - 000F2209 (0x46 bytes), align: 1
+  Segment part 15.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST
+  Relative segment, address: 000F220A - 000F2211 (0x8 bytes), align: 1
+  Segment part 16.            Intra module refs:   loop
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002068 - 0000207B (0x14 bytes), align: 1
+  Segment part 30.            Intra module refs:   echo_data
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000207C - 00002083 (0x8 bytes), align: 1
+  Segment part 31.            Intra module refs:   Segment part 2
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002084 - 00002087 (0x4 bytes), align: 1
+  Segment part 32.            Intra module refs:   Segment part 3
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002088 - 00002089 (0x2 bytes), align: 1
+  Segment part 33.            Intra module refs:   Segment part 4
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000208A - 00002097 (0xe bytes), align: 1
+  Segment part 34.            Intra module refs:   Segment part 5
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002098 - 000020AB (0x14 bytes), align: 1
+  Segment part 35.            Intra module refs:   Segment part 6
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 000020AC - 000020C5 (0x1a bytes), align: 1
+  Segment part 36.            Intra module refs:   Segment part 7
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 000020C6 - 000020E1 (0x1c bytes), align: 1
+  Segment part 37.            Intra module refs:   Segment part 8
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 000020E2 - 000020FB (0x1a bytes), align: 1
+  Segment part 38.            Intra module refs:   Segment part 9
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 000020FC - 00002117 (0x1c bytes), align: 1
+  Segment part 39.            Intra module refs:   Segment part 10
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 00002118 - 0000214D (0x36 bytes), align: 1
+  Segment part 40.            Intra module refs:   Segment part 11
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000214E - 0000217B (0x2e bytes), align: 1
+  Segment part 41.            Intra module refs:   Segment part 12
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000217C - 0000218B (0x10 bytes), align: 1
+  Segment part 42.            Intra module refs:   Segment part 13
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000218C - 000021C3 (0x38 bytes), align: 1
+  Segment part 43.            Intra module refs:   Segment part 14
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 000021C4 - 00002209 (0x46 bytes), align: 1
+  Segment part 44.            Intra module refs:   Segment part 15
+    -------------------------------------------------------------------------
+NEAR_CONST_ID
+  Relative segment, address: 0000220A - 00002211 (0x8 bytes), align: 1
+  Segment part 45.            Intra module refs:   Segment part 16
+
+    *************************************************************************
+
+  FILE NAME : C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\rl78\LIB\dlrl78nn1f.r87
+  LIBRARY MODULE, NAME : ?__dbg_break
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 00001655 - 00001657 (0x3 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           __DebugBreak            00001655        __exit (?__exit)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__exit
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 00001658 - 00001667 (0x10 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           __exit                  00001658        __iar_exit_end (?_exit)
+               calls direct
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?_exit
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000000D8 - 000000D8 (0x1 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           _exit                   000000D8        exit (?exit)
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000000D9 - 000000DC (0x4 bytes), align: 0
+  Segment part 5.             Intra module refs:   _exit
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           __iar_exit_end          000000DD 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?CSTARTUP
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+CSTACK
+  Relative segment, address: 000FF18E, align: 1
+  Segment part 2. ROOT 
+    -------------------------------------------------------------------------
+INTVEC
+  Common segment, address: 00000000 - 00000001 (0x2 bytes), align: 1
+  Segment part 3. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000000DD - 0000010B (0x2f bytes), align: 0
+  Segment part 4. ROOT        Intra module refs:   Segment part 3
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?C_STARTUP              000000DD 
+           @cstart                 000000DD 
+           __program_start         000000DD        Absolute parts (?ABS_ENTRY_MOD)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__INIT_HUGE_Z
+
+  SEGMENTS IN THE MODULE
+  ======================
+HUGE_Z
+  Relative segment, address: 000FF18D, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__INIT_FAR_Z
+
+  SEGMENTS IN THE MODULE
+  ======================
+FAR_Z
+  Relative segment, address: 000FF18D, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__INIT_NEAR_Z
+
+  SEGMENTS IN THE MODULE
+  ======================
+NEAR_Z
+  Relative segment, address: 000FF18D, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 0000010C - 0000011E (0x13 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           __INIT_NEAR_Z           0000010C        RXcnt (CG_serial)
+                                                   RxSPIByte (CG_serial)
+                                                   Serial (CG_serial)
+                                                   TXcnt (CG_serial)
+                                                   a_pins_local_ptr (hal_aci_tl)
+                                                   aci_data (main)
+                                                   aci_debug_print (hal_aci_tl)
+                                                   aci_echo_cmd (main)
+                                                   aci_rx_q (hal_aci_tl)
+                                                   aci_state (main)
+                                                   aci_tx_q (hal_aci_tl)
+                                                   addByte (CG_serial)
+                                                   bufferUARTrx (CG_serial)
+                                                   bufferUARTtx (CG_serial)
+                                                   delay_counter (CG_timer)
+                                                   msg_to_send (lib_aci)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__INIT_WRKSEG
+
+  SEGMENTS IN THE MODULE
+  ======================
+WRKSEG
+  Relative segment, address: 000FFE20, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__INIT_NEAR_I
+
+  SEGMENTS IN THE MODULE
+  ======================
+NEAR_I
+  Relative segment, address: 000FEF00, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+NEAR_ID
+  Relative segment, address: 000016D3, align: 0
+  Segment part 2. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?__MAIN_CALL
+
+  SEGMENTS IN THE MODULE
+  ======================
+RCODE
+  Relative segment, address: 0000011F - 00000124 (0x6 bytes), align: 0
+  Segment part 1.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           @cend                   00000125 
+           __MAIN_CALL             0000011F        Segment part 4 (?CSTARTUP)
+           __program_end           00000125 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?exit
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 00001668 - 0000166A (0x3 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           exit                    00001668        Segment part 1 (?__MAIN_CALL)
+               calls direct
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?CLRL78_V1_0_L00
+
+Absolute parts
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?CLRL78_V1_0_L00        FFFFFFFF        CLOCK_Init (CG_system)
+                                                   CSI00_Init (CG_serial)
+                                                   CSI00_SendReceiveData (CG_serial)
+                                                   CSI00_Start (CG_serial)
+                                                   MD_INTTM00 (CG_timer)
+                                                   PORT_Init (CG_port)
+                                                   SAU0_Init (CG_serial)
+                                                   TAU0_Channel0_Start (CG_timer)
+                                                   TAU0_Channel0_Stop (CG_timer)
+                                                   TAU0_Init (CG_timer)
+                                                   UART1_Init (CG_serial)
+                                                   UART1_Start (CG_serial)
+                                                   UARTrxInterrupt (CG_serial)
+                                                   UARTtxInterrupt (CG_serial)
+                                                   __DebugBreak (?__dbg_break)
+                                                   __ble_assert (main)
+                                                   __exit (?__exit)
+                                                   __low_level_init (CG_systeminit)
+                                                   aci_queue_dequeue (aci_queue)
+                                                   aci_queue_dequeue_from_isr (aci_queue)
+                                                   aci_queue_enqueue (aci_queue)
+                                                   aci_queue_enqueue_from_isr (aci_queue)
+                                                   aci_queue_init (aci_queue)
+                                                   aci_queue_is_empty (aci_queue)
+                                                   aci_queue_is_empty_from_isr (aci_queue)
+                                                   aci_queue_is_full (aci_queue)
+                                                   aci_queue_is_full_from_isr (aci_queue)
+                                                   acil_encode_cmd_echo_msg (acilib)
+                                                   acil_encode_cmd_set_test_mode (acilib)
+                                                   attachInterrupt (hal_platform)
+                                                   delay (CG_timer)
+                                                   detachInterrupt (hal_platform)
+                                                   digitalRead (CG_port)
+                                                   digitalWrite (CG_port)
+                                                   exit (?exit)
+                                                   hal_aci_tl_event_get (hal_aci_tl)
+                                                   hal_aci_tl_init (hal_aci_tl)
+                                                   hal_aci_tl_pin_reset (hal_aci_tl)
+                                                   hal_aci_tl_send (hal_aci_tl)
+                                                   initializeSerialMonitor (CG_serial)
+                                                   interrupts (hal_platform)
+                                                   lib_aci_echo_msg (lib_aci)
+                                                   lib_aci_event_get (lib_aci)
+                                                   lib_aci_test (lib_aci)
+                                                   loop (main)
+                                                   m_aci_data_print (hal_aci_tl)
+                                                   m_aci_event_check (hal_aci_tl)
+                                                   m_aci_isr (hal_aci_tl)
+                                                   m_aci_pins_set (hal_aci_tl)
+                                                   m_aci_reqn_disable (hal_aci_tl)
+                                                   m_aci_reqn_enable (hal_aci_tl)
+                                                   m_aci_spi_transfer (hal_aci_tl)
+                                                   main (main)
+                                                   memcmp (?memcmp)
+                                                   memmove (?memmove)
+                                                   noInterrupts (hal_platform)
+                                                   pinMode (hal_platform)
+                                                   printDec (CG_serial)
+                                                   printHex (CG_serial)
+                                                   printString (CG_serial)
+                                                   selectPrint (CG_serial)
+                                                   selectPrintln (CG_serial)
+                                                   setup (main)
+                                                   spi_readwrite (hal_aci_tl)
+                                                   strlen (?strlen)
+                                                   systeminit (CG_systeminit)
+                                                   writeByte (CG_serial)
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?UCHAR_DIV_MOD_L01
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 00000125 - 0000014A (0x26 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?UC_DIV_L01             00000125        printDec (CG_serial)
+                                                   printHex (CG_serial)
+           ?UC_MOD_L01             00000133        aci_queue_dequeue (aci_queue)
+                                                   aci_queue_dequeue_from_isr (aci_queue)
+                                                   aci_queue_enqueue (aci_queue)
+                                                   aci_queue_enqueue_from_isr (aci_queue)
+                                                   printDec (CG_serial)
+                                                   printHex (CG_serial)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?UCHAR_DIVUW_L01
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 0000014B - 000001AF (0x65 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?DIVUW_L01              0000014B        Segment part 2 (?UCHAR_DIV_MOD_L01)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?INT_LSH_L02
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?INT_MUL_L02
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000001B0 - 000001CA (0x1b bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?I_MUL_L02              000001B0        aci_queue_dequeue (aci_queue)
+                                                   aci_queue_dequeue_from_isr (aci_queue)
+                                                   aci_queue_enqueue (aci_queue)
+                                                   aci_queue_enqueue_from_isr (aci_queue)
+                                                   aci_queue_init (aci_queue)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?SINT_CMP_L02
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000001CB - 000001D6 (0xc bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?SI_CMP_L02             000001CB        m_aci_spi_transfer (hal_aci_tl)
+                                                   printString (CG_serial)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?LONG_MUL_L03
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?ULONG_DIV_L03
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?LONG_IOR_L03
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?ULONG_CMP_L03
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?LONG_LOAD_DIV_MOD_L03
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?LONG_DIV_L03
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?FUNCTION_LEAVE_L06
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?LONG_FLOAT_DEALLOC_L06
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?WRKSEG_DEFINE_L09
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?CHAR_SSWITCH_L10
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?MEMCPY_NEAR
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000001D7 - 000001E0 (0xa bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?MEMCPY_NEAR            000001DD        aci_queue_enqueue (aci_queue)
+                                                   aci_queue_enqueue_from_isr (aci_queue)
+                                                   acil_encode_cmd_echo_msg (acilib)
+                                                   lib_aci_echo_msg (lib_aci)
+                                                   printString (CG_serial)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?MEMCPY_SMALL_NEAR
+
+  SEGMENTS IN THE MODULE
+  ======================
+__aseg
+  Relative segment, address: 00000000, align: 0
+  Segment part 1. ROOT 
+    -------------------------------------------------------------------------
+RCODE
+  Relative segment, address: 000001E1 - 000001E8 (0x8 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           ?MEMCPY_SMALL_NEAR      000001E1        aci_queue_dequeue (aci_queue)
+                                                   aci_queue_dequeue_from_isr (aci_queue)
+                                                   printString (CG_serial)
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?memcmp
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 0000166B - 00001690 (0x26 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           memcmp                  0000166B        loop (main)
+               CSTACK = 00000000 ( 00000002 )
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?memmove
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 00001691 - 000016C4 (0x34 bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           memmove                 00001691        printDec (CG_serial)
+                                                   printHex (CG_serial)
+                                                   printString (CG_serial)
+               CSTACK = 00000000 ( 00000004 )
+
+    -------------------------------------------------------------------------
+  LIBRARY MODULE, NAME : ?strlen
+
+  SEGMENTS IN THE MODULE
+  ======================
+CODE
+  Relative segment, address: 000016C5 - 000016D2 (0xe bytes), align: 0
+  Segment part 2.
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           strlen                  000016C5        printString (CG_serial)
+               CSTACK = 00000000 ( 00000002 )
+
+
+
+
+                ****************************************
+                *                                      *
+                *      SEGMENTS IN ADDRESS ORDER       *
+                *                                      *
+                ****************************************
+
+
+SEGMENT              SPACE    START ADDRESS   END ADDRESS     SIZE  TYPE  ALIGN
+=======              =====    =============   ===========     ====  ====  =====
+__aseg                                  00000000                     rel    0
+INTVEC                             00000000 - 0000002D          2E   com    1
+OPTBYTE                            000000C0 - 000000C3           4   rel    0
+SECUID                             000000C4 - 000000CD           A   rel    1
+RCODE                              000000D8 - 000001E8         111   rel    0
+CODE                               000001E9 - 000016D2        14EA   rel    0
+NEAR_ID                                 000016D3                     rel    0
+NEAR_CONST_ID                      00002000 - 00002211         212   rel    1
+NEAR_A                             000F003E - 000F003E           1   rel    0
+                                   000F0060 - 000F0060           1 
+                                   000F006E - 000F006E           1 
+                                   000F0070 - 000F0070           1 
+                                   000F0077 - 000F0077           1 
+                                   000F00F0 - 000F00F0           1 
+                                   000F00F3 - 000F00F3           1 
+                                   000F0110 - 000F0111           2 
+                                   000F0114 - 000F0119           6 
+                                   000F011C - 000F011F           4 
+                                   000F0122 - 000F012B           A 
+                                   000F0134 - 000F0135           2 
+                                   000F0190 - 000F0191           2 
+                                   000F01B2 - 000F01BB           A 
+NEAR_CONST                         000F2000 - 000F2211         212   rel    1
+NEAR_I                                  000FEF00                     rel    0
+NEAR_Z                             000FEF00 - 000FF18C         28D   rel    1
+HUGE_Z                                  000FF18D                     rel    0
+FAR_Z                                   000FF18D                     rel    0
+CSTACK                             000FF18E - 000FF28D         100   rel    1
+WRKSEG                                  000FFE20                     rel    0
+SADDR_A                            000FFF00 - 000FFF01           2   rel    0
+                                   000FFF07 - 000FFF07           1 
+                                   000FFF0E - 000FFF0E           1 
+                                   000FFF10 - 000FFF11           2 
+                                   000FFF18 - 000FFF19           2 
+NEAR_A                             000FFF20 - 000FFF21           2   rel    0
+                                   000FFF27 - 000FFF27           1 
+                                   000FFF2E - 000FFF2E           1 
+                                   000FFF44 - 000FFF47           4 
+                                   000FFFA0 - 000FFFA1           2 
+                                   000FFFA4 - 000FFFA4           1 
+                                   000FFFD0 - 000FFFD1           2 
+                                   000FFFD4 - 000FFFD5           2 
+NEAR_A                             000FFFE0 - 000FFFEF          10   rel    0
+
+                ****************************************
+                *                                      *
+                *        END OF CROSS REFERENCE        *
+                *                                      *
+                ****************************************
+
+ 5 687 bytes of CODE  memory
+   909 bytes of DATA  memory (+ 82 absolute )
+   530 bytes of CONST memory
+
+Errors: none
+Warnings: none
+

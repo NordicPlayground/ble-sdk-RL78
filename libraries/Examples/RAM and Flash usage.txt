@@ -1,0 +1,17 @@
+
+RAM and Flash usage - BLE-SDK-RL78 Examples
+
+ble_aci_transport_layer_verification
+ 5 687 bytes of CODE  memory
+   909 bytes of DATA  memory (+ 82 absolute )
+   530 bytes of CONST memory
+
+ble_my_project_template
+ 6 888 bytes of CODE  memory
+   915 bytes of DATA  memory (+ 82 absolute )
+   972 bytes of CONST memory
+ 
+ble_A_Hello_World_Program
+9 082 bytes of CODE  memory
+   993 bytes of DATA  memory (+ 82 absolute )
+ 1 658 bytes of CONST memory
