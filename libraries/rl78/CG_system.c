@@ -51,20 +51,21 @@
 void CLOCK_Init(void)
 {
   /* Set fMX */
-  CMC = _00_CG_HISYS_PORT | _00_CG_SUB_PORT | _00_CG_SYSOSC_DEFAULT | _00_CG_SUBMODE_DEFAULT;   //Set all pins for crystal as normal I/O
+  /*Set all pins for crystal as normal I/O */
+  CMC = _00_CG_HISYS_PORT | _00_CG_SUB_PORT | _00_CG_SYSOSC_DEFAULT | _00_CG_SUBMODE_DEFAULT;
   
-  //MSTOP = 1U;   //Stop X1
+  // MSTOP = 1U;   /*Stop X1 */
   /* Set fSUB */
-  //XTSTOP = 1U;  //Stop fSUB
+  //XTSTOP = 1U;  /*Stop fSUB */
   /* Set fIH */
-  //HIOSTOP = 0U; //Run On-Chip Oscillator
+  //HIOSTOP = 0U; /*Run On-Chip Oscillator */
   CSC = _80_CG_HISYS_STOP | _40_CG_SUB_STOP | _00_CG_HIO_OPER;
 
   /* Set fMAIN */
-  //MCM0 = 0U;    //Select HOCO as fMAIN
+  //MCM0 = 0U;    /*Select HOCO as fMAIN */
   /* Set fCLK */
-  //CSS = 0U;     //Select fMAIN as CPU and peripheral clock
+  //CSS = 0U;     /*Select fMAIN as CPU and peripheral clock */
   CKC = _00_CG_CPUCLK_SELMAIN | _00_CG_MAINCLK_SELHIO;
 
-  OSMC = _10_CG_RTC_CLK_FIL;      //Select Low-speed on-chip oscillator for RTC and Interval timer
+  OSMC = _10_CG_RTC_CLK_FIL;      /*Select Low-speed on-chip oscillator for RTC and Interval timer */
 }

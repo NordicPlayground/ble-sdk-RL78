@@ -60,7 +60,7 @@ void TAU0_Init(void)
 {
   TAU0EN = 1U;    /* supplies input clock */
   TPS0 = _0005_TAU_CKM0_FCLK_5 | _0000_TAU_CKM1_FCLK_0 | _0000_TAU_CKM2_FCLK_1 | _0000_TAU_CKM3_FCLK_8;   
-  //Due to fCLK 32MHz. Prescaler selected fCKL/2^5 = 1 MHz for CKM0. Other CKMx ignored
+  /*Due to fCLK 32MHz. Pre-scaler selected fCKL/2^5 = 1 MHz for CKM0. Other CKMx ignored */
   /* Stop all channels */
   TT0 = _0001_TAU_CH0_STOP_TRG_ON | _0002_TAU_CH1_STOP_TRG_ON | _0004_TAU_CH2_STOP_TRG_ON | _0008_TAU_CH3_STOP_TRG_ON | _0010_TAU_CH4_STOP_TRG_ON | _0020_TAU_CH5_STOP_TRG_ON | _0040_TAU_CH6_STOP_TRG_ON | _0080_TAU_CH7_STOP_TRG_ON | _0200_TAU_CH1_H8_STOP_TRG_ON | _0800_TAU_CH3_H8_STOP_TRG_ON;
   /* Mask channel 0 interrupt */
@@ -98,7 +98,7 @@ void TAU0_Init(void)
   TMPR000 = 1U;
   /* Channel 0 used as interval timer */
   TMR00 = _0000_TAU_CLOCK_SELECT_CKM0 | _0000_TAU_CLOCK_MODE_CKS | _0000_TAU_TRIGGER_SOFTWARE | _0000_TAU_MODE_INTERVAL_TIMER | _0000_TAU_START_INT_UNUSED;
-  TDR00 = 0x03E7U;   //999 counts plus 1. Each count es every 1us = 1ms.
+  TDR00 = 0x03E7U;   /*999 counts plus 1. Each count es every 1us = 1ms */
   TO0 = _0000_TAU_CH0_OUTPUT_VALUE_0;
   TOE0 = _0000_TAU_CH0_OUTPUT_DISABLE;
 }
@@ -120,7 +120,7 @@ void TAU0_Channel0_Start(void)
 {
   TMIF00 = 0U;  /* clear INTTM00 interrupt flag */
   TMMK00 = 0U;  /* enable INTTM00 interrupt */
-  TS0 = _0001_TAU_CH0_START_TRG_ON;   //Start Channel 0 from Timer Array 0
+  TS0 = _0001_TAU_CH0_START_TRG_ON;   /*Start Channel 0 from Timer Array 0 */
 }
 /*
 **-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ void TAU0_Channel0_Start(void)
 */
 void TAU0_Channel0_Stop(void)
 {
-  TT0 |= _0001_TAU_CH0_STOP_TRG_ON;  //Stop Channel 0 from Timer Array 0
+  TT0 |= _0001_TAU_CH0_STOP_TRG_ON;  /*Stop Channel 0 from Timer Array 0 */
   /* Mask channel 0 interrupt */
   TMMK00 = 1U;  /* disable INTTM00 interrupt */
   TMIF00 = 0U;  /* clear INTTM00 interrupt flag */
@@ -166,7 +166,7 @@ void TAU0_Channel0_ChangeTimerCondition(USHORT regvalue)
 **-----------------------------------------------------------------------------
 **
 **  Abstract:
-**  This function performs a delay based on the number of miliseconds as input.
+**  This function performs a delay based on the number of milliseconds as input.
 **
 **  Parameters:
 **  None

@@ -50,22 +50,22 @@
 */
 void PORT_Init(void)
 {
-  //For the LED2
+  /*For the LED2*/
   P7 = _80_Pn7_OUTPUT_1;      
   PM7 = _01_PMn0_NOT_USE | _02_PMn1_NOT_USE | _04_PMn2_NOT_USE | _08_PMn3_NOT_USE | _10_PMn4_NOT_USE | _20_PMn5_NOT_USE | _40_PMn6_NOT_USE | _00_PMn7_MODE_OUTPUT;
-  //For SPI lines of nRF8001
+  /*For SPI lines of nRF8001*/
   P14 = _01_Pn0_OUTPUT_1 | _02_Pn1_OUTPUT_1;    
   PM14 = _00_PMn0_MODE_OUTPUT | _00_PMn1_MODE_OUTPUT | _40_PMn6_NOT_USE | _80_PMn7_MODE_INPUT | _3C_PM14_DEFAULT;
   PU14 = _80_PUn7_PULLUP_ON;
   PMC14 = _00_PMCn7_DI_ON | _7F_PMC14_DEFAULT;
   
-  /*
-  MOSI  Port1.2
-  MISO  Port1.1
-  SCLK  Port1.0
-  REQN  Port14.1
-  RDYN  Port14.7
-  RESET Port14.0
+  /*The pin organization for the ACI is:
+    MOSI  Port1.2
+    MISO  Port1.1
+    SCLK  Port1.0
+    REQN  Port14.1
+    RDYN  Port14.7
+    RESET Port14.0
   */
 }
 /*
@@ -86,7 +86,7 @@ uint8_t digitalRead(uint8_t pin)
 {
   uint8_t result = 0xFF;
   
-  //The only pin that will be use is ACI_RDYN
+  /*The only pin that will be use is ACI_RDYN*/
   switch (pin){
     case ACI_MOSI:
       result = (uint8_t)P1_bit.no2;
@@ -128,8 +128,11 @@ uint8_t digitalRead(uint8_t pin)
 */
 void digitalWrite(uint8_t pin, uint8_t value)
 {
-  //The only pin that will be use is ACI_REQN
-  //MOSI, MISO and Clk have to be  in 1 for the SPI to work properly
+  /*The only pin that will be used is ACI_REQN.
+    MOSI, MISO and Clk have to be set to 1 so SPI work properly.
+    If any if these three pins are set to 0, that pin will not
+    output the value coming from the SPI module.
+  */
   switch (pin){
     case ACI_MOSI:
       P1_bit.no2 = value;

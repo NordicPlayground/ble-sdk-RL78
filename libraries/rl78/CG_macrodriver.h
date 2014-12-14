@@ -45,7 +45,7 @@
 #define NOP   __no_operation
 #define STOP  __stop
 
-/* Data type defintion */
+/* Data type definition */
 typedef unsigned long  ULONG;
 typedef signed long    SLONG;
 
@@ -102,7 +102,9 @@ typedef unsigned short MD_STATUS;
 #define MD_ERROR1          (MD_ERRORBASE + 0x09U)  /* error 1 */
 #define MD_ERROR2          (MD_ERRORBASE + 0x0AU)  /* error 2 */
 #define MD_ERROR3          (MD_ERRORBASE + 0x0BU)  /* error 3 */
-#define MD_ERROR4          (MD_ERRORBASE + 0x0CU)  /* error 4 *//*
+#define MD_ERROR4          (MD_ERRORBASE + 0x0CU)  /* error 4 */
+
+/*
 *******************************************************************************
 **  Function define
 *******************************************************************************

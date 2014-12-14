@@ -62,7 +62,13 @@ However this removes the need to do the setup of the nRF8001 on every reset.
 **  OPTION BYTES CONFIGURATION
 *******************************************************************************
 */
-/* Set option bytes */
+/* Option bytes are registers in RL78 that have to be set before starting any
+   code on the RL78. These registers control several features of the chip such
+   as the watchdog timer, brown out voltage level, enabling debugging, etc. 
+   This pragma is used to set option bytes.
+   For further details please refer to the RL78 G13 hardware user manual,
+   section Option Bytes.
+*/
 #pragma location = "OPTBYTE"
 __root const UCHAR opbyte0 = 0xEFU;
 #pragma location = "OPTBYTE"
@@ -72,7 +78,11 @@ __root const UCHAR opbyte2 = 0xE8U;
 #pragma location = "OPTBYTE"
 __root const UCHAR opbyte3 = 0x85U;
 
-/* Set security ID */
+/* The RL78 has a security feature that allows flash writing or reading only 
+   when the security ID value written on the RL78 matches the value of the 
+   security ID provided by a debug tool.
+   This pragma sets the security ID. This is the default value.
+*/
 #pragma location = "SECUID"
 __root const UCHAR secuid[10] = 
   {0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU};
@@ -117,10 +127,11 @@ void __ble_assert(const char *file, uint16_t line)
 void setup(void)
 {
   #if defined(__ICCRL78__)
-    //The Serial monitor is configured as 9600, 8 data bit, 1 stop bit, no parity
-    //and is configured on the systeminit() at CG_systeminit.c
-    //This call just initializes the structure needed for sending data using 
-    //the same functions name as in Arduino
+    /*The Serial monitor is configured as 115 200 bps, 8 data bit, 1 stop bit, no parity
+      and is configured on the systeminit() at CG_systeminit.c
+      This call just initializes the structure needed for sending data using 
+      the same functions name as in Arduino
+    */
     initializeSerialMonitor(&Serial);
   #else
     Serial.begin(115200);

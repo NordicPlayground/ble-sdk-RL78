@@ -381,12 +381,20 @@ void hal_aci_tl_init(aci_pins_t *a_pins, bool debug)
   hal_aci_tl_pin_reset();
 
   /* Set the nRF8001 to a known state as required by the datasheet*/
-  //digitalWrite(a_pins->miso_pin, 0);
-  //digitalWrite(a_pins->mosi_pin, 0);
-  digitalWrite(a_pins->reqn_pin, 1);
-  //digitalWrite(a_pins->sck_pin,  0);
+  #if defined (__AVR__) || (__PIC32MX__) 
+  /* For ARDUINO and ChipKit the lines have to be set to 0.
+     But in RL78 these lines are automatically set to 0 when we transmit 
+     the first dummy char. Changing the pin register value to 0 not only 
+     changes the pin value but also disables the SPI module. The three pins
+     have to be set to 1 so the SPI module in the RL78 can output data.
+  */
+    digitalWrite(a_pins->miso_pin, 0);
+    digitalWrite(a_pins->mosi_pin, 0);
+    digitalWrite(a_pins->sck_pin,  0);
+  #endif
 
-  //EAGM Delay had to be bigger
+  digitalWrite(a_pins->reqn_pin, 1);
+  
   delay(30); //Wait for the nRF8001 to get hold of its lines - the lines float for a few ms after the reset
 
   /* Attach the interrupt to the RDYN line as requested by the caller */

@@ -82,7 +82,7 @@
    * the next pragma line has to be included in the code.*/ 
   #pragma pack(1)
 
-  //Include the hardware labraries for the RL78
+  //Include the hardware libraries for the RL78
   #include "CG_macrodriver.h"
   #include "CG_system.h"
   #include "CG_serial.h"
@@ -118,11 +118,11 @@
   #define print(x, ...)    print((uint8_t *)(x), TYPE_##__VA_ARGS__ )
   #define println(x, ...)    println((uint8_t *)(x), TYPE_##__VA_ARGS__ )
 
-  //void delay(uint32_t dlyTicks);                            //Implemented on CG_timer.c file
-  //uint8_t digitalRead(uint8_t pin);                         //Implemented on CG_port.c file
-  //void digitalWrite(uint8_t pin, uint8_t value);            //Implemented on CG_port.c file
-  //uint8_t spi_readwrite(uint8_t data_to_send);              //Implemented on CG_serial.c file
-  //void initializeSerialMonitor(SerialAdapter * initSerial)  //Implemented on CG_serial.c file
+  //void delay(uint32_t dlyTicks);                            /*Implemented on CG_timer.c file */
+  //uint8_t digitalRead(uint8_t pin);                         /*Implemented on CG_port.c file */
+  //void digitalWrite(uint8_t pin, uint8_t value);            /*Implemented on CG_port.c file */
+  //uint8_t spi_readwrite(uint8_t data_to_send);              /*Implemented on CG_serial.c file */
+  //void initializeSerialMonitor(SerialAdapter * initSerial)  /*Implemented on CG_serial.c file */
   void pinMode(uint8_t pin, uint8_t pinMode);
   void attachInterrupt(uint8_t interruptNumber, void (*handlerPtr)(void), uint8_t mode);
   void detachInterrupt(uint8_t interruptNumber);
