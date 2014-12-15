@@ -38,7 +38,7 @@ Quick start guide
 
 1. Connect the nRF8001/nRF24L01+ shield adapter to YRPBRL78G13
 
-  | YRPBRL78G13 <br> (J2 and J1 headers)  | nRF24L01+  <br> (P10 and P11 headers) |
+  | YRPBRL78G13 <br> (J2 and J1 headers)  | nRF8001/nRF24L01+  <br> (P10 and P11 headers) |
   |:-------------------------|:----------------------|
   |**J1 pin1**   GND         |**P11 pin2**  GND      |
   |**J1 pin2**   VDD         |**P11 pin4**  5V       |
@@ -50,11 +50,11 @@ Quick start guide
   |**J2 pin4**   p140        |**P10 pin3**  ACI_RESET|
   |**J2 pin26**  p147        |**P10 pin2**  ACI_RDYN |
 
-  There should be connected an external 3.3V source to the nRF24L01+ as unfortunately the YRPBRL78G13 does not provide any 3.3V output. 
-  The 3.3V voltage is needed so the shield can convert the 5V logic from the YRPBRL78G13 to the needed 3.3V logic of the nRF2740 and vice versa.
-  Remember to interconnect all grounds from the nRF24L01+, YRPBRL78G13 and the external voltage source.
+  There should be connected an external 3.3V source to the nRF8001/nRF24L01+ as unfortunately the YRPBRL78G13 does not provide any 3.3V output. 
+  The 3.3V voltage is needed so the shield can convert the 5V logic from the YRPBRL78G13 to the needed 3.3V logic of the nRF8001/nRF2740 and vice versa.
+  Remember to interconnect all grounds from the nRF8001/nRF24L01+, YRPBRL78G13 and the external voltage source.
 
-  A recommendation is to attach a 3.3V voltage regulator between the YRPBRL78G13 and the shield. The input of the voltage regulator has to be connected to any pin that has VDD(5V) from the YRPBRL78G13, and the output has to be connected to the 3.3V pin of the nRF24L01+ shield.
+  A recommendation is to attach a 3.3V voltage regulator between the YRPBRL78G13 and the shield. The input of the voltage regulator has to be connected to any pin that has VDD(5V) from the YRPBRL78G13, and the output has to be connected to the 3.3V pin of the nRF8001/nRF24L01+ .
 
 2. Connect the serial output of the YRPBRL78G13 to a computer/serial reader device.
 
@@ -139,7 +139,7 @@ Quick start guide
      * Tab `Stack/Heap`:
          * `Stack size (bytes)` : 256
   * On the Category `C/C++ Compiler` select:
-     * Tab `Optmizations`:
+     * Tab `Optimizations`:
          * `Level` : Low.
      * Tab `Preprocessor`:
         * `Additional include directories` add three lines, `$PROJ_DIR$\..\..\RL78\`, `$PROJ_DIR$\..\..\BLE\` and `$PROJ_DIR$\include\`
