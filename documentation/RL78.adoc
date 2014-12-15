@@ -1,0 +1,133 @@
+Bluetooth low energy SDK for Renesas RL78
+=========================================
+
+This file describes some features of the porting of BLE SDK to the RL78 architecture.
+
+:numbered:
+Characteristics of RL78
+-----------------------
+
+The RL78 is a Harvard architecture CPU. Meaning it has just one memory space for both, 
+code memory and data memory. Code is saved in flash memory which is located in the lower 
+part of is memory map while the data memory is located in RAM memory which is in the 
+higher part of its memory map.
+
+RL78 is a 16bit microcontroller and implements little endian for data allocation. For 
+more specific details about the RL78 internal contruction please refer to RL78 User 
+Software Manual <<1>>
+
+NOTE: The endianess refers to the way data is stored in memory<<2>>. 'Big endian' correspond 
+to MSB in the lowest address, while 'low endian' corresponds to MSB in the highest address.
+
+The board used for porting SDK-BLE-Arduino was the Renesas demo board YRPBRL78G13. It contains
+a RL78/G13 chip, specifically the R5F100LEAFB. It has 64Kb of Flash memory and 4Kb of RAM memory.
+For further details please refer to the Renesas documentation website of this board. <<3>> 
+
+:numbered:
+Hardware implementation
+-----------------------
+
+The hardware connection is explained in the *README* file of the git repo. Here are two 
+examples of possible hardware implementations. The first one uses an Arduino for providing the 
+necessary 3.3V for the nRF8001/nRF24L01+, and the second one uses an external voltage regulator
+that outputs 3.3V.
+
+[[X1]]
+Implementation using an Arduino
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The next image depicts the connection of all elements.
+
+.All elements with Arduino
+image::images/All_with_arduino.png[System with arduino image]
+
+As it can be seen on the previous image the Arduino is only connected via its power plug and no USB
+cable is used. Also can be seen that the 5V and 3.3V output pins of the Arduino are connected to the
+nRF8001/nRF24L01+. The ACI/SPI pins of the nRF8001/nRF24L01+ are connected to the YRPBRL78G13 board,
+to which it is also connected a serial adapter for seeing its output.
+
+Next image shows a closer view of the Arduino connections.
+
+.Arduino connections
+image::images/Arduino.png[Arduino image]
+
+
+
+As well next image shows a closer view of the nRF8001/nRF24L01+ connections.
+
+.Radio connections
+image::images/Radio.png[Radio image]
+
+On the left side can be seen the ACI/SPI connection and as the image shows not all the ACI/SPI pins 
+are used. On the right side is power pins connection coming from the Arduino.
+
+
+
+Next image depicts the connections of the YRPBRL78G13 board.
+
+.YRPBRL78G13 board connections
+image::images/RL78.png[RL78 image]
+
+In the previous image can be seen which pins are for the serial adapter and which ones are power
+pins. All the other pins are used for ACI/SPI connection. For further details about how connections
+should be please refer to the *README* file of this repo.
+
+
+[[X1]]
+Implementation using an external regulator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Other possibility for connecting the hardware is to use an external voltage regulator. The next image 
+depicts the connection of all elements.
+
+.All elements with external regulator
+image::images/All_with_reg.png[System with external regulator image]
+
+Connections are almost the same for most of the elements. The YRPBRL78G13 board and the 
+nRF8001/nRF24L01+ have exactly the same connections. For this reason its images are not shown again.
+A closer look of the external regulator connections can be seen in the next image.
+
+.Regulator connection
+image::images/Regulator.png[Regulator image]
+
+On the left side comes the 5V input from the YRPBRL78G13 board, and on the right side is the 3.3V output
+that goes to the nRF8001/nRF24L01+.
+
+:numbered:
+Memory usage of example projects
+--------------------------------
+
+The present implementation of the BLE-SDK-RL78 contains three example projects.
+
+* *ble_aci_transport_layer_verification:* This example project tests that the ACI/SPI hardware 
+works properly.
+* *ble_my_project_template:* This example project is an empty template that can be used for 
+starting a new projects.
+* *ble_A_Hello_World_Program:* This example project sends via Bluetooth/UART the string +"Hello world"+
+
+For further explanation about the examples please refer to the examples documentation on the 
+original SDK-BLE-Arduino repo. <<3>>
+
+This repo contains all the IAR project files so you can either download the source files 
+and create a workspace where you can add the three examples as stated on the *README* file, or 
+just download all the repo files and open the IAR workspace that it contains.
+
+.Memory usage
+[width="100%",options="header"]
+|==============================================
+| Example project | Flash usage | RAM usage
+.2+^.^| ble_aci_transport_layer_verification | 5 687 bytes of CODE  memory |909 bytes of DATA  memory (+ 82 absolute )
+                                              |530 bytes of CONST memory|
+.2+^.^| ble_my_project_template | 6 888 bytes of CODE  memory |915 bytes of DATA  memory (+ 82 absolute )
+                                              |972 bytes of CONST memory|
+.2+^.^| ble_A_Hello_World_Program | 9 082 bytes of CODE  memory |993 bytes of DATA  memory (+ 82 absolute )
+                                              | 1 658 bytes of CONST memory|
+|==============================================
+
+
+[bibliography]
+References
+----------
+[bibliography]
+- [[[1]]] RL78 User Software Manual, http://mcs.uwsuper.edu/sb/327/Resources/RL78.pdf
+- [[[2]]] Endianess http://es.wikipedia.org/wiki/Endianness
+- [[[3]]] Renesas documentation website about YRPBRL78G13 http://am.renesas.com/products/tools/introductory_evaluation_tools/renesas_promo_board/yrpbrl78g13/Documentation.jsp
+- [[[4]]] BLE-SDK-Arduino examples documentation https://github.com/NordicSemiconductor/ble-sdk-arduino/tree/master/documentation/libraries/BLE/examples
