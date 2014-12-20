@@ -7,7 +7,8 @@ This file describes some features of the porting of BLE SDK to the RL78 architec
 Characteristics of RL78
 -----------------------
 
-The RL78 is a Harvard architecture CPU. Meaning it has just one memory space for both, 
+The RL78 is a Harvard architecture CPU because it has one bus for fetching instructions 
+and another one for fetching data, however it has just one memory space for both, 
 code memory and data memory. Code is saved in flash memory which is located in the lower 
 part of is memory map while the data memory is located in RAM memory which is in the 
 higher part of its memory map.
