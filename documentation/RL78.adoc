@@ -39,7 +39,7 @@ Implementation using an Arduino
 The next image depicts the connection of all elements.
 
 .All elements with Arduino
-image::images/All_with_arduino.png[System with arduino image, link="https://github.com/NordicSemiconductor/ble-sdk-RL78/blob/master/documentation/Images/All_with_arduino.png"]
+image::images/All_with_arduino.png[System with arduino image, link="https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/All_with_arduino.png?token=AGb1cxlLkkThK8p5J9mAKbZFOcL67njhks5Uuqo0wA%3D%3D"]
 
 As it can be seen on the previous image the Arduino is only connected via its power plug and no USB
 cable is used. Also can be seen that the 5V and 3.3V output pins of the Arduino are connected to the
