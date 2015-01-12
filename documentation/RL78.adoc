@@ -1,7 +1,7 @@
+:imagesdir: ./Images
+
 Bluetooth low energy SDK for Renesas RL78
 =========================================
-
-:image-uri-screenshot: https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/All_with_arduino.png?token=AGb1c7mcLx6TYFmK1DeEAZ0fK2wk-b8iks5UvOcBwA%3D%3D
 
 This file describes some features of the porting of BLE SDK to the RL78 architecture.
 
@@ -42,8 +42,6 @@ The next image depicts the connection of all elements.
 
 .All elements with Arduino
 image::https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/All_with_arduino.png?token=AGb1c7mcLx6TYFmK1DeEAZ0fK2wk-b8iks5UvOcBwA%3D%3D[System with arduino image]
-//image::images/All_with_arduino.png[System with arduino image, link="https://raw.github.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/All_with_arduino.png"]
-//image::{image-uri-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
 As it can be seen on the previous image the Arduino is only connected via its power plug and no USB
 cable is used. Also can be seen that the 5V and 3.3V output pins of the Arduino are connected to the
@@ -53,14 +51,14 @@ to which it is also connected a serial adapter for seeing its output.
 Next image shows a closer view of the Arduino connections.
 
 .Arduino connections
-image::images/Arduino.png[Arduino image]
+image::https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/Arduino.png?token=AGb1c-K7-ZBRMIllDiPJCLxAS2P6v6o8ks5UvOnrwA%3D%3D[Arduino image]
 
 
 
 As well next image shows a closer view of the nRF8001/nRF24L01+ connections.
 
 .Radio connections
-image::images/Radio.png[Radio image]
+image::https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/Radio.png?token=AGb1czSn6bF_AyTarwnkHs8j_4oPIdWPks5UvOorwA%3D%3D[Radio image]
 
 On the left side can be seen the ACI/SPI connection and as the image shows not all the ACI/SPI pins 
 are used. On the right side is power pins connection coming from the Arduino.
@@ -70,7 +68,7 @@ are used. On the right side is power pins connection coming from the Arduino.
 Next image depicts the connections of the YRPBRL78G13 board.
 
 .YRPBRL78G13 board connections
-image::images/RL78.png[RL78 image]
+image::https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/RL78.png?token=AGb1cxHDdHYj5JoT93-geVyuhHx44L09ks5UvOpCwA%3D%3D[RL78 image]
 
 In the previous image can be seen which pins are for the serial adapter and which ones are power
 pins. All the other pins are used for ACI/SPI connection. For further details about how connections
@@ -84,14 +82,14 @@ Other possibility for connecting the hardware is to use an external voltage regu
 depicts the connection of all elements.
 
 .All elements with external regulator
-image::images/All_with_reg.png[System with external regulator image]
+image::https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/All_with_reg.png?token=AGb1c-7o-v3q18IgzXbl01OTXafv7KVNks5UvOpjwA%3D%3D[System with external regulator image]
 
 Connections are almost the same for most of the elements. The YRPBRL78G13 board and the 
 nRF8001/nRF24L01+ have exactly the same connections. For this reason its images are not shown again.
 A closer look of the external regulator connections can be seen in the next image.
 
 .Regulator connection
-image::images/Regulator.png[Regulator image]
+image::https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/Regulator.png?token=AGb1c7vKUUdShg-WqA0LnB58k5siaYN4ks5UvOpVwA%3D%3D[Regulator image]
 
 On the left side comes the 5V input from the YRPBRL78G13 board, and on the right side is the 3.3V output
 that goes to the nRF8001/nRF24L01+.
