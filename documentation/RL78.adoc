@@ -1,7 +1,7 @@
 Bluetooth low energy SDK for Renesas RL78
 =========================================
 
-:image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
+:image-uri-screenshot: https://raw.githubusercontent.com/NordicSemiconductor/ble-sdk-RL78/master/documentation/Images/All_with_arduino.png?token=AGb1c7mcLx6TYFmK1DeEAZ0fK2wk-b8iks5UvOcBwA%3D%3D
 
 This file describes some features of the porting of BLE SDK to the RL78 architecture.
 
