@@ -6,7 +6,7 @@ This uses the Nordic Semiconductor nRF8001 chip which is embedded on the nRF2740
 This adapter was connected to the Renesas demo board [YRPBRL78G13 (RL78/G13)](http://am.renesas.com/products/tools/introductory_evaluation_tools/renesas_promo_board/yrpbrl78g13/index.jsp). The programming IDE used is IAR Embedded Workbench for Renesas RL78 version 1.40.1. It can be downloaded from the [IAR website](http://www.iar.com/Products/IAR-Embedded-Workbench/Renesas-RL78/).
 
 
-The nRF2740 board and the nRF8001/nRF24L01+ shield adapter for Arduino are part of the nRF8001 Development kit. Alternatively you can use an [nRF8001 breakout board](http://www.adafruit.com/products/1697) or [shield](http://www.seeedstudio.com/depot/bluetooth-40-low-energy-ble-shield-v20-p-1631.html). 
+The nRF2740 board and the nRF8001/nRF24L01+ shield adapter for Arduino are part of the [nRF8001 Development kit](https://www.nordicsemi.com/eng/Products/Bluetooth-Smart-Bluetooth-low-energy/nRF8001-Development-Kit). Alternatively you can use an [nRF8001 breakout board](http://www.adafruit.com/products/1697) or [shield](http://www.seeedstudio.com/depot/Bluetooth-40-Low-EnergyBLE-Shield-v21-p-1995.html). 
 For further details about the nRF8001 chip, the nRF2740 board and the nRF8001/nRF24L01+ shield adapter for Arduino please refer to the [Nordic Semiconductor website](http://www.nordicsemi.com).
 
 This port is backward compatible with Arduino, but the file `hal_platform.cpp` has to be deleted. In case you want to use the BLE library with an Arduino it is recommended to use the original repo: [ble-sdk-arduino](https://github.com/NordicSemiconductor/ble-sdk-arduino)
